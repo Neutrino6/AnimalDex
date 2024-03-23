@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    
+    <link rel="stylesheet" href="1 bootstrap/css/bootstrap.css" />
+    <script src="1 bootstrap/js/bootstrap.bundle.js"></script>
+    
+    <link rel = "stylesheet" href = "generale.css" />
+
+    <title> Personal Page </title>
+    
+<!--  aggiungere modifica immagine e vedere come
+fare per modificare i vari campi -->
+
+
+</head>
+
+<body>
+<!-- navbar in alto -->
+    <nav class="navbar navbar-expand-lg bg-light">
+        <div class="container-fluid">
+            <a id="logo" class="navbar-brand" href="#">
+                </a>
+
+            <div>
+          <button class="navbar-toggler" type="button"
+          data-bs-toggle="collapse" data-bs-target="#target"
+          aria-controls="target" aria-expanded="false"
+          aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="target">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link" href="home.html">Home</a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                  Menù
+                </a>
+                <ul class="dropdown-menu text-center">
+                  <li><a class="dropdown-item" href="chisiamo.html">Chi siamo</a></li>
+                  <li><a class="dropdown-item" href="dovesiamo.html">Dove siamo</a></li>
+                  <li><a class="dropdown-item" href="corsi.html">Corsi</a></li>
+                  <li><a class="dropdown-item" href="gallery.html">Gallery</a></li>
+                  <li><a class="dropdown-item" href="eventi.html">Eventi</a></li>
+                  <li><a class="dropdown-item" href="contatti.html">Contatti</a></li>
+                </ul>
+            </li>
+        </ul>
+        </div>
+        </div>
+     </div>
+</nav>
+
+
+<br>
+<br>
+
+        <br>
+
+<!-- form con tutti i dati-->
+    <form action = "iscrizione.php" class = "form-signin m-auto"
+        method = "POST" name = "iscrizione" onSubmit = "return validaIscrizione()">
+
+
+        
+            <input type="email" name="e-mail" 
+            placeholder = "E-mail"
+            class = "form-control">
+            
+            <a class="link" href="gallery.html">Change e-mail</a>
+            <br><br>
+              
+            <input type="number" name="operatorcode"  
+            placeholder = "Operator code"
+            class = "form-control">
+            <a class="link" href="gallery.html">Operator code</a>
+
+    <br><br>
+
+          
+            <input type="text" name="name" 
+                placeholder = "Name"
+                class = "form-control">
+                <a class="link" href="gallery.html">Change name</a>
+            <br><br>
+            
+            <input type="text" name="surname" 
+            placeholder = "Surname"
+            class = "form-control">
+            <a class="link" href="gallery.html">Change surname</a>
+        <br><br> 
+
+        <input type="password" name="password"
+        placeholder = "Password" minlength="8" class = "form-control" required />
+        <a class="link" href="gallery.html">Change password</a>
+        <br><br>
+
+              <input type="date" name="dateofbirth"
+                class = "form-control">
+                <a class="link" href="gallery.html">Change date of birth</a>
+
+    <br><br>
+ 
+    </form>
+
+
+    <!-- pagina reports-->
+      
+    <h5 style="text-align: center;"><a class="link" href="Reports.html">View reports</a></h5>
+
+<br><br>
+    
+
+    
+
+
+
+
+<!-- footer -->
+ <footer class="page-footer font-small teal pt-4" style="background-color: white;">
+      <div class="container-fluid">
+        <div class="row justify-content-center">
+    
+             
+          <div class="col-lg-4 text-center">
+            <br><br> <br><br>
+            <h5 class="font-weight-bold">Contatti</h5>
+            <br> 
+            Sede:<br><br>
+            Via di Priscilla, 35 - Roma
+            <br><br>
+            
+            
+            
+          </div>
+    
+          <div class="col-lg-4 text-center">
+              <br><br>
+            
+            <br><br><br>
+          </div>
+         
+    
+          <div class="col-lg-4 text-center">
+    
+            <br><br>
+            <h2 class="font-weight-bold">AnimalDex</h2>
+            <br>
+            
+            Telefono:<br>
+            <a href="tel:+390644254639" style="color:black; font-size: medium">
+              +39 06 5525 4639</a>
+              <br>
+              <br>
+            E-mail:<br>
+            <a href="mailto:tinystepcrew@gmail.com" style="color:black; font-size: medium">
+              animaldex@gmail.com
+          </a>
+          
+          <br><br>
+          
+        
+          </div>
+    
+          
+          
+    
+    </div>
+      
+    
+      <div class="footer-copyright py-3 text-center">
+        <br>
+          <p style="color:black">© 2020 Copyright: AnimalDex</p>
+          
+      </div>
+      
+      
+    </footer>
+</div>
+
+
+
+</body>
+</html>
