@@ -1,0 +1,2 @@
+execute:
+    python recognition.py
