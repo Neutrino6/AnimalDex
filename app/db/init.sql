@@ -37,7 +37,7 @@ CREATE TABLE administrator (
 
 CREATE TABLE operator (
     o_email varchar(255) PRIMARY KEY,
-    code varchar(255),
+    code varchar(255) not null,
 	unique(code)
 );
 
