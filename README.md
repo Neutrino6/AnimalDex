@@ -6,5 +6,18 @@
 - animal emergency (idea di implementazione): viene inviato un report ad una coda di messaggi (stile prof a lezione vedi rabbitmq e/o immuni like app da esame), dopo tot minuti viene mandato indietro un messaggio che notifica l'arrivo dei soccorsi. Dopo altri tot minuti viene inviato un messaggio tra tre possibili (randomico) che definisce l'esito del soccorso;  
 - pagine: login/register, pagina personale user/admin, pagina principale mappa, help center generale, help center animali feriti, forum, pagina personale operatore, pagina animaldex (completo e/o personale), pagina eventi, pagina valutazioni utenti/operatori;
 - In seguito sistemare la questione database legata alle notifiche per commenti e alarm (se tracciare o meno chi ha generato il commento/alarm e come farlo).
+- Istruzioni per uso di docker (prova per visualizzare il database):
+ 1) Nella cartella di AnimalDex eseguire il comando "docker compose up --build";
+ 2) Una volta eseguito, le immagini di postgres e pgadmin4 saranno buildate e pronte all'uso;
+ 3) Andate nel browser e digitate nella barra delle url "localhost:5050";
+ 4) Questo aprirà l'interfaccia di pgadmin4. Dovrete accedere con le credenziali specificate nel file "docker-compose.yml"
+ 5) Effettuato l'accesso, dovrete aggiungere un server in questo modo -> 
+ Nome (nella sezione Generale) qualsiasi; 
+ host name/Address = indirizzo ip che trovate in fondo al terminale eseguiti i comandi "docker ps" per visualizzare gli id dei container e "docker inspect {postgres_container_id}" per visualizzare i dettagli del container di postgres e trovare l'indirizzo per connettersi;
+ Username = postgres
+ Password= postgres
+ Port = 5432
+ 6) Una volta connessi, potrete trovare il database inizializzato con le tabelle specificate nel file init.sql;
+ 7) Questo dovrebbe risolvere il problema della gestione del database in quanto viene salvato nel container di postgres e i dati in esso mantenuti persistenti.
 
 Mercoledì dalle 17:30, Venerdì da definire, Domenica da definire
