@@ -19,7 +19,18 @@ services:
             - PGADMIN_DEFAULT_EMAIL=ale@gmail.com
             - PGADMIN_DEFAULT_PASSWORD=9900
         ports:
-            - "5050:80" 
+            - "5050:80"
+    recognizer:
+        build:
+            context: ./app/recognizer
+        image: python
+        ports:
+            - "5000:5000"
+    certificate:
+        build:
+            context: "./app/certificate/certificate"
+        ports:
+            - "8080:8080"
 volumes:
     db-data:
         driver: local 

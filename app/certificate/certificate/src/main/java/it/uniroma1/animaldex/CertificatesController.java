@@ -24,7 +24,7 @@ public class CertificatesController {
         return 
             "<form action=\"http://localhost:5000/predict\" method=\"post\" enctype=\"multipart/form-data\">\r\n" + //
             "    <label for=\"fileInput\">Upload a certificate and get points:</label><br>\r\n" + //
-            "    <input type=\"file\" id=\"fileInput\" name=\"fileInput\" accept=\"image/*\"><br><br>\r\n" + //
+            "    <input type=\"file\" id=\"fileInput\" name=\"fileInput\" accept=\"image/*\" required><br><br>\r\n" + //
             "    <input type=\"submit\" value=\"Upload certificate\">\r\n" + //
             "</form>\r\n";
     }
