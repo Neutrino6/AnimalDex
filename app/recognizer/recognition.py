@@ -1,11 +1,17 @@
+import logging
 import tensorflow as tf
 import numpy as np
 from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2, preprocess_input, decode_predictions
 from tensorflow.keras.preprocessing import image
 from flask import Flask, request, jsonify
+from flask import redirect
+import requests
 import io
 
 app = Flask(__name__)
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)  # Set logging level to DEBUG
 
 model = MobileNetV2(weights='imagenet')
 
@@ -23,6 +29,8 @@ def predict_image(img):
 
 @app.route('/predict', methods=['POST'])
 def predict():
+    app.logger.info('Received a prediction request')  # Log an informational message
+    
     if 'fileInput' not in request.files:
         return jsonify({'error': 'No file part'}), 400
     
@@ -38,11 +46,23 @@ def predict():
     if not prediction:
         return jsonify({'error': 'No prediction found'}), 400
     
-    result = {'prediction': prediction[0][1], 'probability': float(prediction[0][2])}
-
-    return jsonify(result), 200
-
+    # Sending the POST request with the prediction result back to the same endpoint
+    if float(prediction[0][2]) > 0.65: # set a threshold value
+        url="http://host.docker.internal:8080/certificates/upload?data="+prediction[0][1] # change to localhost when executing without docker
+        response = requests.post(url)
+        # Checking the response
+        if response.status_code == 200:
+            # If the request was successful, return the prediction result
+            app.logger.info('Prediction result sent successfully')
+            return redirect(url, code=307)
+        else:
+            # If there was an error, return an error message
+            app.logger.error('Failed to send prediction result back: %s', response.text)
+            return jsonify({'error': 'Failed to send prediction result back'}), 500
+    else:
+        url="http://host.docker.internal:8080/certificates/upload?data=UNRECOGNIZED" # change to localhost when executing without docker
+        response = requests.post(url)
+        return redirect(url, code=307)
 
 if __name__ == '__main__':
-    app.run(debug=True,host='0.0.0.0', port=5000)
-
+    app.run(debug=True, host='0.0.0.0', port=5000)
