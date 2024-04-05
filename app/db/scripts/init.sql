@@ -70,6 +70,7 @@ CREATE TABLE certification (
     cert_image bytea not null,
     animal_id int references animal(a_id),
     user_id int references users(user_id),
+    cert_date date not null,
     primary key (animal_id,user_id)
 );
 
