@@ -12,7 +12,7 @@ DROP TABLE IF EXISTS SpecialEvent;
 DROP TABLE IF EXISTS alarm;
 DROP TYPE IF EXISTS evaluation;
 
-CREATE TYPE evaluation AS ENUM ('0', '1','2', '3', '4', '5');
+CREATE TYPE evaluation AS ENUM ('0','1','2', '3', '4', '5');
 
 CREATE TABLE users (
     user_id int PRIMARY KEY,

@@ -14,8 +14,18 @@
     
 <!--  aggiungere modifica immagine e vedere come
 fare per modificare i vari campi -->
+<script>
+  // Recupera i valori della query string dall'URL
+  const params = new URLSearchParams(window.location.search);
+  const username = params.get('username');
+  const passw = params.get('password');
 
+  // Popola i campi input nella pagina HTML con l'username e l'email
+  document.getElementByName('username').innerHTML = username;
+  document.getElementByName('password').innerHTML = passw;
 
+  //CERCARE DI FAR APPARIRE QUESTE INFO NEI CAMPI INPUT DOPO AVER FATTO L'AUTENTICAZIONE
+</script> 
 </head>
 
 <body>
@@ -78,6 +88,7 @@ fare per modificare i vari campi -->
     <br>
 <br>
 <!-- form con tutti i dati-->
+
     <form action = "iscrizione.php" class = "form-signin m-auto"
         method = "POST" name = "iscrizione" onSubmit = "return validaIscrizione()">
 
@@ -142,8 +153,7 @@ fare per modificare i vari campi -->
             <h5 style="color: aliceblue;" > Allow emergencies notification</h5><br>
       
  
-    </form>
-         
+    </form>   
 <br><br><br>
 
 <!-- delete account-->    
