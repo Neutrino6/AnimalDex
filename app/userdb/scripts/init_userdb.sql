@@ -1,8 +1,5 @@
-CREATE DATABASE ANIMALDEX_userdb;
-
 DROP TABLE IF EXISTS certification;
 DROP TABLE IF EXISTS animal;
-
 
 CREATE TABLE animal (
     a_id int PRIMARY KEY,
