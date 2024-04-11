@@ -1,3 +1,25 @@
+const express = require('express'); 
+const path = require('path');
+
+const app = express();
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/RegistrationUser.html'));
+});
+
+app.use(express.static(path.join(__dirname, '../public')));
+
+app.use((req, res) => {
+    res.status(404);
+    res.sendFile(path.join(__dirname, '../public/404page.html'));
+});
+
+app.listen(3000, () => {
+    console.log("App listening on port 3000!!");
+});
+
+
+/*
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -55,3 +77,4 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+*/
