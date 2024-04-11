@@ -1,9 +1,6 @@
 /* sfondo */
 body {
-    background-image: url("0 immagini/dai.jpg");
-    background-repeat: no-repeat;
     background-color: #000000;
-    height: 400px;
     background-position: center;
     background-size: cover;
     background-attachment: fixed;
