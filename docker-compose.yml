@@ -30,7 +30,7 @@ services:
         build:
             context: "./app/certificate/certificate"
         ports:
-            - "8080:8080"
+            - "8079:8080"
 volumes:
     db-data:
         driver: local 

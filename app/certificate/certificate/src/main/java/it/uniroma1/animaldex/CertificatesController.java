@@ -11,6 +11,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.*;
+import java.util.Base64;
+
+
 @RestController
 public class CertificatesController {
     @Autowired
@@ -19,12 +26,49 @@ public class CertificatesController {
     @RequestMapping("/certificates")
     String certificates() {
         return 
-            "<form action=\"http://localhost:5000/predict\" method=\"post\" enctype=\"multipart/form-data\">\r\n" + //
+            "<form action=\"localhost:8080/certificates/manage\" method=\"post\" enctype=\"multipart/form-data\">\r\n" + //
             "    <label for=\"fileInput\">Upload a certificate and get points:</label><br>\r\n" + //
             "    <input type=\"file\" id=\"fileInput\" name=\"fileInput\" accept=\"image/*\" required><br><br>\r\n" + //
             "    <input type=\"submit\" value=\"Upload certificate\">\r\n" + //
             "</form>\r\n";
     }
+
+    @RequestMapping(value="/certificates/manage", method = RequestMethod.POST)
+    public String manage(@RequestParam("fileInput") MultipartFile fileInput) {
+        // Post managed to download image and then send it to the recognition page
+        if (fileInput.isEmpty()){
+            return "error";
+        }
+
+        try{
+            //preparation of the request to the recognition page
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+            //image encoded in base 64 so to send it easily
+            byte[] bytes = fileInput.getBytes();
+            String base64_img= Base64.getEncoder().encodeToString(bytes);
+
+            
+            MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+            
+            map.add("fileInput", base64_img);
+
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+            String pythonUrl = "http://localhost:5000/predict";
+            ResponseEntity<String> response = restTemplate.postForEntity(pythonUrl, request, String.class);
+
+            // return value of the request as a string
+            String response2=response.getBody();
+
+            return response2; // routing to the page returned
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ""; 
+        }
+    }
+
 
     @RequestMapping(value = "/certificates/upload", method = RequestMethod.POST)
     public String upload(@RequestParam("data") String data) {
@@ -41,47 +85,3 @@ public class CertificatesController {
     }
 }
 
-    /*@RequestMapping("/upload")
-    public String handleFileUpload(@RequestParam("fileInput") MultipartFile file) {
-        try {
-            // Salva l'immagine temporaneamente
-            File tempFile = File.createTempFile("temp", null);
-            file.transferTo(tempFile);
-
-            // Costruisci il processo per eseguire lo script Python
-            ProcessBuilder pb = new ProcessBuilder("python", "recognition.py", tempFile.getAbsolutePath());
-            pb.directory(new File("src\\main\\resources\\recognition.py"));
-            
-            // Avvia il processo
-            Process process = pb.start();
-            
-            // Attendere il completamento del processo
-            int exitCode = process.waitFor();
-            System.out.println("\nIl processo di analisi dell'immagine è terminato con il codice di uscita " + exitCode);
-
-            // Rimuovi il file temporaneo
-            tempFile.delete();
-
-            return "Analisi dell'immagine completata!";
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-            return "Errore durante l'analisi dell'immagine.";
-        }
-    }*/
-
-    /*@Data
-    static class Result {
-        private final int left;
-        private final int right;
-        private final long answer;
-    }
-
-    // SQL sample
-    @RequestMapping("calc")
-    Result calc(@RequestParam int left, @RequestParam int right) {
-        MapSqlParameterSource source = new MapSqlParameterSource()
-                .addValue("left", left)
-                .addValue("right", right);
-        return jdbcTemplate.queryForObject("SELECT :left + :right AS answer", source,
-                (rs, rowNum) -> new Result(left, right, rs.getLong("answer")));
-    }*/
