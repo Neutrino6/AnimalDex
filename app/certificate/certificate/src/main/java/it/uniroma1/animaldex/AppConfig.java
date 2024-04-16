@@ -8,8 +8,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-
 
 import javax.sql.DataSource;
 
@@ -29,13 +27,6 @@ public class AppConfig {
                 .build();
         return dataSource;
     }
-
-    @Bean(name = "multipartResolver")
-        public CommonsMultipartResolver multipartResolver() {
-        CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
-        return multipartResolver;
-    }
-
 
     @Bean
     @Primary

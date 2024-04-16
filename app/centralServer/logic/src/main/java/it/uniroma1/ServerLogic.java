@@ -24,11 +24,6 @@ public class ServerLogic {
     @Autowired
     NamedParameterJdbcTemplate jdbcTemplate;
 
-    @RequestMapping("/")
-    String hello() {
-        return "Hello World!";
-    }
-
     @RequestMapping(value = "/newCertificate", method = RequestMethod.POST)
     public ResponseEntity<String> newCertificate(@RequestBody String requestBody) {
         try {
