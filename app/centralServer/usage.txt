@@ -1,6 +1,0 @@
-Use the command 
-  docker-compose -f docker-compose_MAIN.yml up --build
-to run the container for central server.
-In the file initdb.sql there are some sample tuples for testing.
-Use test.ps1 for sending a post request containg an animal name. 
-Connection to the database is perfomed in the same way described in the readme file.
