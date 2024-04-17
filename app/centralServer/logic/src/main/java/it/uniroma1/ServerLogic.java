@@ -24,6 +24,11 @@ public class ServerLogic {
     @Autowired
     NamedParameterJdbcTemplate jdbcTemplate;
 
+    @RequestMapping("/hello")
+    public String hello(){
+        return "Hello this server is running";
+    }
+
     @RequestMapping(value = "/newCertificate", method = RequestMethod.POST)
     public ResponseEntity<String> newCertificate(@RequestBody String requestBody) {
         try {
