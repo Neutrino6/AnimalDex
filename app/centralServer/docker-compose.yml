@@ -24,22 +24,14 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=9900
     ports:
       - "5051:80"
-
   logic:
     build:
       context: "./logic"
     ports: 
-      - "6039:6039"
-
-  nodejs:
-        build: ./FrontendServer
-        ports:
-            - "3000:3000"   
-
+      - "6039:6039"   
 networks:
   pg_network:
     driver: bridge
-
 volumes:
   db-data-central:
     driver: local

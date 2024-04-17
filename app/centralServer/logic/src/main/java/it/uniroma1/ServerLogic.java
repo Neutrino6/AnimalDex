@@ -98,15 +98,17 @@ public class ServerLogic {
         }
     }
 
+//requestparam
+
     @RequestMapping(value = "/userSignUp", method = RequestMethod.POST)
     public ResponseEntity<String> userSignUp(@RequestBody String requestBody) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode jsonNode = mapper.readTree(requestBody);
 
-            if (jsonNode.has("email") && jsonNode.has("hashedPassw") && jsonNode.has("username")) {
+            if (jsonNode.has("email") && jsonNode.has("password") && jsonNode.has("username")) {
                 String email = jsonNode.get("email").asText();
-                String hashedPassw = jsonNode.get("hashedPassw").asText();
+                String hashedPassw = jsonNode.get("password").asText();
                 String username = jsonNode.get("username").asText();
                 if (!email.isEmpty() && !hashedPassw.isEmpty() && !username.isEmpty()) {
                     MapSqlParameterSource source1 = new MapSqlParameterSource()
@@ -119,14 +121,14 @@ public class ServerLogic {
                         String firstname = null;
                         String surname = null;
                         LocalDateTime dob = null;
-                        if (jsonNode.has("firstname")) {
-                            firstname = jsonNode.get("firstname").asText();
+                        if (jsonNode.has("name")) {
+                            firstname = jsonNode.get("name").asText();
                         }
                         if (jsonNode.has("surname")) {
                             surname = jsonNode.get("surname").asText();
                         }
-                        if (jsonNode.has("dob")) {
-                            String dobString = jsonNode.get("dob").asText();
+                        if (jsonNode.has("dateofbirth")) {
+                            String dobString = jsonNode.get("dateofbirth").asText();
                             dobString+="T00:00:00";
                             // Parse date from string
                             dob = LocalDateTime.parse(dobString);
