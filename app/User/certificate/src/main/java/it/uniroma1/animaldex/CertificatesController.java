@@ -19,6 +19,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import java.io.IOException;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.util.Base64;
 
@@ -41,7 +43,7 @@ public class CertificatesController {
     public String upload(@RequestParam("data") String data, @RequestParam("fileInput") MultipartFile fileInput) {
         // Check if file is empty
         if (fileInput.isEmpty()) {
-            return "Error: File is empty";
+            return "Error: File is empty <br> <a href='/certificates'>Click here to insert a new certificate</a>";
         }
         
         // Process the fileInput here
@@ -54,7 +56,7 @@ public class CertificatesController {
             base64Image = Base64.getEncoder().encodeToString(fileBytes);
         } catch (IOException e) {
             e.printStackTrace();
-            return "Error processing file";
+            return "Error processing file <br> <a href='/certificates'>Click here to insert a new certificate</a>";
         }
         
         // If data is UNRECOGNIZED, handle the fileInput
@@ -64,30 +66,30 @@ public class CertificatesController {
         } else {
 
             //Send request to centralServer for validation
-
-            HttpClient client = HttpClients.createDefault();
         
             // Create RequestBody
             String jsonBody = "{\"animalName\":\""+data+"\"}";
             
             // Create HTTP request
-            HttpPost request = new HttpPost("http://localhost:6039/newCertificate");
+            HttpPost request = new HttpPost("http://host.docker.internal:6039/newCertificate");  //communication between different containers
             request.setHeader("Content-Type", "application/json");
             request.setEntity(new StringEntity(jsonBody, "UTF-8"));
-            
-            // execute the request and manage the response
-            try {
-                HttpResponse response = client.execute(request);
+
+            try (CloseableHttpClient client = HttpClients.createDefault()) {
+                CloseableHttpResponse response = client.execute(request);
                 int statusCode = response.getStatusLine().getStatusCode();
                 HttpEntity entity = response.getEntity();
                 String responseBody = EntityUtils.toString(entity);
-                
+            
                 System.out.println("Status code: " + statusCode);
                 System.out.println("Response body: " + responseBody);
+            
+                // Add response validation logic here if needed
             } catch (IOException e) {
                 System.err.println("Error: " + e.getMessage());
+                e.printStackTrace(); // Print detailed stack trace for debugging
             }
-
+            
             // Return HTML with image tag to display the uploaded image
             return "<img src='data:image/jpeg;base64," + base64Image + "' alt='" + fileName + "'>" +
                 "<p>File recognized as " + data + ". <a href='/certificates'>Click here to insert a new certificate</a> <br></p>";

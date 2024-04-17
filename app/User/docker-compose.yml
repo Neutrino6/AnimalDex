@@ -31,6 +31,10 @@ services:
             context: "./certificate"
         ports:
             - "7777:7777"
+    nodejs:
+        build: ./FrontendServer
+        ports:
+            - "3000:3000"
 volumes:
     db-data:
         driver: local 

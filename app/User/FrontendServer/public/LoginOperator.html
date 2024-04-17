@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    
+    <link rel="stylesheet" href="1 bootstrap/css/bootstrap.css" />
+    <script src="1 bootstrap/js/bootstrap.bundle.js"></script>
+    
+    <link rel = "stylesheet" href = "generale.css" />
+
+    <title> Login </title>
+    
+
+
+</head>
+
+<body>
+
+
+
+<br>
+<br>
+<br>
+<br>
+<h1 style="text-align: center; color:aliceblue"> Login </h1>
+<br>
+<br>
+<br>
+<br>   
+<!-- form con tutti i dati-->
+    <form action = "iscrizione.php" class = "form-signin m-auto"
+        method = "POST" name = "iscrizione" onSubmit = "return validaIscrizione()">
+
+        <input type="number" name="operatorcode"  
+        placeholder = "Operator code"
+        class = "form-control">
+        
+        <br>
+        <br>
+            <input type="email" name="e-mail" 
+            placeholder = "E-mail"
+            class = "form-control">
+            
+            <br>
+            <br>
+
+        <input type="password" name="password"
+        placeholder = "Password" minlength="8" class = "form-control" required />
+        
+        <br>
+            <br>
+        <a style="text-align: center;" 
+        class="link" href="Forgot.html">Forgot password?</a>
+            
+        <br>
+        <br>
+    <button class = "btn btn-lg btn-primary" name ="inviaButton"
+    type = "submit"> Login as an operator </button>    
+    <br>
+    <br>    
+
+    </form>
+    <br><br>
+
+    <!-- registration links-->
+ <div style="text-align: center;">  
+    <h5 style="color:aliceblue"> Don't have an account?</h5>
+    <br>
+    <h5> <a style="text-align: center;" 
+    class="link" href="RegistrationOperator.html">
+    Register as an operator</a></h5>
+    <h5> <a style="text-align: center;" 
+        class="link" href="RegistrationUser.html">
+        Register as a user</a>
+</h5></div>
+
+<br><br>
+    
+
+</body>
+</html>
