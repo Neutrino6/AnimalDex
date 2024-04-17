@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 
 import javax.sql.DataSource;
+import javax.validation.constraints.Null;
 
 @RestController
 public class ServerLogic {
@@ -92,4 +93,92 @@ public class ServerLogic {
         }
     }
 
+    @RequestMapping(value = "/userSignUp", method = RequestMethod.POST)
+    public ResponseEntity<String> userSignUp(@RequestBody String requestBody) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonNode = mapper.readTree(requestBody);
+
+            if (jsonNode.has("email") && jsonNode.has("hashedPassw") && jsonNode.has("username")) {
+                String email = jsonNode.get("email").asText();
+                String hashedPassw = jsonNode.get("hashedPassw").asText();
+                String username = jsonNode.get("username").asText();
+                if (!email.isEmpty() && !hashedPassw.isEmpty() && !username.isEmpty()) {
+                    MapSqlParameterSource source1 = new MapSqlParameterSource()
+                            .addValue("u_email", email);
+                    String checkEmail = "SELECT count(*) from users where email = :u_email";
+                    Integer count = jdbcTemplate.queryForObject(checkEmail, source1, Integer.class);
+                    if (count != null && count > 0) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email already used by someone");
+                    } else {
+                        String firstname = null;
+                        String surname = null;
+                        LocalDateTime dob = null;
+                        if (jsonNode.has("firstname")) {
+                            firstname = jsonNode.get("firstname").asText();
+                        }
+                        if (jsonNode.has("surname")) {
+                            surname = jsonNode.get("surname").asText();
+                        }
+                        if (jsonNode.has("dob")) {
+                            String dobString = jsonNode.get("dob").asText();
+                            dobString+="T00:00:00";
+                            // Parse date from string
+                            dob = LocalDateTime.parse(dobString);
+                        }
+                        // Save user information in the database
+                        MapSqlParameterSource source2 = new MapSqlParameterSource()
+                            .addValue("u_email", email)
+                            .addValue("hpassw", hashedPassw)
+                            .addValue("username", username)
+                            .addValue("firstname", firstname)
+                            .addValue("surname", surname)
+                            .addValue("birthday", dob);
+                        String insertQuery = "INSERT INTO users (email, passw, username, firstname, surname, birthday) VALUES (:u_email, :hpassw, :username, :firstname, :surname, :birthday)";
+                        jdbcTemplate.update(insertQuery, source2);
+                        return ResponseEntity.status(HttpStatus.CREATED).body("User signed up successfully");
+                    }
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Void value for email, hashed password, or username");
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email, hashed password, or username not found in the request");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error during JSON parsing.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
+        }
+    }
+
+    @RequestMapping(value = "/userSignIn", method = RequestMethod.POST)
+    public ResponseEntity<String> userSignIn(@RequestBody String requestBody) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonNode = mapper.readTree(requestBody);
+            if (jsonNode.has("email") && jsonNode.has("hashedPassw")) {
+                String email = jsonNode.get("email").asText();
+                String hashedPassw = jsonNode.get("hashedPassw").asText();
+                MapSqlParameterSource source1 = new MapSqlParameterSource()
+                    .addValue("u_email", email)
+                    .addValue("hpassw", hashedPassw);
+                String insertQuery = "select count(*) from users where email = :u_email and passw = :hpassw";
+                if(jdbcTemplate.queryForObject(insertQuery, source1, Integer.class) > 0){
+                    return ResponseEntity.status(HttpStatus.OK).body("User signed in successfully");
+                }
+                else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect login credential");
+            }
+            else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email or hashed password not found in the request");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error during JSON parsing.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
+        }
+    }
 }

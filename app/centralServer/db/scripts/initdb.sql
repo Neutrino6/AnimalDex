@@ -32,7 +32,6 @@ CREATE TABLE users (
     fav_animal int references animal(a_id),
     forum_notify boolean default false,
     emergency_notify boolean default false,
-    userImage bytea,
     administrator boolean default false,
     unique(email)
 );
