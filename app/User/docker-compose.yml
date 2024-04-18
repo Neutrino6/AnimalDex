@@ -32,7 +32,7 @@ services:
         ports:
             - "7777:7777"
     nodejs:
-        build: ./FrontendServer
+        build: ./FrontendUser
         ports:
             - "3000:3000"
 volumes:
