@@ -11,9 +11,11 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.List;
@@ -41,61 +43,13 @@ public class ServerLogic {
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode jsonNode = mapper.readTree(requestBody);
+
+            Integer exampleUserId=new Integer(999);
         
             if (jsonNode.has("animalName")) {
                 String animalName = jsonNode.get("animalName").asText();
                 if (!animalName.isEmpty()) {
-                    MapSqlParameterSource source1 = new MapSqlParameterSource()
-                        .addValue("animalName",animalName);
-                    String sql = "SELECT a_id FROM animal WHERE :animalName ILIKE concat('%',a_name,'%')";
-                    Integer animalId = jdbcTemplate.queryForObject(sql, source1, Integer.class);
-                    if(animalId!=null){
-                        String insertCertificate= "INSERT INTO certification (animal_id, user_id, cert_date) VALUES (:a_id,:u_id,:time);";
-                        String checkCertificate= "SELECT count(*) from certification where animal_id = :a_id and user_id = :u_id";
-                        String updateCertificate= "UPDATE certification SET cert_date = :time where animal_id = :a_id and user_id = :u_id";
-                        String discoveryAnimal= "Select regions,details from animal where a_id = :a_id";
-                        Integer exampleUserId=new Integer(999);
-                        LocalDateTime currentTime = LocalDateTime.now();
-                        MapSqlParameterSource source2 = new MapSqlParameterSource()
-                            .addValue("a_id",animalId)
-                            .addValue("u_id", exampleUserId)
-                            .addValue("time", currentTime);
-                        MapSqlParameterSource source3 = new MapSqlParameterSource()
-                            .addValue("a_id",animalId)
-                            .addValue("u_id", exampleUserId);
-                        
-                        ObjectNode responseJson = mapper.createObjectNode();
-
-                        // check whether the user has already a certificate regarding animal with id = animalId
-                        Integer count = jdbcTemplate.queryForObject(checkCertificate, source3,Integer.class);
-                        if(count>0 && count!=null){
-                            //update the last certificate
-                            jdbcTemplate.update(updateCertificate, source2);
-                            responseJson.put("message", "Certificate updated");
-                            responseJson.put("animal_id", animalId);
-                        }
-                        else {
-                            MapSqlParameterSource source4 = new MapSqlParameterSource()
-                                .addValue("a_id",animalId);
-
-                            //insert a new certificate
-                            jdbcTemplate.update(insertCertificate, source2);
-                            responseJson.put("message", "Certificate inserted");
-                            responseJson.put("animal_id", animalId);
-
-                            List<Map<String, Object>> rows =jdbcTemplate.queryForList(discoveryAnimal, source4);
-                            if (!rows.isEmpty()) {
-                                Map<String, Object> result = rows.get(0);
-                                String regions = (String) result.get("regions");
-                                String details = (String) result.get("details");
-                                responseJson.put("regions", regions);
-                                responseJson.put("details", details);
-                            }
-                        }
-                        String jsonResponse = mapper.writeValueAsString(responseJson);
-                        return ResponseEntity.ok(jsonResponse);
-                    }
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("animalName not found");
+                    return certificateManagement(animalName,exampleUserId);
                 } else {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Void value for animalName");
                 }
@@ -169,5 +123,82 @@ public class ServerLogic {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect login credential");
         }
+    }
+
+    @Transactional
+    private ResponseEntity<String> certificateManagement(String animalName,int user_id) throws JsonProcessingException{
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        MapSqlParameterSource source1 = new MapSqlParameterSource()
+            .addValue("animalName",animalName);
+        String sql = "SELECT a_id FROM animal WHERE :animalName ILIKE concat('%',a_name,'%')";
+        Integer animalId = jdbcTemplate.queryForObject(sql, source1, Integer.class);
+        if(animalId!=null){
+            String insertCertificate= "INSERT INTO certification (animal_id, user_id, cert_date) VALUES (:a_id,:u_id,:time);";
+            String checkCertificate= "SELECT count(*) from certification where animal_id = :a_id and user_id = :u_id";
+            String updateCertificate= "UPDATE certification SET cert_date = :time where animal_id = :a_id and user_id = :u_id";
+            String discoveryAnimal= "Select regions,details from animal where a_id = :a_id";
+            
+            LocalDateTime currentTime = LocalDateTime.now();
+            MapSqlParameterSource source2 = new MapSqlParameterSource()
+                .addValue("a_id",animalId)
+                .addValue("u_id", user_id)
+                .addValue("time", currentTime);
+            MapSqlParameterSource source3 = new MapSqlParameterSource()
+                .addValue("a_id",animalId)
+                .addValue("u_id", user_id);
+            
+            ObjectNode responseJson = mapper.createObjectNode();
+
+            // check whether the user has already a certificate regarding animal with id = animalId
+            Integer count = jdbcTemplate.queryForObject(checkCertificate, source3,Integer.class);
+            if(count>0 && count!=null){
+                //update the last certificate
+                jdbcTemplate.update(updateCertificate, source2);
+                responseJson.put("message", "Certificate updated");
+                responseJson.put("animal_id", animalId);
+            }
+            else {
+                MapSqlParameterSource source4 = new MapSqlParameterSource()
+                    .addValue("a_id",animalId);
+
+                //insert a new certificate
+                jdbcTemplate.update(insertCertificate, source2);
+                responseJson.put("message", "Certificate inserted");
+                responseJson.put("animal_id", animalId);
+
+                List<Map<String, Object>> rows =jdbcTemplate.queryForList(discoveryAnimal, source4);
+                if (!rows.isEmpty()) {
+                    Map<String, Object> result = rows.get(0);
+                    String regions = (String) result.get("regions");
+                    String details = (String) result.get("details");
+                    responseJson.put("regions", regions);
+                    responseJson.put("details", details);
+                }
+            }
+            updatePoints(user_id,animalId,count);
+            String jsonResponse = mapper.writeValueAsString(responseJson);
+            return ResponseEntity.ok(jsonResponse);
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("animalName not found");
+    }
+
+    // this method updates the points get by an user
+    // isInserted is a variable which has value 0 if this is the first time that user user_id inserts an certificates
+    // regarding animal a_id, otherwise it's > 0
+    private void updatePoints(int user_id, int a_id, int isInserted){
+        if(isInserted==0){
+            String getPoints= "Select std_points from animal where a_id = :a_id";
+            String updateUser= "update users set points = points + :animal_points where user_id = :user_id";
+            MapSqlParameterSource source1 = new MapSqlParameterSource()
+                .addValue("a_id", a_id);
+            Integer animal_points = jdbcTemplate.queryForObject(getPoints, source1, Integer.class);
+            MapSqlParameterSource source2 = new MapSqlParameterSource()
+                .addValue("animal_points", animal_points)
+                .addValue("user_id", user_id);
+            jdbcTemplate.update(updateUser, source2);
+        }
+        return;
     }
 }
