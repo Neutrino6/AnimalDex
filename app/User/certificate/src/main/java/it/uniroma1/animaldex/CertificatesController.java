@@ -23,6 +23,11 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.util.Base64;
+import java.time.LocalDateTime;
+import org.json.JSONObject;
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 public class CertificatesController {
@@ -51,8 +56,10 @@ public class CertificatesController {
         
         // Convert file to base64 for displaying in HTML
         String base64Image = null;
+        byte[] fileBytes;
+        int animalId=0;
         try {
-            byte[] fileBytes = fileInput.getBytes();
+            fileBytes = fileInput.getBytes();
             base64Image = Base64.getEncoder().encodeToString(fileBytes);
         } catch (IOException e) {
             e.printStackTrace();
@@ -64,6 +71,8 @@ public class CertificatesController {
             // Return a response message or perform further actions based on the file content
             return "File unrecognized. <a href='/certificates'>Click here to insert a new certificate</a>";
         } else {
+
+            System.out.println("Animal name: " + data);
 
             //Send request to centralServer for validation
         
@@ -80,19 +89,60 @@ public class CertificatesController {
                 int statusCode = response.getStatusLine().getStatusCode();
                 HttpEntity entity = response.getEntity();
                 String responseBody = EntityUtils.toString(entity);
+
             
                 System.out.println("Status code: " + statusCode);
                 System.out.println("Response body: " + responseBody);
+
+                JSONObject jsonObject = new JSONObject(responseBody);
+
+                animalId = jsonObject.getInt("animal_id");
+                System.out.println("Animal id:"+animalId);
+                if(animalId>0){
+                } else {
+                    System.out.println("No number found following 'animal_id='.");
+                    return "No animal found with such a name <br> <a href='/certificates'>Click here to insert a new certificate</a>";
+                }
             
                 // Add response validation logic here if needed
             } catch (IOException e) {
                 System.err.println("Error: " + e.getMessage());
                 e.printStackTrace(); // Print detailed stack trace for debugging
             }
+
+            LocalDateTime currentTime = LocalDateTime.now();
             
-            // Return HTML with image tag to display the uploaded image
-            return "<img src='data:image/jpeg;base64," + base64Image + "' alt='" + fileName + "'>" +
+            //query to check if already exists a certificate about that animal
+            MapSqlParameterSource source1 = new MapSqlParameterSource().addValue("animal_id", animalId);
+            source1.addValue("user_id", 999 );
+            String checkCertificate= "SELECT count(*) from certification where animal_id = :animal_id and user_id = :user_id";
+            Integer count = jdbcTemplate.queryForObject(checkCertificate, source1,Integer.class);
+            if(count!=null && count>0 ){
+                //update the last certificate
+                String updateCertificate= "UPDATE certification SET cert_date = :cert_date where animal_id = :animal_id and user_id = :user_id";
+                MapSqlParameterSource source3 = new MapSqlParameterSource().addValue("animal_id", animalId);
+                source3.addValue("user_id", 999 );
+                source3.addValue("cert_date", currentTime);
+                jdbcTemplate.update(updateCertificate, source3);
+                // Return HTML with image tag to display the uploaded image
+                return "<img src='data:image/jpeg;base64," + base64Image + "' alt='" + fileName + "'>" +
+                "<p>File recognized as " + data + ". and has been updated at" + currentTime+ 
+                "<a href='/certificates'>Click here to insert a new certificate</a> <br></p>";
+            }
+            else{
+                MapSqlParameterSource source2 = new MapSqlParameterSource().addValue("cert_image",fileBytes);
+                source2.addValue("animal_id", animalId );
+                source2.addValue("user_id", 999 );
+                source2.addValue("cert_date", currentTime);
+
+
+                String InsertCertificate = "INSERT INTO certification (cert_image, animal_id, user_id, cert_date) VALUES (:cert_image, :animal_id, :user_id, :cert_date)";
+                jdbcTemplate.update(InsertCertificate, source2);
+
+                // Return HTML with image tag to display the uploaded image
+                return "<img src='data:image/jpeg;base64," + base64Image + "' alt='" + fileName + "'>" +
                 "<p>File recognized as " + data + ". <a href='/certificates'>Click here to insert a new certificate</a> <br></p>";
+            }
         }
     }
 
