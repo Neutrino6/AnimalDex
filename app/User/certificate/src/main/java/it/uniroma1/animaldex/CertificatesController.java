@@ -3,6 +3,8 @@ package it.uniroma1.animaldex;
 import lombok.Data;
 
 import java.io.IOException;
+import java.sql.Date;
+import java.sql.Timestamp;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -22,6 +24,7 @@ import java.io.IOException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
 
+import java.util.ArrayList;
 import java.util.Base64;
 import java.time.LocalDateTime;
 import org.json.JSONObject;
@@ -40,8 +43,9 @@ public class CertificatesController {
             "<form action=\"http://localhost:5000/predict\" method=\"post\" enctype=\"multipart/form-data\">\r\n" + //
             "    <label for=\"fileInput\">Upload a certificate and get points:</label><br>\r\n" + //
             "    <input type=\"file\" id=\"fileInput\" name=\"fileInput\" accept=\"image/*\" required><br><br>\r\n" + //
-            "    <input type=\"submit\" value=\"Upload certificate\">\r\n" + //
-            "</form>\r\n";
+            "    <input type=\"submit\" value=\"Upload certificate\">" + //
+            "</form>"+
+            "<br> <a href='/certificates/list'> My Certificates </a> <br>";
     }
 
     @RequestMapping(value = "/certificates/upload", method = RequestMethod.POST)
@@ -144,6 +148,59 @@ public class CertificatesController {
                 "<p>File recognized as " + data + ". <a href='/certificates'>Click here to insert a new certificate</a> <br></p>";
             }
         }
+    }
+
+    @RequestMapping("/certificates/list")
+    String certificatesList() {
+        String GetCertificates= "SELECT a_name, cert_date, details, regions from certification JOIN animal on animal_id = a_id where user_id=999"; //user=999 to be replaced by current_user
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(GetCertificates, new MapSqlParameterSource());
+        
+        // Generating a string to add every entry in the database to appear in the table
+        StringBuilder tableHtml = new StringBuilder();
+        tableHtml.append("<h1> Uploaded certificates</h1>");
+        tableHtml.append("<table border=\"1\">");
+        tableHtml.append("<thead>");
+        tableHtml.append("<tr>");
+        tableHtml.append("<th>Animal name</th>");
+        tableHtml.append("<th>Certificate Date</th>");
+        tableHtml.append("<th>Details</th>");
+        tableHtml.append("<th>Regions</th>");
+        tableHtml.append("</tr>");
+        tableHtml.append("</thead>");
+        tableHtml.append("<tbody>");
+
+        for (Map<String, Object> row : rows) {
+            String name = (String) row.get("a_name");
+            Date certDate = (Date) row.get("cert_date");
+            String details = (String) row.get("details");
+            String region = (String) row.get("regions");
+    
+            tableHtml.append("<tr>");
+            tableHtml.append("<td><a href='../certificates/image?animal=").append(name).append("''>").append(name).append("</td>");
+            tableHtml.append("<td>").append(certDate).append("</td>");
+            tableHtml.append("<td>").append(details).append("</td>");
+            tableHtml.append("<td>").append(region).append("</td>");
+            tableHtml.append("</tr>");
+        }
+    
+        tableHtml.append("</tbody>");
+        tableHtml.append("</table>");
+        tableHtml.append("<br> <a href='/certificates'> Go back </a>");
+    
+        return tableHtml.toString();
+    }
+
+    @RequestMapping("/certificates/image")
+    String ShowImage(@RequestParam("animal") String name) {
+        //Shows the last uploaded image for the selected certificate
+        String GetImage= "SELECT cert_image from certification JOIN animal on animal_id=a_id where a_name=:name";
+        MapSqlParameterSource source7 = new MapSqlParameterSource().addValue("name", name);
+        byte[] imageBytes = jdbcTemplate.queryForObject(GetImage, source7, byte[].class);
+        String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+
+        return "<img src='data:image/jpeg;base64," + base64Image + "' alt='" + name + "'>"+
+        "<br> <a href='/certificates'> Go back to upload certificates </a> <br>"+
+        "<a href='../certificates/list'> Go back to your certificates</a>";
     }
 
 }
