@@ -34,9 +34,10 @@ app.listen(3000, () => {
 
 //gestire get reindirizzamento logica server login/signup e collegarsi al database per riottenere le info sull'utente (anche nel caso in cui debbano essere cambiate)
 
-app.get('/PersonalPage.html', (req, res) => {
+//PROBABILE PROBLEMA NELL'URL DELLA GET
+app.get('/PersonalPage.html?userId=', (req, res) => {
     const userId = req.query.userId; // Supponiamo che l'ID utente sia passato come parametro query nella richiesta GET
-  
+    console.log(userId);
     // Esegui una query per recuperare le informazioni dell'utente dal database
     pool.query('SELECT * FROM users WHERE user_id = $1', [userId], (err, result) => {
       if (err) {
@@ -45,10 +46,8 @@ app.get('/PersonalPage.html', (req, res) => {
       } else {
         const user = result.rows[0]; // Supponiamo che l'utente sia il primo risultato della query
         // Fai qualcosa con le informazioni dell'utente, ad esempio restituisci una risposta JSON
+        console.log(user);
         res.json(user);
-
-
-        //-------------RISOLVERE PROBLEMA APPARIZIONE INFO NELLE AREE DELLA PAGINA PERSONALE E GESTIRE SESSIONE----------
       }
     });
   });

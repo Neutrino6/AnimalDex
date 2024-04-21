@@ -7,17 +7,6 @@
     
     <link rel="stylesheet" href="1 bootstrap/css/bootstrap.css" />
     <script src="1 bootstrap/js/bootstrap.bundle.js"></script>
-
-    <script type="text/javascript" language="javascript">
-      // Esempio di codice JavaScript lato client per recuperare i dati dall'endpoint del server e aggiornare l'elemento textarea
-      fetch('http://localhost:3000/PersonalPage.html?userId=' + userId)
-      .then(response => response.json())
-      .then(user => {
-        // Aggiorna il valore dell'elemento textarea con i dati dell'utente
-        document.perpag.getElementById("username").innerHTML = JSON.stringify(user);
-      })
-      .catch(error => console.error('Errore:', error));
-    </script>
     
     <link rel = "stylesheet" href = "generale.css" />
 
@@ -89,7 +78,41 @@ fare per modificare i vari campi -->
     <br>
 <br>
 <!-- form con tutti i dati-->
-    <form action = "iscrizione.php" class = "form-signin m-auto"
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" language="javascript">
+      
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const userId = urlParams.get('userId');
+      console.log("valore userId=" + userId);
+      //CONTINUARE A MODIFICARE DA QUI (PER ORA NON RIESCE A PRENDERE LE INFORMAZIONI DAL DB)
+      
+        // Il tuo codice JavaScript qui
+        fetch('http://localhost:3000/PersonalPage.html?userId=' + userId)
+        .then(response => response.json())
+        .then(user => {
+          document.addEventListener("DOMContentLoaded", function() {
+            let form = $("form").first();
+            console.log("Numero di elementi form:", form.length);
+            let inputs = form.find(":input")
+            console.log("Numero di elementi input:", inputs.length);
+            //let input = inputs.first();
+            inputs[0].focus().val(user.email);
+            inputs[1].focus().val(user.username);
+            inputs[2].focus().val(user.firstname);
+            inputs[3].focus().val(user.surname);
+            inputs[4].focus().val(user.passw);
+            inputs[5].focus().val(user.birthday);
+            inputs[6].focus().val(user.fav_animal);
+            inputs[7].focus().val(user.forum_notify);
+            inputs[8].focus().val(user.emergency_notify);
+          });
+      })
+      .catch(error => console.error('Errore:', error));
+      
+    </script>
+
+    <form action = "" class = "form-signin m-auto"
         method = "POST" name = "perpag" onSubmit = "return validaIscrizione()">
 
         
