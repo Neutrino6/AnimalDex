@@ -7,6 +7,17 @@
     
     <link rel="stylesheet" href="1 bootstrap/css/bootstrap.css" />
     <script src="1 bootstrap/js/bootstrap.bundle.js"></script>
+
+    <script type="text/javascript" language="javascript">
+      // Esempio di codice JavaScript lato client per recuperare i dati dall'endpoint del server e aggiornare l'elemento textarea
+      fetch('http://localhost:3000/PersonalPage.html?userId=' + userId)
+      .then(response => response.json())
+      .then(user => {
+        // Aggiorna il valore dell'elemento textarea con i dati dell'utente
+        document.perpag.getElementById("username").innerHTML = JSON.stringify(user);
+      })
+      .catch(error => console.error('Errore:', error));
+    </script>
     
     <link rel = "stylesheet" href = "generale.css" />
 
@@ -79,25 +90,22 @@ fare per modificare i vari campi -->
 <br>
 <!-- form con tutti i dati-->
     <form action = "iscrizione.php" class = "form-signin m-auto"
-        method = "POST" name = "iscrizione" onSubmit = "return validaIscrizione()">
-
+        method = "POST" name = "perpag" onSubmit = "return validaIscrizione()">
 
         
-            <input type="email" name="e-mail" 
-            placeholder = "E-mail"
+            <input type="email" name="email" 
+            placeholder = "Email"
             class = "form-control">
             
             <a class="link" href="gallery.html">Change e-mail</a>
             <br><br>
               
-            <input type="text" name="username"  
+            <input type="text" id="username" name="username"  
             placeholder = "Username"
             class = "form-control">
             <a class="link" href="gallery.html">Change username</a>
 
     <br><br>
-
-          
             <input type="text" name="name" 
                 placeholder = "Name"
                 class = "form-control">

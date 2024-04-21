@@ -27,6 +27,8 @@ import javax.validation.constraints.Null;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import org.springframework.web.servlet.ModelAndView;
+
 @RestController
 public class ServerLogic {
     
@@ -104,12 +106,39 @@ public class ServerLogic {
                     .addValue("birthday", dob);
                 String insertQuery = "INSERT INTO users (email, passw, username, firstname, surname, birthday) VALUES (:u_email, :hpassw, :username, :firstname, :surname, :birthday)";
                 jdbcTemplate.update(insertQuery, source2);
-                return ResponseEntity.status(HttpStatus.CREATED).body("User signed up successfully");
+                return ResponseEntity.status(HttpStatus.CREATED).body("User signed up successfully");    //reindirizzare a personalpage su localhost 3000 con id utente (?)
             }
         }
         else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error password is not equal to confirmPassword");
     }
+    
+    @RequestMapping(value = "/userSignIn", method = RequestMethod.POST)
+    public ModelAndView userSignIn(@RequestParam(value = "email", required = true) String email, @RequestParam(value = "password", required = true) String password) {
+        MapSqlParameterSource source1 = new MapSqlParameterSource().addValue("u_email", email);
+        String insertQuery = "select user_id, passw from users where email = :u_email"; // Seleziona anche l'id dell'utente
+        // Recupera l'id e la password dell'utente dal database
+        Map<String, Object> userMap = jdbcTemplate.queryForMap(insertQuery, source1);
 
+        String realPassword = (String) userMap.get("passw");
+        int userId = (int) userMap.get("user_id"); // Ottieni l'id dell'utente
+        //System.out.println(userId);
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        if (encoder.matches(password, realPassword)) {
+            // Se il login è corretto, reindirizza alla pagina personal page con l'id utente allegato
+            ModelAndView modelAndView = new ModelAndView("redirect:http://localhost:3000/PersonalPage.html?userId=" + userId);
+            //modelAndView.addObject("userId", userId); // Aggiungi l'id utente come attributo per il reindirizzamento
+            return modelAndView;
+        } else {
+            // Se le credenziali di accesso sono incorrette, reindirizza alla pagina di login con un messaggio di errore
+            ModelAndView modelAndView = new ModelAndView("redirect:/login.html");
+            modelAndView.addObject("error", "Incorrect login credentials");
+            return modelAndView;
+        }
+    }
+
+
+    /*
     @RequestMapping(value = "/userSignIn", method = RequestMethod.POST)
     public ResponseEntity<String> userSignIn(@RequestParam(value = "email", required = true) String email, 
                                             @RequestParam(value = "password", required = true) String password) {
@@ -124,7 +153,7 @@ public class ServerLogic {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect login credential");
         }
     }
-
+    */
     @Transactional
     private ResponseEntity<String> certificateManagement(String animalName,int user_id) throws JsonProcessingException{
 
