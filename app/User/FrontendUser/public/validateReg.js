@@ -12,11 +12,11 @@ function hasChar(s, chars) {
 
 function controllo_email(){
     const emailRegex = /^[^\s@]+@[^\s@]+.[^\s@]+$/;
-    if(document.reg.email.value.length > 50){
+    if(document.iscrizione.email.value.length > 50){
         alert("Email troppo lunga");
         return false;
     }
-    if(emailRegex.test(document.reg.email.value)==false ){
+    if(emailRegex.test(document.iscrizione.email.value)==false ){
         alert("Formato email errato");
         return false;
     }
