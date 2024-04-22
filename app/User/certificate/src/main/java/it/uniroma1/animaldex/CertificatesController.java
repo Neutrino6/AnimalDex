@@ -32,20 +32,26 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.web.servlet.ModelAndView;
+import org.thymeleaf.TemplateEngine;
+
+import org.thymeleaf.context.Context;
+
 @RestController
 public class CertificatesController {
     @Autowired
     NamedParameterJdbcTemplate jdbcTemplate;
+    @Autowired
+    private TemplateEngine templateEngine;
 
     @RequestMapping("/certificates")
-    String certificates() {
-        return 
-            "<form action=\"http://localhost:5000/predict\" method=\"post\" enctype=\"multipart/form-data\">\r\n" + //
-            "    <label for=\"fileInput\">Upload a certificate and get points:</label><br>\r\n" + //
-            "    <input type=\"file\" id=\"fileInput\" name=\"fileInput\" accept=\"image/*\" required><br><br>\r\n" + //
-            "    <input type=\"submit\" value=\"Upload certificate\">" + //
-            "</form>"+
-            "<br> <a href='/certificates/list'> My Certificates </a> <br>";
+    public String certificates() {
+        Context context = new Context();
+        //this is an example if you want to add same variable to your context to add in the template
+        //context.setVariable("name", "John Doe");
+        // first argument of processe is the name of the template you want to use
+        String html = templateEngine.process("certificates", context);
+        return html;
     }
 
     @RequestMapping(value = "/certificates/upload", method = RequestMethod.POST)

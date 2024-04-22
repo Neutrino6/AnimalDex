@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title></title>
+    <title>Upload a new certificate</title>
 </head>
 <body>
-<p>
-    <span th:text="${certificates}">Hello!!</span>
-</p>
+    <form action="http://localhost:5000/predict" method="post" enctype="multipart/form-data">
+        <label for="fileInput">Upload a certificate and get points:</label><br>
+        <input type="file" id="fileInput" name="fileInput" accept="image/*" required><br><br>
+        <input type="submit" value="Upload certificate">
+        </form>
+        <br> <a href='/certificates/list'> My Certificates </a> <br>
 </body>
 </html>

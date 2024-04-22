@@ -153,6 +153,6 @@ INSERT INTO animal (a_name, details, regions, std_points) VALUES
     ('Wasp', 'The wasp is a flying insect known for its slender body and ability to deliver painful stings. It is commonly found in gardens, forests, and urban areas across all regions of Italy.', 'All regions of Italy', 65);
 
 
-INSERT INTO users (user_id,email, passw, username, firstname, surname, birthday, fav_animal, forum_notify, emergency_notify, userImage, administrator)
-VALUES (999,'example@example.com', 'password123', 'example_user', 'John', 'Doe', '1990-01-01', 1, true, false, NULL, false);
+INSERT INTO users (user_id,email, passw, username, firstname, surname, birthday, fav_animal, forum_notify, emergency_notify, administrator)
+VALUES (999,'example@example.com', 'password123', 'example_user', 'John', 'Doe', '1990-01-01', 1, true, false, false);
 
