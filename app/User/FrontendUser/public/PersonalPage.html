@@ -80,35 +80,30 @@ fare per modificare i vari campi -->
 <!-- form con tutti i dati-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script type="text/javascript" language="javascript">
-      
-      
+
       const urlParams = new URLSearchParams(window.location.search);
       const userId = urlParams.get('userId');
       console.log("valore userId=" + userId);
-      //CONTINUARE A MODIFICARE DA QUI (PER ORA NON RIESCE A PRENDERE LE INFORMAZIONI DAL DB)
       
-        // Il tuo codice JavaScript qui
-        fetch('http://localhost:3000/PersonalPage.html?userId=' + userId)
-        .then(response => response.json())
-        .then(user => {
-          document.addEventListener("DOMContentLoaded", function() {
-            let form = $("form").first();
-            console.log("Numero di elementi form:", form.length);
-            let inputs = form.find(":input")
-            console.log("Numero di elementi input:", inputs.length);
-            //let input = inputs.first();
-            inputs[0].focus().val(user.email);
-            inputs[1].focus().val(user.username);
-            inputs[2].focus().val(user.firstname);
-            inputs[3].focus().val(user.surname);
-            inputs[4].focus().val(user.passw);
-            inputs[5].focus().val(user.birthday);
-            inputs[6].focus().val(user.fav_animal);
-            inputs[7].focus().val(user.forum_notify);
-            inputs[8].focus().val(user.emergency_notify);
+      //CONTINUARE A MODIFICARE DA QUI (PER ORA NON RIESCE A PRENDERE LE INFORMAZIONI DAL DB)
+      fetch('http://localhost:3000/PersonalPage.html?userId=' + userId).then(response => response.json()).then(user => {
+            document.addEventListener("DOMContentLoaded", function() {
+              let form = $("form").first();
+              console.log("Numero di elementi form:", form.length);
+              let inputs = form.find(":input")
+              console.log("Numero di elementi input:", inputs.length);
+              //let input = inputs.first();
+              inputs[0].focus().val(user.email);
+              inputs[1].focus().val(user.username);
+              inputs[2].focus().val(user.firstname);
+              inputs[3].focus().val(user.surname);
+              inputs[4].focus().val(user.passw);
+              inputs[5].focus().val(user.birthday);
+              inputs[6].focus().val(user.fav_animal);
+              inputs[7].focus().val(user.forum_notify);
+              inputs[8].focus().val(user.emergency_notify);
           });
-      })
-      .catch(error => console.error('Errore:', error));
+      }).catch(error => console.error('Errore:', error));
       
     </script>
 

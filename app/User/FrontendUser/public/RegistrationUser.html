@@ -12,7 +12,13 @@
     <link rel = "stylesheet" href = "generale.css" />
 
     <title> Register as a player </title>
-    
+    <script type="text/javascript" language="javascript">
+        const urlParams = new URLSearchParams(window.location.search);
+        const err = urlParams.get('err2');
+        if(err == 91) {
+            alert("Passw and Confirm Passw not corresponding");
+        }
+    </script>
 
 </head>
 

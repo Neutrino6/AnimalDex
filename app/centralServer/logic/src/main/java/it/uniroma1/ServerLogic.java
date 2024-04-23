@@ -70,13 +70,13 @@ public class ServerLogic {
     }
 
     @RequestMapping(value = "/userSignUp", method = RequestMethod.POST)
-    public ResponseEntity<String> userSignUp(@RequestParam(value = "email", required = true) String email, 
-                                            @RequestParam(value = "password", required = true) String password,
-                                            @RequestParam(value = "username", required = true) String username,
-                                            @RequestParam(value = "name", required = false) String name,
-                                            @RequestParam(value = "surname", required = false) String surname,
-                                            @RequestParam(value = "dateofbirth", required = false) String dateofbirth,
-                                            @RequestParam(value = "confirmpassword", required = true) String confirmPassword) {
+    public ModelAndView userSignUp(@RequestParam(value = "email", required = true) String email, 
+                                @RequestParam(value = "password", required = true) String password,
+                                @RequestParam(value = "username", required = true) String username,
+                                @RequestParam(value = "name", required = false) String name,
+                                @RequestParam(value = "surname", required = false) String surname,
+                                @RequestParam(value = "dateofbirth", required = false) String dateofbirth,
+                                @RequestParam(value = "confirmpassword", required = true) String confirmPassword) {
         if(password.equals(confirmPassword)){
             // compute the hash of the password
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -94,7 +94,9 @@ public class ServerLogic {
             String checkEmail = "SELECT count(*) from users where email = :u_email";
             Integer count = jdbcTemplate.queryForObject(checkEmail, source1, Integer.class);
             if (count != null && count > 0) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email already used by someone");
+                // Email already used
+                Integer err=90;
+                return new ModelAndView("redirect:http://localhost:3000/LoginUser.html?err="+err);
             } else {
                 // Save user information in the database
                 MapSqlParameterSource source2 = new MapSqlParameterSource()
@@ -106,10 +108,16 @@ public class ServerLogic {
                     .addValue("birthday", dob);
                 String insertQuery = "INSERT INTO users (email, passw, username, firstname, surname, birthday) VALUES (:u_email, :hpassw, :username, :firstname, :surname, :birthday)";
                 jdbcTemplate.update(insertQuery, source2);
-                return ResponseEntity.status(HttpStatus.CREATED).body("User signed up successfully");    //reindirizzare a personalpage su localhost 3000 con id utente (?)
+                // Redirect to login page
+                Integer suc=99;
+                return new ModelAndView("redirect:http://localhost:3000/LoginUser.html?suc="+suc);
             }
         }
-        else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error password is not equal to confirmPassword");
+        else {
+            // Error: password is not equal to confirmPassword
+            Integer err2=91;
+            return new ModelAndView("redirect:http://localhost:3000/RegistrationUser.html?err2="+err2);
+        }
     }
     
     @RequestMapping(value = "/userSignIn", method = RequestMethod.POST)
@@ -131,29 +139,12 @@ public class ServerLogic {
             return modelAndView;
         } else {
             // Se le credenziali di accesso sono incorrette, reindirizza alla pagina di login con un messaggio di errore
-            ModelAndView modelAndView = new ModelAndView("redirect:/login.html");
-            modelAndView.addObject("error", "Incorrect login credentials");
+            Integer err=990;
+            ModelAndView modelAndView = new ModelAndView("redirect:http://localhost:3000/LoginUser.html?err="+err);
             return modelAndView;
         }
     }
 
-
-    /*
-    @RequestMapping(value = "/userSignIn", method = RequestMethod.POST)
-    public ResponseEntity<String> userSignIn(@RequestParam(value = "email", required = true) String email, 
-                                            @RequestParam(value = "password", required = true) String password) {
-        MapSqlParameterSource source1 = new MapSqlParameterSource()
-            .addValue("u_email", email);
-        String insertQuery = "select passw from users where email = :u_email";
-        String realPassword = jdbcTemplate.queryForObject(insertQuery, source1, String.class);
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        if (encoder.matches(password, realPassword)) {
-            return ResponseEntity.status(HttpStatus.OK).body("User signed in successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect login credential");
-        }
-    }
-    */
     @Transactional
     private ResponseEntity<String> certificateManagement(String animalName,int user_id) throws JsonProcessingException{
 

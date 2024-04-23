@@ -11,7 +11,20 @@
     <link rel = "stylesheet" href = "generale.css" />
 
     <title> Login </title>
-    
+    <script type="text/javascript" language="javascript">
+        const urlParams = new URLSearchParams(window.location.search);
+        const err = urlParams.get('err');
+        const suc = urlParams.get('suc');
+        if(err == 90) {
+            alert("Email already in use");
+        }
+        else if(err == 990) {
+            alert("Wrong credentials");
+        }
+        if(suc == 99) {
+            alert("Registration successful");
+        }
+    </script>
 
 
 </head>
