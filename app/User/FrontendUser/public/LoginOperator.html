@@ -11,7 +11,20 @@
     <link rel = "stylesheet" href = "generale.css" />
 
     <title> Login </title>
-    
+    <script type="text/javascript" language="javascript">
+        const urlParams = new URLSearchParams(window.location.search);
+        const err = urlParams.get('err');
+        const suc = urlParams.get('suc');
+        if(err == 90) {
+            alert("Email already in use");
+        }
+        else if(err == 990) {
+            alert("Wrong credentials");
+        }
+        if(suc == 99) {
+            alert("Registration successful");
+        }
+    </script>
 
 
 </head>
@@ -30,23 +43,17 @@
 <br>
 <br>   
 <!-- form con tutti i dati-->
-    <form action = "iscrizione.php" class = "form-signin m-auto"
+    <form action = "http://localhost:6039/operatorSignIn" class = "form-signin m-auto"
         method = "POST" name = "iscrizione" onSubmit = "return validaIscrizione()">
 
-        <input type="number" name="operatorcode"  
-        placeholder = "Operator code"
-        class = "form-control">
-        
-        <br>
-        <br>
-            <input type="email" name="e-mail" 
+            <input type="email" name="o_email" 
             placeholder = "E-mail"
             class = "form-control">
             
             <br>
             <br>
 
-        <input type="password" name="password"
+        <input type="password" name="passw"
         placeholder = "Password" minlength="8" class = "form-control" required />
         
         <br>

@@ -11,7 +11,16 @@
     <link rel = "stylesheet" href = "generale.css" />
 
     <title> Register as an operator </title>
-    
+    <script type="text/javascript" language="javascript">
+        const urlParams = new URLSearchParams(window.location.search);
+        const err = urlParams.get('err2');
+        if(err == 91) {
+            alert("Passw and Confirm Passw not corresponding");
+        }
+        if(err == 95) {
+            alert("Operator doesn't exist");
+        }
+    </script>
 
 </head>
 
@@ -32,11 +41,11 @@
     <h5 style="text-align: center; color:aliceblue; ">Before completing the registration, please read and accept our terms and conditions
     <a style="text-decoration: underline;" href="Terms.html">here</a></h5>        
     <br><br>
-    <form action = "" class = "form-signin m-auto"
+    <form action = "http://localhost:6039/operatorSignUp" class = "form-signin m-auto"
         method = "POST" name = "iscrizione" onSubmit = "return validaIscrizione()">
 
 
-        <input type="text" name="name" 
+        <input type="text" name="firstname" 
                 placeholder = "Name"
                 class = "form-control">
                 
@@ -49,7 +58,7 @@
             <input type="date" name="dateofbirth"
             class = "form-control">
             <br><br>
-            <input type="password" name="password"
+            <input type="password" name="passw"
             placeholder = "Password" minlength="8" class = "form-control" required />
             
             <br><br>
@@ -59,7 +68,7 @@
             
 
         <br><br> 
-            <input type="email" name="e-mail" 
+            <input type="email" name="o_email" 
             placeholder = "E-mail"
             class = "form-control">
             

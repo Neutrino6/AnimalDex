@@ -37,9 +37,14 @@ CREATE TABLE users (
 );
 
 CREATE TABLE operator (
-    o_email varchar(255) PRIMARY KEY,
-    code varchar(255) not null,
-	unique(code)
+    o_email varchar(255) not null,
+    code varchar(255) PRIMARY KEY,
+    passw varchar(255) not null,
+    firstname varchar(255),
+    surname varchar(255),
+    birthday date,
+	unique(code),
+    unique(o_email)
 );
 
 CREATE TABLE comment (

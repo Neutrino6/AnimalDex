@@ -29,6 +29,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.UUID;
+
 @RestController
 public class ServerLogic {
     
@@ -123,6 +125,14 @@ public class ServerLogic {
     @RequestMapping(value = "/userSignIn", method = RequestMethod.POST)
     public ModelAndView userSignIn(@RequestParam(value = "email", required = true) String email, @RequestParam(value = "password", required = true) String password) {
         MapSqlParameterSource source1 = new MapSqlParameterSource().addValue("u_email", email);
+        String checkEmail = "SELECT count(*) from users where email = :u_email";
+        Integer count = jdbcTemplate.queryForObject(checkEmail, source1, Integer.class);
+        if (count == null || count <= 0) {
+            // User not in db
+            Integer err2=95;
+            return new ModelAndView("redirect:http://localhost:3000/RegistrationUser.html?err2="+err2);
+        }
+        
         String insertQuery = "select user_id, passw from users where email = :u_email"; // Seleziona anche l'id dell'utente
         // Recupera l'id e la password dell'utente dal database
         Map<String, Object> userMap = jdbcTemplate.queryForMap(insertQuery, source1);
@@ -141,6 +151,91 @@ public class ServerLogic {
             // Se le credenziali di accesso sono incorrette, reindirizza alla pagina di login con un messaggio di errore
             Integer err=990;
             ModelAndView modelAndView = new ModelAndView("redirect:http://localhost:3000/LoginUser.html?err="+err);
+            return modelAndView;
+        }
+    }
+
+    @RequestMapping(value = "/operatorSignUp", method = RequestMethod.POST)
+    public ModelAndView operatorSignUp(@RequestParam(value = "o_email", required = true) String o_email, 
+                                @RequestParam(value = "passw", required = true) String passw,
+                                @RequestParam(value = "firstname", required = false) String firstname,
+                                @RequestParam(value = "surname", required = false) String surname,
+                                @RequestParam(value = "dateofbirth", required = false) String dateofbirth,
+                                @RequestParam(value = "confirmpassword", required = true) String confirmPassword) {
+        if(passw.equals(confirmPassword)){
+            // compute the hash of the password
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            passw = encoder.encode(passw);
+
+            // transform dateofbirth in the right format
+            LocalDateTime dob = null;
+            if(!dateofbirth.isEmpty()){
+                dateofbirth+="T00:00:00";
+                dob = LocalDateTime.parse(dateofbirth);
+            }
+
+            MapSqlParameterSource source1 = new MapSqlParameterSource().addValue("o_email", o_email);
+            String checkEmail = "SELECT count(*) from operator where o_email = :o_email";
+            Integer count = jdbcTemplate.queryForObject(checkEmail, source1, Integer.class);
+            if (count != null && count > 0) {
+                // Email already used
+                Integer err=90;
+                return new ModelAndView("redirect:http://localhost:3000/LoginOperator.html?err="+err);
+            } else {
+                //genera un code randomico mai uguale ai precedenti
+                UUID uuid = UUID.randomUUID();
+                String code = uuid.toString();
+                // Save user information in the database
+                MapSqlParameterSource source2 = new MapSqlParameterSource()
+                    .addValue("o_email", o_email)
+                    .addValue("code", code)
+                    .addValue("passw", passw)
+                    .addValue("firstname", firstname)
+                    .addValue("surname", surname)
+                    .addValue("birthday", dob);
+                String insertQuery = "INSERT INTO operator (o_email, code, passw, firstname, surname, birthday) VALUES (:o_email, :code, :passw, :firstname, :surname, :birthday)";
+                jdbcTemplate.update(insertQuery, source2);
+                // Redirect to login page
+                Integer suc=99;
+                return new ModelAndView("redirect:http://localhost:3000/LoginOperator.html?suc="+suc);
+            }
+        }
+        else {
+            // Error: password is not equal to confirmPassword
+            Integer err2=91;
+            return new ModelAndView("redirect:http://localhost:3000/RegistrationOperator.html?err2="+err2);
+        }
+    }
+    
+    @RequestMapping(value = "/operatorSignIn", method = RequestMethod.POST)
+    public ModelAndView operatorSignIn(@RequestParam(value = "o_email", required = true) String o_email, @RequestParam(value = "passw", required = true) String passw) {
+        MapSqlParameterSource source1 = new MapSqlParameterSource().addValue("o_email", o_email);
+        String checkEmail = "SELECT count(*) from operator where o_email = :o_email";
+        Integer count = jdbcTemplate.queryForObject(checkEmail, source1, Integer.class);
+        if (count == null || count <= 0) {
+            // Operator not in db
+            Integer err2=95;
+            return new ModelAndView("redirect:http://localhost:3000/RegistrationOperator.html?err2="+err2);
+        }
+        
+        String insertQuery = "select code, passw from operator where o_email = :o_email"; // Seleziona anche l'id dell'utente
+        // Recupera l'id e la password dell'utente dal database
+        Map<String, Object> opMap = jdbcTemplate.queryForMap(insertQuery, source1);
+
+        String realPassword = (String) opMap.get("passw");
+        String opCode = (String) opMap.get("code"); // Ottieni l'id dell'utente
+        //System.out.println(userId);
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        if (encoder.matches(passw, realPassword)) {
+            // Se il login è corretto, reindirizza alla pagina personal page con l'id utente allegato
+            ModelAndView modelAndView = new ModelAndView("redirect:http://localhost:3000/PersonalPageOperator.html?userId=" + opCode);
+            //modelAndView.addObject("userId", userId); // Aggiungi l'id utente come attributo per il reindirizzamento
+            return modelAndView;
+        } else {
+            // Se le credenziali di accesso sono incorrette, reindirizza alla pagina di login con un messaggio di errore
+            Integer err=990;
+            ModelAndView modelAndView = new ModelAndView("redirect:http://localhost:3000/LoginOperator.html?err="+err);
             return modelAndView;
         }
     }
