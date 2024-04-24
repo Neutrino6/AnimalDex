@@ -31,6 +31,10 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.util.UUID;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+
 @RestController
 public class ServerLogic {
     
@@ -144,7 +148,7 @@ public class ServerLogic {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         if (encoder.matches(password, realPassword)) {
             // Se il login è corretto, reindirizza alla pagina personal page con l'id utente allegato
-            ModelAndView modelAndView = new ModelAndView("redirect:http://localhost:3000/PersonalPage.html?userId=" + userId);
+            ModelAndView modelAndView = new ModelAndView("redirect:http://localhost:3000/PersonalPage/" + userId);
             //modelAndView.addObject("userId", userId); // Aggiungi l'id utente come attributo per il reindirizzamento
             return modelAndView;
         } else {
@@ -229,7 +233,7 @@ public class ServerLogic {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         if (encoder.matches(passw, realPassword)) {
             // Se il login è corretto, reindirizza alla pagina personal page con l'id utente allegato
-            ModelAndView modelAndView = new ModelAndView("redirect:http://localhost:3000/PersonalPageOperator.html?userId=" + opCode);
+            ModelAndView modelAndView = new ModelAndView("redirect:http://localhost:3000/PersonalPageOperator.html?opId=" + opCode);
             //modelAndView.addObject("userId", userId); // Aggiungi l'id utente come attributo per il reindirizzamento
             return modelAndView;
         } else {
@@ -238,6 +242,53 @@ public class ServerLogic {
             ModelAndView modelAndView = new ModelAndView("redirect:http://localhost:3000/LoginOperator.html?err="+err);
             return modelAndView;
         }
+    }
+
+    @RequestMapping(value = "/PersonalPageUser")
+    public ResponseEntity<String> PersonalePageUser(@RequestParam(value = "user_id") Integer user_id) throws JsonProcessingException {
+        MapSqlParameterSource source1 = new MapSqlParameterSource().addValue("user_id", user_id);
+        String checkId = "SELECT count(*) from users where user_id = :user_id";
+        Integer count = jdbcTemplate.queryForObject(checkId, source1, Integer.class);
+        if (count == null || count <= 0) {
+            // User not in db
+            Integer err2=95;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("user not found");
+        }
+        
+        String insertQuery = "select * from users where user_id = :user_id"; // Seleziona anche l'id dell'utente
+        // Recupera l'id e la password dell'utente dal database
+        Map<String, Object> userMap = jdbcTemplate.queryForMap(insertQuery, source1);
+
+        String passw = (String) userMap.get("passw");
+        String username = (String) userMap.get("username"); // Ottieni l'id dell'utente
+        String email = (String) userMap.get("email");
+        String firstname = (String) userMap.get("firstname"); 
+        String surname = (String) userMap.get("surname");
+        Date dob = (Date) userMap.get("birthday");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+        String strdob = dateFormat.format(dob); 
+        Integer points = (Integer) userMap.get("points");
+        Integer fav_animal = (Integer) userMap.get("fav_animal"); 
+        Boolean forum_not = (Boolean) userMap.get("forum_notify");
+        Boolean emergency_not = (Boolean) userMap.get("emergency_notify"); 
+        
+        
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode responseJson = mapper.createObjectNode();
+
+        responseJson.put("passw", passw);
+        responseJson.put("username", username);
+        responseJson.put("email", email);
+        responseJson.put("firstname", firstname);
+        responseJson.put("surname", surname);
+        responseJson.put("points", points);
+        responseJson.put("dob", strdob);
+        responseJson.put("fav_animal", fav_animal);
+        responseJson.put("emergency_not", emergency_not);
+        responseJson.put("forum_not", forum_not);
+
+        String jsonResponse = mapper.writeValueAsString(responseJson);
+        return ResponseEntity.ok(jsonResponse);
     }
 
     @Transactional
