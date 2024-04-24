@@ -35,6 +35,11 @@ services:
             context: "./certificate"
         ports:
             - "7777:7777"
+    google-oauth:
+        build:
+            context: "./googleOauthManagement"
+        ports:
+            - "8080:8080"
     nodejs:
         build: ./FrontendUser
         ports:

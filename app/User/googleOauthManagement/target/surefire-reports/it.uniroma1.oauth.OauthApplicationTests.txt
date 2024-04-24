@@ -1,0 +1,9 @@
+-------------------------------------------------------------------------------
+Test set: it.uniroma1.oauth.OauthApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 3.377 s <<< FAILURE! - in it.uniroma1.oauth.OauthApplicationTests
+contextLoads  Time elapsed: 0.001 s  <<< ERROR!
+java.lang.IllegalStateException: Failed to load ApplicationContext
+Caused by: org.springframework.beans.factory.CannotLoadBeanClassException: Error loading class [it.uniroma1.oauth.OauthController] for bean with name 'oauthController' defined in file [c:\Users\saver\OneDrive\Università\Magistrale\LabAdvProg\Proj\AnimalDex\app\User\googleOauthManagement\target\classes\it\uniroma1\oauth\OauthController.class]: problem with class file or dependent class; nested exception is java.lang.UnsupportedClassVersionError: it/uniroma1/oauth/OauthController has been compiled by a more recent version of the Java Runtime (class file version 61.0), this version of the Java Runtime only recognizes class file versions up to 52.0
+Caused by: java.lang.UnsupportedClassVersionError: it/uniroma1/oauth/OauthController has been compiled by a more recent version of the Java Runtime (class file version 61.0), this version of the Java Runtime only recognizes class file versions up to 52.0
+
