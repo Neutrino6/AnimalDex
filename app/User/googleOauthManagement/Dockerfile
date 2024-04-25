@@ -1,4 +1,6 @@
-FROM feranto/java-maven-spring:v1
+FROM python
 COPY . .
-RUN mvn install
-ENTRYPOINT ["java","-jar","/target/oauth-1.0-SNAPSHOT.jar"]
+RUN pip install Flask requests
+EXPOSE 8080
+ENTRYPOINT ["python"]
+CMD ["oauth.py"]
