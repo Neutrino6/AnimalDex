@@ -13,11 +13,11 @@ function hasChar(s, chars) {
 function controllo_email(){
     const emailRegex = /^[^\s@]+@[^\s@]+.[^\s@]+$/;
     if(document.iscrizione.email.value.length > 50){
-        alert("Email troppo lunga");
+        alert("Email too long");
         return false;
     }
     if(emailRegex.test(document.iscrizione.email.value)==false ){
-        alert("Formato email errato");
+        alert("Wrong e-mail format");
         return false;
     }
     return true;
@@ -25,63 +25,63 @@ function controllo_email(){
 
 function validateReg() {
     if (hasChar(document.iscrizione.username.value, BlackListChars_username) ) {
-        alert("I caratteri di punteggiatura, di parentesi e la maggior parte di quelli speciali non sono consentiti nel campo username");
+        alert("Punctuation characters, brackets and most of special characters are not allowed in the username field");
         return false;
     }
 
     if (hasChar(document.iscrizione.name.value, BlackListChars_username) ) {
-        alert("I caratteri di punteggiatura, di parentesi e la maggior parte di quelli speciali non sono consentiti nel campo username");
+        alert("Punctuation characters, brackets and most of special characters are not allowed in the name field");
         return false;
     }
 
     if (hasChar(document.iscrizione.surname.value, BlackListChars_username) ) {
-        alert("I caratteri di punteggiatura, di parentesi e la maggior parte di quelli speciali non sono consentiti nel campo username");
+        alert("Punctuation characters, brackets and most of special characters are not allowed in the surname field");
         return false;
     }
 
     if (hasChar(document.iscrizione.password.value, BlackListChars_passw)) {
-        alert("I caratteri virgoletta, doppia virgoletta, spazio e virgola non sono consentiti nel campo password");
+        alert("Comma, double comma, space and column are not allowed in the password field");
         return false;
     }
 
     if (hasChar(document.iscrizione.email.value, BlackListChars_username) ) {
-        alert("I caratteri di punteggiatura, di parentesi e la maggior parte di quelli speciali non sono consentiti nel campo username");
+        alert("Punctuation characters, brackets and most of special characters are not allowed in the e-mail field");
         return false;
     }
 
     if (document.iscrizione.confirmpassword.value!=document.iscrizione.password.value) {
-        alert("Password non corrispondenti");
+        alert("Password does not correspond");
         return false;
     }
 
     if(document.iscrizione.acceptterms.checked==false){
-        alert("Accettare termini e condizioni per continuare");
+        alert("Accept terms and conditions to continue");
         return false;
     }
     
     var bool = controllo_email();
 
     if(bool==false) {
-        alert("Email non corretta");
+        alert("Wrong e-mail format");
         return false;
     }
 
     if (document.iscrizione.email.value.length > 255) {
-        alert("Email troppo lunga");
+        alert("Email too long");
         return false;
     }
 
     if (document.iscrizione.name.value.length > 255) {
-        alert("name troppo lungo");
+        alert("Name too long");
         return false;
     }
 
     if (document.iscrizione.username.value.length > 255) {
-        alert("username troppo lungo");
+        alert("Username too long");
         return false;
     }
     if (document.iscrizione.surname.value.length > 255) {
-        alert("surname troppo lungo");
+        alert("Surname too long");
         return false;
     }
 
