@@ -1,11 +1,12 @@
+import os
 import json
 import flask
 import requests
 
 app = flask.Flask(__name__)
 
-CLIENT_ID = '894483498590-vce84rh69ulm5hvbckqs507d6biu9q3r.apps.googleusercontent.com'
-CLIENT_SECRET = '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'
+CLIENT_ID = os.environ.get('CLIENT_ID')
+CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
 SCOPE = 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
 REDIRECT_URI = 'http://localhost:8080/callback'
 
@@ -52,4 +53,3 @@ if __name__ == '__main__':
     app.secret_key = str(uuid.uuid4())
     app.debug = False
     app.run(debug=True, host='0.0.0.0', port=8080)
-
