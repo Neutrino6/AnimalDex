@@ -208,6 +208,64 @@ public class CertificatesController {
         "<br> <a href='/certificates'> Go back to upload certificates </a> <br>"+
         "<a href='../certificates/list'> Go back to your certificates</a>";
     }
+    
+    @RequestMapping("/certificates/animals")
+    String AnimalsList() {
+        String GetCertificates= "SELECT a_id, a_name, details, regions from animal"; //user=999 to be replaced by current_user
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(GetCertificates, new MapSqlParameterSource());
+
+        String Getids= "SELECT animal_id from certification where user_id=999"; //user=999 to be replaced by current_user
+        List<Map<String, Object>> ids = jdbcTemplate.queryForList(Getids, new MapSqlParameterSource());
+        
+        // Generating a string to add every entry in the database to appear in the table
+        StringBuilder tableHtml = new StringBuilder();
+        tableHtml.append("<h1> Gotta cacth 'em all</h1>");
+        tableHtml.append("<table border=\"1\">");
+        tableHtml.append("<thead>");
+        tableHtml.append("<tr>");
+        tableHtml.append("<th>Animal name</th>");
+        tableHtml.append("<th>Details</th>");
+        tableHtml.append("<th>Regions</th>");
+        tableHtml.append("</tr>");
+        tableHtml.append("</thead>");
+        tableHtml.append("<tbody>");
+
+        Boolean isPresent=false;
+        for (Map<String, Object> row : rows) {
+            Integer id=(Integer) row.get("a_id");
+            String name = (String) row.get("a_name");
+            String details = (String) row.get("details");
+            String region = (String) row.get("regions");
+            
+            isPresent=false;
+            for (Map<String, Object> animalids : ids) {                 // checks if the user has registered the animal
+                Integer animalid=(Integer) animalids.get("animal_id");
+                if(animalid.equals(id)){
+                    isPresent=true;
+                    break;
+                } 
+            }
+            if(isPresent){                //if the user has registered the animal then show infos about the animal, else not
+                tableHtml.append("<tr>");
+                tableHtml.append("<td><a href='../certificates/image?animal=").append(name).append("''>").append(name).append("</td>");    
+                tableHtml.append("<td>").append(details).append("</td>");
+                tableHtml.append("<td>").append(region).append("</td>");
+            }
+            else{
+                tableHtml.append("<tr>");
+                tableHtml.append("<td>").append(name).append("</td>");    
+                tableHtml.append("<td> ??? </td>");
+                tableHtml.append("<td> ??? </td>");
+            }
+            tableHtml.append("</tr>");
+        }
+    
+        tableHtml.append("</tbody>");
+        tableHtml.append("</table>");
+        tableHtml.append("<br> <a href='/certificates'> Go back </a>");
+    
+        return tableHtml.toString();
+    }
 
 }
 
