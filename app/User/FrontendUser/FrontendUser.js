@@ -65,11 +65,31 @@ app.get('/PersonalPage/:userId', (req, res) => {
   res.sendFile(path.join(__dirname, './public/PersonalPage.html'));
 });
 */
+
+/*così funziona, nel dubbio la lascerei così*/
+// Route per le richieste non gestite
+app.use((req, res, next) => {
+  // Controlla se la richiesta corrisponde a una route delle risorse statiche
+  if (req.path.startsWith('/')) {
+      // La richiesta corrisponde a una route delle risorse statiche, passa alla route successiva
+      next();
+  } else {
+      // La richiesta non corrisponde a nessuna delle route definite, invia la risposta 404
+      res.status(404);
+      res.sendFile(path.join(__dirname, './public/404page.html'));
+      console.log("URL sbagliato!!");
+  }
+});
+
+
+
+
+/* ORIGINALE ALE
 app.use((req, res) => {
     res.status(404);
     res.sendFile(path.join(__dirname, './public/404page.html'));
     console.log("URL sbagliato!!");
-});
+}); */
 
 app.listen(3000, () => {
     console.log("App listening on port 3000!!");
