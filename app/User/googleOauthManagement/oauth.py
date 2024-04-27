@@ -2,6 +2,7 @@ import os
 import json
 import flask
 import requests
+from flask import redirect
 
 app = flask.Flask(__name__)
 
@@ -11,7 +12,7 @@ SCOPE = 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis
 REDIRECT_URI = 'http://localhost:8080/callback'
 
 
-@app.route('/oauth/google')
+@app.route('/oauth/google',methods=['POST'])
 def index():
     if 'credentials' not in flask.session:
         return flask.redirect(flask.url_for('callback'))
@@ -20,15 +21,58 @@ def index():
         return flask.redirect(flask.url_for('callback'))
     else:
         access_token = credentials['access_token']
-        userinfo = get_user_info(access_token)
-        return userinfo
+        user_info = get_user_info(access_token)
+        url="http://host.docker.internal:6039/UserOauth"
+        response = requests.post(url, json=user_info)
+        # Checking the response
+        if response.status_code == 200:
+            url="http://host.docker.internal:3000/PersonalPage/"
+            # If the request was successful, return the prediction result
+            user_id = response.text
+            app.logger.info(f'Oauth OK. User ID: {user_id}')
+            url=url+user_id
+            # Now you can use the user ID as needed
+            return redirect(url, 307)
+        else:
+            # If there was an error, return an error message
+            url=("http://host.docker.internal:3000/LoginUser.html?err=990")
+            app.logger.error('Oauth KO')
+            return redirect(url, 307)
+
+@app.route('/oauth/google',methods=['GET'])
+def get():
+    credentials = json.loads(flask.session['credentials'])
+    access_token = credentials['access_token']
+    user_info = get_user_info(access_token)
+    url="http://host.docker.internal:6039/UserOauth"
+    response = requests.post(url, json=user_info)
+
+    # Checking the response
+    if response.status_code == 200:
+        url="http://host.docker.internal:3000/PersonalPage/"
+        # If the request was successful, return the prediction result
+        user_id = response.text
+        app.logger.info(f'Oauth OK. User ID: {user_id}')
+        url=url+user_id
+        # Now you can use the user ID as needed
+        return redirect(url, 307)
+    else:
+        # If there was an error, return an error message
+        url=("http://host.docker.internal:3000/LoginUser.html?err=990")
+        app.logger.error('Oauth KO')
+        return redirect(url, 307)
+    
 
 
 def get_user_info(access_token):
     headers = {'Authorization': 'Bearer {}'.format(access_token)}
     req_uri = 'https://www.googleapis.com/oauth2/v1/userinfo'
     r = requests.get(req_uri, headers=headers)
-    return r.text
+    user_info_json = r.json()  
+    email = user_info_json.get('email') 
+    name = user_info_json.get('name')  
+    return {'email': email, 'name': name} 
+
 
 @app.route('/callback')
 def callback():
@@ -45,7 +89,7 @@ def callback():
                 'grant_type': 'authorization_code'}
         r = requests.post('https://oauth2.googleapis.com/token', data=data)
         flask.session['credentials'] = r.text
-        return flask.redirect(flask.url_for('index'))
+        return flask.redirect(flask.url_for('get'))
 
 
 if __name__ == '__main__':

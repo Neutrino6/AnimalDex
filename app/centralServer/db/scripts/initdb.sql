@@ -23,7 +23,7 @@ CREATE TABLE animal (
 CREATE TABLE users (
     user_id serial PRIMARY KEY,
     email varchar(255) not null,
-    passw varchar(255) not null,
+    passw varchar(255), /*passw null allowed only for users registred via oauth*/
     username varchar(255) not null,
     firstname varchar(255),
     surname varchar(255),

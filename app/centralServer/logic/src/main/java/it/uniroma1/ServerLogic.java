@@ -259,19 +259,21 @@ public class ServerLogic {
         // Recupera l'id e la password dell'utente dal database
         Map<String, Object> userMap = jdbcTemplate.queryForMap(insertQuery, source1);
 
+        String strdob=null;
         String passw = (String) userMap.get("passw");
         String username = (String) userMap.get("username"); // Ottieni l'id dell'utente
         String email = (String) userMap.get("email");
         String firstname = (String) userMap.get("firstname"); 
         String surname = (String) userMap.get("surname");
         Date dob = (Date) userMap.get("birthday");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
-        String strdob = dateFormat.format(dob); 
+        if(dob!=null){
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+            strdob = dateFormat.format(dob);
+        }
         Integer points = (Integer) userMap.get("points");
         Integer fav_animal = (Integer) userMap.get("fav_animal"); 
         Boolean forum_not = (Boolean) userMap.get("forum_notify");
         Boolean emergency_not = (Boolean) userMap.get("emergency_notify"); 
-        
         
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode responseJson = mapper.createObjectNode();
@@ -348,6 +350,57 @@ public class ServerLogic {
             return ResponseEntity.ok(jsonResponse);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("animalName not found");
+    }
+
+    @RequestMapping(value = "/UserOauth", method = RequestMethod.POST)
+    public ResponseEntity<String> UserOauth(@RequestBody String requestBody){
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonNode = mapper.readTree(requestBody);
+
+            if (jsonNode.has("email") && jsonNode.has("name")) {
+                String email = jsonNode.get("email").asText();
+                String username = jsonNode.get("name").asText();
+                if (!email.isEmpty() && !username.isEmpty()) {
+                    return oauthManagement(email,username);
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
+        }
+    }
+
+    @Transactional
+    private ResponseEntity<String> oauthManagement(String email, String username) {
+        
+        MapSqlParameterSource source1 = new MapSqlParameterSource()
+            .addValue("email",email);
+        String checkExistenceforSameEmail = "SELECT count(*) FROM users WHERE :email=email and passw is not null";
+        String checkExistence = "SELECT count(*) FROM users WHERE :email=email";
+        Integer count0 = jdbcTemplate.queryForObject(checkExistenceforSameEmail, source1, Integer.class);
+        Integer count1 = jdbcTemplate.queryForObject(checkExistence, source1, Integer.class);
+        if(count0!=null && count0==0 && count1!=null){
+            //first time, create a new user
+            if(count1==0){
+                MapSqlParameterSource source2 = new MapSqlParameterSource()
+                    .addValue("username", username)
+                    .addValue("email",email);
+                String insertUser= "INSERT INTO users (email, username) VALUES (:email, :username)";
+                jdbcTemplate.update(insertUser, source2);
+            }
+            //user already registered
+            String getUserId = "select user_id from users where email = :email";
+            Integer userId = jdbcTemplate.queryForObject(getUserId, source1, Integer.class);
+            return ResponseEntity.ok(userId.toString());
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
+        }
     }
 
     // this method updates the points get by an user
