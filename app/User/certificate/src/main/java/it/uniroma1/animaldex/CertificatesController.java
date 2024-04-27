@@ -158,42 +158,34 @@ public class CertificatesController {
 
     @RequestMapping("/certificates/list")
     String certificatesList() {
+        Context context = new Context();
         String GetCertificates= "SELECT a_name, cert_date, details, regions from certification JOIN animal on animal_id = a_id where user_id=999"; //user=999 to be replaced by current_user
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(GetCertificates, new MapSqlParameterSource());
         
-        // Generating a string to add every entry in the database to appear in the table
-        StringBuilder tableHtml = new StringBuilder();
-        tableHtml.append("<h1> Uploaded certificates</h1>");
-        tableHtml.append("<table border=\"1\">");
-        tableHtml.append("<thead>");
-        tableHtml.append("<tr>");
-        tableHtml.append("<th>Animal name</th>");
-        tableHtml.append("<th>Certificate Date</th>");
-        tableHtml.append("<th>Details</th>");
-        tableHtml.append("<th>Regions</th>");
-        tableHtml.append("</tr>");
-        tableHtml.append("</thead>");
-        tableHtml.append("<tbody>");
+        List<String> AnimalsName = new ArrayList<String>();
+        List<String> AnimalsDescription = new ArrayList<String>();
+        List<String> AnimalsRegions = new ArrayList<String>();
+        List<Date> CertificatesDate = new ArrayList<Date>();
 
         for (Map<String, Object> row : rows) {
             String name = (String) row.get("a_name");
             Date certDate = (Date) row.get("cert_date");
             String details = (String) row.get("details");
             String region = (String) row.get("regions");
-    
-            tableHtml.append("<tr>");
-            tableHtml.append("<td><a href='../certificates/image?animal=").append(name).append("''>").append(name).append("</td>");
-            tableHtml.append("<td>").append(certDate).append("</td>");
-            tableHtml.append("<td>").append(details).append("</td>");
-            tableHtml.append("<td>").append(region).append("</td>");
-            tableHtml.append("</tr>");
+            
+            AnimalsName.add(name);
+            AnimalsDescription.add(details);
+            AnimalsRegions.add(region);
+            CertificatesDate.add(certDate);
+            
         }
-    
-        tableHtml.append("</tbody>");
-        tableHtml.append("</table>");
-        tableHtml.append("<br> <a href='/certificates'> Go back </a>");
-    
-        return tableHtml.toString();
+        context.setVariable("animalsNameRegistered", AnimalsName);
+        context.setVariable("animalsDescriptionRegistered", AnimalsDescription);
+        context.setVariable("animalsRegionsRegistered", AnimalsRegions);
+        context.setVariable("certificateDate", CertificatesDate);
+
+        String html = templateEngine.process("personaltable", context);
+        return html;
     }
 
     @RequestMapping("/certificates/image")
@@ -211,33 +203,28 @@ public class CertificatesController {
     
     @RequestMapping("/certificates/animals")
     String AnimalsList() {
+        Context context = new Context();
         String GetCertificates= "SELECT a_id, a_name, details, regions from animal"; //user=999 to be replaced by current_user
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(GetCertificates, new MapSqlParameterSource());
 
         String Getids= "SELECT animal_id from certification where user_id=999"; //user=999 to be replaced by current_user
         List<Map<String, Object>> ids = jdbcTemplate.queryForList(Getids, new MapSqlParameterSource());
-        
-        // Generating a string to add every entry in the database to appear in the table
-        StringBuilder tableHtml = new StringBuilder();
-        tableHtml.append("<h1> Gotta cacth 'em all</h1>");
-        tableHtml.append("<table border=\"1\">");
-        tableHtml.append("<thead>");
-        tableHtml.append("<tr>");
-        tableHtml.append("<th>Animal name</th>");
-        tableHtml.append("<th>Details</th>");
-        tableHtml.append("<th>Regions</th>");
-        tableHtml.append("</tr>");
-        tableHtml.append("</thead>");
-        tableHtml.append("<tbody>");
 
-        Boolean isPresent=false;
-        for (Map<String, Object> row : rows) {
-            Integer id=(Integer) row.get("a_id");
-            String name = (String) row.get("a_name");
-            String details = (String) row.get("details");
-            String region = (String) row.get("regions");
-            
-            isPresent=false;
+        List<String> AnimalsName = new ArrayList<String>();
+        List<String> AnimalsNameRegistered = new ArrayList<String>();
+        List<String> AnimalsDescription = new ArrayList<String>();
+        List<String> AnimalsDescriptionRegistered = new ArrayList<String>();
+        List<String> AnimalsRegions = new ArrayList<String>();
+        List<String> AnimalsRegionsRegistered = new ArrayList<String>();
+
+        // Popolamento delle liste con i dati dal database
+        for (Map<String, Object> result : rows) {
+            Integer id=(Integer) result.get("a_id");
+            String name = (String) result.get("a_name");
+            String region = (String) result.get("regions");
+            String detail = (String) result.get("details");
+
+            Boolean isPresent=false;
             for (Map<String, Object> animalids : ids) {                 // checks if the user has registered the animal
                 Integer animalid=(Integer) animalids.get("animal_id");
                 if(animalid.equals(id)){
@@ -245,27 +232,132 @@ public class CertificatesController {
                     break;
                 } 
             }
-            if(isPresent){                //if the user has registered the animal then show infos about the animal, else not
-                tableHtml.append("<tr>");
-                tableHtml.append("<td><a href='../certificates/image?animal=").append(name).append("''>").append(name).append("</td>");    
-                tableHtml.append("<td>").append(details).append("</td>");
-                tableHtml.append("<td>").append(region).append("</td>");
+            if(isPresent){    
+                AnimalsNameRegistered.add(name);
+                AnimalsDescriptionRegistered.add(detail);
+                AnimalsRegionsRegistered.add(region);
             }
             else{
-                tableHtml.append("<tr>");
-                tableHtml.append("<td>").append(name).append("</td>");    
-                tableHtml.append("<td> ??? </td>");
-                tableHtml.append("<td> ??? </td>");
+                AnimalsName.add(name);
+                AnimalsDescription.add(detail);
+                AnimalsRegions.add(region);
             }
-            tableHtml.append("</tr>");
         }
-    
-        tableHtml.append("</tbody>");
-        tableHtml.append("</table>");
-        tableHtml.append("<br> <a href='/certificates'> Go back </a>");
-    
-        return tableHtml.toString();
+
+        context.setVariable("animalsNameRegistered", AnimalsNameRegistered);
+        context.setVariable("animalsDescriptionRegistered", AnimalsDescriptionRegistered);
+        context.setVariable("animalsRegionsRegistered", AnimalsRegionsRegistered);
+        context.setVariable("animalsName", AnimalsName);
+
+
+        String html = templateEngine.process("table", context);
+        return html;
     }
 
+    @RequestMapping("/certificates/animals/increasingOrder")
+    String AnimalsListIncOrder() {
+        Context context = new Context();
+        String GetCertificates= "SELECT a_id, a_name, details, regions from animal order by a_name"; //user=999 to be replaced by current_user
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(GetCertificates, new MapSqlParameterSource());
+
+        String Getids= "SELECT animal_id from certification where user_id=999"; //user=999 to be replaced by current_user
+        List<Map<String, Object>> ids = jdbcTemplate.queryForList(Getids, new MapSqlParameterSource());
+
+        List<String> AnimalsName = new ArrayList<String>();
+        List<String> AnimalsNameRegistered = new ArrayList<String>();
+        List<String> AnimalsDescription = new ArrayList<String>();
+        List<String> AnimalsDescriptionRegistered = new ArrayList<String>();
+        List<String> AnimalsRegions = new ArrayList<String>();
+        List<String> AnimalsRegionsRegistered = new ArrayList<String>();
+
+        // Popolamento delle liste con i dati dal database
+        for (Map<String, Object> result : rows) {
+            Integer id=(Integer) result.get("a_id");
+            String name = (String) result.get("a_name");
+            String region = (String) result.get("regions");
+            String detail = (String) result.get("details");
+
+            Boolean isPresent=false;
+            for (Map<String, Object> animalids : ids) {                 // checks if the user has registered the animal
+                Integer animalid=(Integer) animalids.get("animal_id");
+                if(animalid.equals(id)){
+                    isPresent=true;
+                    break;
+                } 
+            }
+            if(isPresent){    
+                AnimalsNameRegistered.add(name);
+                AnimalsDescriptionRegistered.add(detail);
+                AnimalsRegionsRegistered.add(region);
+            }
+            else{
+                AnimalsName.add(name);
+                AnimalsDescription.add(detail);
+                AnimalsRegions.add(region);
+            }
+        }
+
+        context.setVariable("animalsNameRegistered", AnimalsNameRegistered);
+        context.setVariable("animalsDescriptionRegistered", AnimalsDescriptionRegistered);
+        context.setVariable("animalsRegionsRegistered", AnimalsRegionsRegistered);
+        context.setVariable("animalsName", AnimalsName);
+
+
+        String html = templateEngine.process("tableinc", context);
+        return html;
+    }
+
+    @RequestMapping("/certificates/animals/decreasingOrder")
+    String AnimalsListDecOrder() {
+        Context context = new Context();
+        String GetCertificates= "SELECT a_id, a_name, details, regions from animal order by a_name DESC"; //user=999 to be replaced by current_user
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(GetCertificates, new MapSqlParameterSource());
+
+        String Getids= "SELECT animal_id from certification where user_id=999"; //user=999 to be replaced by current_user
+        List<Map<String, Object>> ids = jdbcTemplate.queryForList(Getids, new MapSqlParameterSource());
+
+        List<String> AnimalsName = new ArrayList<String>();
+        List<String> AnimalsNameRegistered = new ArrayList<String>();
+        List<String> AnimalsDescription = new ArrayList<String>();
+        List<String> AnimalsDescriptionRegistered = new ArrayList<String>();
+        List<String> AnimalsRegions = new ArrayList<String>();
+        List<String> AnimalsRegionsRegistered = new ArrayList<String>();
+
+        // Popolamento delle liste con i dati dal database
+        for (Map<String, Object> result : rows) {
+            Integer id=(Integer) result.get("a_id");
+            String name = (String) result.get("a_name");
+            String region = (String) result.get("regions");
+            String detail = (String) result.get("details");
+
+            Boolean isPresent=false;
+            for (Map<String, Object> animalids : ids) {                 // checks if the user has registered the animal
+                Integer animalid=(Integer) animalids.get("animal_id");
+                if(animalid.equals(id)){
+                    isPresent=true;
+                    break;
+                } 
+            }
+            if(isPresent){    
+                AnimalsNameRegistered.add(name);
+                AnimalsDescriptionRegistered.add(detail);
+                AnimalsRegionsRegistered.add(region);
+            }
+            else{
+                AnimalsName.add(name);
+                AnimalsDescription.add(detail);
+                AnimalsRegions.add(region);
+            }
+        }
+
+        context.setVariable("animalsNameRegistered", AnimalsNameRegistered);
+        context.setVariable("animalsDescriptionRegistered", AnimalsDescriptionRegistered);
+        context.setVariable("animalsRegionsRegistered", AnimalsRegionsRegistered);
+        context.setVariable("animalsName", AnimalsName);
+
+
+        String html = templateEngine.process("tableinv", context);
+        return html;
+    }
 }
 

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Upload a new certificate</title>
+</head>
+<body>
+    <a href='/certificates'> Go back </a><br>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Regions</th>
+                <th>Registration Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Utilizzo delle liste nel modello Thymeleaf -->
+            <tr th:each="item, i : ${animalsNameRegistered}">
+                <td><a th:href="@{'../certificates/image?animal=' + ${item}}" th:text="${item}"></a></td>
+                <td th:text="${animalsDescriptionRegistered[i.index]}"></td>
+                <td th:text="${animalsRegionsRegistered[i.index]}"></td>
+                <td th:text="${certificateDate[i.index]}"></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
