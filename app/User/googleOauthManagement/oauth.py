@@ -12,7 +12,7 @@ SCOPE = 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis
 REDIRECT_URI = 'http://localhost:8080/callback'
 
 
-@app.route('/oauth/google',methods=['POST'])
+@app.route('/oauth/google')
 def index():
     if 'credentials' not in flask.session:
         return flask.redirect(flask.url_for('callback'))
@@ -21,58 +21,30 @@ def index():
         return flask.redirect(flask.url_for('callback'))
     else:
         access_token = credentials['access_token']
-        user_info = get_user_info(access_token)
-        url="http://host.docker.internal:6039/UserOauth"
-        response = requests.post(url, json=user_info)
-        # Checking the response
-        if response.status_code == 200:
-            url="http://host.docker.internal:3000/PersonalPage/"
-            # If the request was successful, return the prediction result
-            user_id = response.text
-            app.logger.info(f'Oauth OK. User ID: {user_id}')
-            url=url+user_id
-            # Now you can use the user ID as needed
-            return redirect(url, 307)
+        headers = {'Authorization': 'Bearer {}'.format(access_token)}
+        req_uri = 'https://www.googleapis.com/oauth2/v1/userinfo'
+        r = requests.get(req_uri, headers=headers)
+        if r.status_code == 200:
+            user_info_json = r.json()
+            email = user_info_json.get('email')
+            name = user_info_json.get('name')
+            user_info = {'email': email, 'name': name}
+            url = "http://host.docker.internal:6039/UserOauth"
+            response = requests.post(url, json=user_info)
+            if response.status_code == 200:
+                url = "http://host.docker.internal:3000/PersonalPageUser/"
+                user_id = response.text
+                app.logger.info(f'Oauth OK. User ID: {user_id}')
+                url = url + user_id
+                return redirect(url, 307)
+            else:
+                url = "http://host.docker.internal:3000/LoginUser.html?err=990"
+                app.logger.error('Oauth KO')
+                return redirect(url, 307)
         else:
-            # If there was an error, return an error message
-            url=("http://host.docker.internal:3000/LoginUser.html?err=990")
-            app.logger.error('Oauth KO')
+            url = "http://host.docker.internal:3000/LoginUser.html?err=990"
+            app.logger.error('Failed to retrieve user info from Google')
             return redirect(url, 307)
-
-@app.route('/oauth/google',methods=['GET'])
-def get():
-    credentials = json.loads(flask.session['credentials'])
-    access_token = credentials['access_token']
-    user_info = get_user_info(access_token)
-    url="http://host.docker.internal:6039/UserOauth"
-    response = requests.post(url, json=user_info)
-
-    # Checking the response
-    if response.status_code == 200:
-        url="http://host.docker.internal:3000/PersonalPage/"
-        # If the request was successful, return the prediction result
-        user_id = response.text
-        app.logger.info(f'Oauth OK. User ID: {user_id}')
-        url=url+user_id
-        # Now you can use the user ID as needed
-        return redirect(url, 307)
-    else:
-        # If there was an error, return an error message
-        url=("http://host.docker.internal:3000/LoginUser.html?err=990")
-        app.logger.error('Oauth KO')
-        return redirect(url, 307)
-    
-
-
-def get_user_info(access_token):
-    headers = {'Authorization': 'Bearer {}'.format(access_token)}
-    req_uri = 'https://www.googleapis.com/oauth2/v1/userinfo'
-    r = requests.get(req_uri, headers=headers)
-    user_info_json = r.json()  
-    email = user_info_json.get('email') 
-    name = user_info_json.get('name')  
-    return {'email': email, 'name': name} 
-
 
 @app.route('/callback')
 def callback():
@@ -89,7 +61,7 @@ def callback():
                 'grant_type': 'authorization_code'}
         r = requests.post('https://oauth2.googleapis.com/token', data=data)
         flask.session['credentials'] = r.text
-        return flask.redirect(flask.url_for('get'))
+        return flask.redirect(flask.url_for('index'))
 
 
 if __name__ == '__main__':
@@ -97,3 +69,4 @@ if __name__ == '__main__':
     app.secret_key = str(uuid.uuid4())
     app.debug = False
     app.run(debug=True, host='0.0.0.0', port=8080)
+

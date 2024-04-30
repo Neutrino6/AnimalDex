@@ -85,36 +85,26 @@ fare per modificare i vari campi -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script type="text/javascript" language="javascript">
 
-      const urlParams = new URLSearchParams(window.location.search);
-      // Recupera i valori dei parametri dall'URL
-      const email = urlParams.get('email');
-      const username = urlParams.get('username');
-      const firstname = urlParams.get('firstname');
-      const surname = urlParams.get('surname');
-      const birthday = urlParams.get('dob');
-      const points = urlParams.get('points');
-      const fav_animal = urlParams.get('fav_animal');
-      const forum_notify = urlParams.get('forum_not');
-      const emergency_notify = urlParams.get('emergency_not');
-      
+      var userData = JSON.parse(`<<userData>>`);
+
       $(document).ready(function() {
         // Seleziona tutti gli input nella form
         let inputs = $("form :input");
 
         // Assegna i valori ai campi input
-        $(inputs[0]).val(email);
-        $(inputs[1]).val(username);
-        $(inputs[2]).val(firstname);
-        $(inputs[3]).val(surname);
-        $(inputs[4]).val(points);
-        $(inputs[5]).val(birthday);
-        $(inputs[6]).val(fav_animal);
-        if (forum_notify === true) {
+        $(inputs[0]).val(userData.email);
+        $(inputs[1]).val(userData.username);
+        $(inputs[2]).val(userData.firstname);
+        $(inputs[3]).val(userData.surname);
+        $(inputs[4]).val(userData.points);
+        $(inputs[5]).val(userData.birthday);
+        $(inputs[6]).val(userData.fav_animal);
+        if (userData.forum_notify === true) {
           $(inputs[7]).prop('checked', true);
         } else {
             $(inputs[7]).prop('checked', false);
         }
-        if (emergency_notify === false) {
+        if (userData.emergency_notify === false) {
             $(inputs[8]).prop('checked', true);
         } else {
             $(inputs[8]).prop('checked', false);

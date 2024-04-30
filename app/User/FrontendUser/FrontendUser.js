@@ -1,4 +1,5 @@
 const express = require('express'); 
+const fs = require('fs');
 const path = require('path');
 const axios = require('axios'); // Per effettuare richieste HTTP
 /*const { Pool } = require('pg');
@@ -36,17 +37,27 @@ app.get('/PersonalPageUser/:userId', async (req, res) => {
     const userData = response.data; // Supponendo che la risposta contenga i dati dell'utente
     console.log(userData);
 
-    // Concatena ogni valore della userData alla URL di reindirizzamento
-    let redirectURL = "http://localhost:3000/PersonalPage.html?";
+    /*// Costruisci l'URL con i dati dell'utente come parametri query
+    let redirectURL = `?userId=${userId}`;
     for (const [key, value] of Object.entries(userData)) {
-      redirectURL += `${key}=${value}&`;
-    }
+      redirectURL += `&${key}=${value}`;
+    }*/
 
-    // Rimuovi l'ultimo carattere '&' dalla URL
-    redirectURL = redirectURL.slice(0, -1);
+    const filePath = path.join(__dirname, './public/PersonalPage.html');
 
     // Effettua il reindirizzamento alla URL composta
-    res.redirect(redirectURL);
+    fs.readFile(filePath, 'utf8', (err, data) => {
+      if (err) {
+        console.error('Errore durante la lettura del file HTML:', err);
+        return res.status(500).send('Errore durante la lettura del file HTML');
+      }
+      
+      // Sostituisci <<userData>> con i dati utente
+      const modifiedHTML = data.replace('<<userData>>', JSON.stringify(userData));
+      
+      // Invia il contenuto modificato come risposta
+      res.send(modifiedHTML);
+    });
   } catch (error) {
     // Gestione degli errori nel caso in cui la richiesta fallisca
     console.error('Errore durante la richiesta al servizio:', error.message);
