@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="../1 bootstrap/css/bootstrap.css" />
     
     <script src="../1 bootstrap/js/bootstrap.bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
     
     <link rel = "stylesheet" href = "../generale.css" />
 
@@ -84,6 +86,7 @@ fare per modificare i vari campi -->
 <!-- form con tutti i dati-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script type="text/javascript" language="javascript">
+      const axios = require('axios');
 
       var userData = JSON.parse(`<<userData>>`);
 
@@ -110,6 +113,30 @@ fare per modificare i vari campi -->
             $(inputs[8]).prop('checked', false);
         }
       });
+
+      function getUserIdFromUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('userId');
+}
+
+const userId = getUserIdFromUrl();
+
+     function deleteAccount() {
+  // Effettua una richiesta HTTP DELETE per eliminare l'account
+  const userId = getUserIdFromUrl(); // Ottieni l'ID dell'utente dall'URL
+  axios.delete(`/deleteAccount/${userId}`)
+    .then(response => {
+      alert(response.data); // Mostra un messaggio di successo
+      // Puoi reindirizzare l'utente a una pagina di login o fare altre azioni dopo l'eliminazione
+      /* res.redirect("/LoginUser.html"); //intuizione mia */
+      window.location.href = 'LoginUser.html';
+    })
+    .catch(error => {
+      console.error('Errore durante l\'eliminazione dell\'account:', error);
+      alert('Si è verificato un errore durante l\'eliminazione dell\'account.');
+    });
+    }
+
       
     </script>
 
@@ -183,15 +210,15 @@ fare per modificare i vari campi -->
 <br><br><br>
 
 <!-- delete account-->    
-<form action = "delete.php" class = "form-signin m-auto"
-  method = "POST" name = "deleteacc" onSubmit = "return validaIscrizione()">
+<!-- <form action = "delete.php" class = "form-signin m-auto"
+  method = "POST" name = "deleteacc" onSubmit = "return validaIscrizione()"> -->
   
   <button class = "btn btn-lg btn-primary" name ="delete"
-  type = "submit" > Delete my account </button>    
+  type = "submit" onclick="deleteAccount()"> Delete my account </button>    
   <br>
   <br>    
   <br><br><br><br>
-</form>
+<!-- </form> -->
 
 
 

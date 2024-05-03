@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Upload a new certificate</title>
+</head>
+<body>
+    <a href='/certificates/list'> Go back </a>
+    <br>
+    <form action="/certificates/list/filter" method="post" enctype="multipart/form-data">
+        <label for="filter">Filter by Region</label>
+        <input type="radio" id="filter" name="filter" value="North">North Region</input>
+        <input type="radio" id="filter" name="filter" value="Central">Central Region</input>
+        <input type="radio" id="filter" name="filter" value="South">South Region</input>
+        <input type="radio" id="filter" name="filter" value="Islands">Islands</input>
+        <input type="submit" value="Search">
+    </form>
+    <br>
+    <h1>Bad Luck</h1>
+    <p th:text="${error}"></p>
+</body>
+</html>

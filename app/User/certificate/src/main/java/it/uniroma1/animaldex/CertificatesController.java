@@ -37,6 +37,9 @@ import org.thymeleaf.TemplateEngine;
 
 import org.thymeleaf.context.Context;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
 @RestController
 public class CertificatesController {
     @Autowired
@@ -185,6 +188,45 @@ public class CertificatesController {
         context.setVariable("certificateDate", CertificatesDate);
 
         String html = templateEngine.process("personaltable", context);
+        return html;
+    }
+
+    @RequestMapping(value="/certificates/list/filter", method = RequestMethod.POST)
+    String certificatesFilteredList(@RequestParam("filter") String regione) {
+        Context context = new Context();
+        MapSqlParameterSource filterSearch = new MapSqlParameterSource().addValue("filter", regione);
+        String GetCertificates= "SELECT a_name, cert_date, details, regions from certification JOIN animal on animal_id = a_id where user_id=999 AND regions ILIKE concat('%',:filter ,'%')"; //user=999 to be replaced by current_user
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(GetCertificates, filterSearch);
+        
+        if(rows.isEmpty()){
+            context.setVariable("error", "No registered animal in that region");
+            String html = templateEngine.process("personaltableError", context);
+            return html;
+        }
+
+        List<String> AnimalsName = new ArrayList<String>();
+        List<String> AnimalsDescription = new ArrayList<String>();
+        List<String> AnimalsRegions = new ArrayList<String>();
+        List<Date> CertificatesDate = new ArrayList<Date>();
+
+        for (Map<String, Object> row : rows) {
+            String name = (String) row.get("a_name");
+            Date certDate = (Date) row.get("cert_date");
+            String details = (String) row.get("details");
+            String region = (String) row.get("regions");
+            
+            AnimalsName.add(name);
+            AnimalsDescription.add(details);
+            AnimalsRegions.add(region);
+            CertificatesDate.add(certDate);
+            
+        }
+        context.setVariable("animalsNameRegistered", AnimalsName);
+        context.setVariable("animalsDescriptionRegistered", AnimalsDescription);
+        context.setVariable("animalsRegionsRegistered", AnimalsRegions);
+        context.setVariable("certificateDate", CertificatesDate);
+
+        String html = templateEngine.process("personaltablefiltered", context);
         return html;
     }
 
@@ -357,6 +399,67 @@ public class CertificatesController {
 
 
         String html = templateEngine.process("tableinv", context);
+        return html;
+    }
+
+    @RequestMapping(value="/certificates/animals/search", method = RequestMethod.POST)
+    String AnimalSearch(@RequestParam("searchAnimal") String animalsearch) {
+        Context context = new Context();
+        MapSqlParameterSource sourceSearch = new MapSqlParameterSource().addValue("animalName", animalsearch);
+        String GetCertificates= "SELECT a_id, a_name, details, regions from animal where a_name ILIKE concat('%',:animalName ,'%')"; //user=999 to be replaced by current_user
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(GetCertificates, sourceSearch);
+
+        if(rows.isEmpty()){
+            context.setVariable("error", "No such animal found");
+            String html = templateEngine.process("tableError", context);
+            return html;
+        }
+
+        String Getids= "SELECT animal_id from certification where user_id=999"; //user=999 to be replaced by current_user
+        List<Map<String, Object>> ids = jdbcTemplate.queryForList(Getids, new MapSqlParameterSource());
+
+        List<String> AnimalsName = new ArrayList<String>();
+        List<String> AnimalsNameRegistered = new ArrayList<String>();
+        List<String> AnimalsDescription = new ArrayList<String>();
+        List<String> AnimalsDescriptionRegistered = new ArrayList<String>();
+        List<String> AnimalsRegions = new ArrayList<String>();
+        List<String> AnimalsRegionsRegistered = new ArrayList<String>();
+
+
+        // Popolamento delle liste con i dati dal database
+        for (Map<String, Object> result : rows) {
+            Integer id=(Integer) result.get("a_id");
+            String name = (String) result.get("a_name");
+            String region = (String) result.get("regions");
+            String detail = (String) result.get("details");
+
+            Boolean isPresent=false;
+            for (Map<String, Object> animalids : ids) {                 // checks if the user has registered the animal
+                Integer animalid=(Integer) animalids.get("animal_id");
+                if(animalid.equals(id)){
+                    isPresent=true;
+                    break;
+                } 
+            }
+            if(isPresent){    
+                AnimalsNameRegistered.add(name);
+                AnimalsDescriptionRegistered.add(detail);
+                AnimalsRegionsRegistered.add(region);
+            }
+            else{
+                AnimalsName.add(name);
+                AnimalsDescription.add(detail);
+                AnimalsRegions.add(region);
+            }
+        }
+
+        context.setVariable("animalsNameRegistered", AnimalsNameRegistered);
+        context.setVariable("animalsDescriptionRegistered", AnimalsDescriptionRegistered);
+        context.setVariable("animalsRegionsRegistered", AnimalsRegionsRegistered);
+        context.setVariable("animalsName", AnimalsName);
+
+
+        String html = templateEngine.process("tableSearch", context);
         return html;
     }
 }

@@ -113,6 +113,25 @@ app.get('/PersonalPageOperator/:opCode', async (req, res) => {
   }
 });
 
+app.delete('/deleteAccount/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  
+  try {
+    // Esegui la logica per eliminare l'account dal tuo archivio di dati
+    // Supponiamo che tu abbia una funzione deleteUserFromDatabase che accetta userId come parametro e elimina l'account corrispondente dal database
+    // await deleteUserFromDatabase(userId);
+    await axios.get("http://host.docker.internal:6039/DeleteAccountUser?user_id="+ userId);
+    // Rispondi con un messaggio di successo dopo l'eliminazione
+    res.status(200).send("Account eliminato con successo.");
+  } catch (error) {
+    console.error('Errore durante l\'eliminazione dell\'account:', error.message);
+    res.status(500).send('Errore durante l\'eliminazione dell\'account.');
+  }
+});
+
+
+
+
 /*così funziona, nel dubbio la lascerei così*/
 // Route per le richieste non gestite
 app.use((req, res, next) => {
