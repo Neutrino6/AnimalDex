@@ -9,23 +9,20 @@
     <form action="/certificates/animals/search" method="post" enctype="multipart/form-data">
         <label for="searchAnimal">Search</label>
         <input type="text" id="searchAnimal" name="searchAnimal" maxlength="50" size="20" placeholder="Search an animal" required></input>
-        <input type="submit">
+        <input type="submit" value="Search">
     </form>
     <br>
     <table border="1">
         <thead>
             <tr>
-                <th>
-                    <button type="button" onclick="OrderRedirect()" style="border:none">Name</button>
-                </th>
+                <th>Name</th>
                 <th>Description</th>
                 <th>Regions</th>
             </tr>
         </thead>
         <tbody>
-            <!-- Utilizzo delle liste nel modello Thymeleaf -->
             <tr th:each="item, i : ${animalsNameRegistered}">
-                <td><a th:href="@{'../certificates/image?animal=' + ${item}}" th:text="${item}"></a></td>
+                <td><a th:href="@{'../../certificates/image?animal=' + ${item}}" th:text="${item}"></a></td>
                 <td th:text="${animalsDescriptionRegistered[i.index]}"></td>
                 <td th:text="${animalsRegionsRegistered[i.index]}"></td>
             </tr>

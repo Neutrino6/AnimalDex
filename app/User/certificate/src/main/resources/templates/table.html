@@ -9,7 +9,7 @@
     <form action="/certificates/animals/search" method="post" enctype="multipart/form-data">
         <label for="searchAnimal">Search</label>
         <input type="text" id="searchAnimal" maxlength="50" size="20" name="searchAnimal" placeholder="Search an animal" required ></input>
-        <input type="submit">
+        <input type="submit" value="Search">
     </form>
     <br>
     <table border="1">
@@ -23,7 +23,6 @@
             </tr>
         </thead>
         <tbody>
-            <!-- Utilizzo delle liste nel modello Thymeleaf -->
             <tr th:each="item, i : ${animalsNameRegistered}">
                 <td><a th:href="@{'../certificates/image?animal=' + ${item}}" th:text="${item}"></a></td>
                 <td th:text="${animalsDescriptionRegistered[i.index]}"></td>

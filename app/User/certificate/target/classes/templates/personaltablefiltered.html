@@ -5,7 +5,7 @@
     <title>Upload a new certificate</title>
 </head>
 <body>
-    <a href='/certificates'> Go back </a>
+    <a href='/certificates/list'> Go back </a>
     <br>
     <form action="/certificates/list/filter" method="post" enctype="multipart/form-data">
         <label for="filter">Filter by Region</label>
@@ -26,7 +26,7 @@
         </thead>
         <tbody>
             <tr th:each="item, i : ${animalsNameRegistered}">
-                <td><a th:href="@{'../certificates/image?animal=' + ${item}}" th:text="${item}"></a></td>
+                <td><a th:href="@{'../../certificates/image?animal=' + ${item}}" th:text="${item}"></a></td>
                 <td th:text="${animalsDescriptionRegistered[i.index]}"></td>
                 <td th:text="${animalsRegionsRegistered[i.index]}"></td>
                 <td th:text="${certificateDate[i.index]}"></td>

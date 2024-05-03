@@ -7,6 +7,14 @@
 <body>
     <a href='/certificates'> Go back </a>
     <br>
+    <form action="/certificates/list/filter" method="post" enctype="multipart/form-data">
+        <label for="filter">Filter by Region</label>
+        <input type="radio" id="filter" name="filter" value="North">North Region</input>
+        <input type="radio" id="filter" name="filter" value="Central">Central Region</input>
+        <input type="radio" id="filter" name="filter" value="South">South Region</input>
+        <input type="radio" id="filter" name="filter" value="Islands">Islands</input>
+        <input type="submit" value="Search">
+    </form>
     <table border="1">
         <thead>
             <tr>
@@ -17,7 +25,6 @@
             </tr>
         </thead>
         <tbody>
-            <!-- Utilizzo delle liste nel modello Thymeleaf -->
             <tr th:each="item, i : ${animalsNameRegistered}">
                 <td><a th:href="@{'../certificates/image?animal=' + ${item}}" th:text="${item}"></a></td>
                 <td th:text="${animalsDescriptionRegistered[i.index]}"></td>

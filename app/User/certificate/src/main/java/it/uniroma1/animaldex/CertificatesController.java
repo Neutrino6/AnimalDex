@@ -191,6 +191,45 @@ public class CertificatesController {
         return html;
     }
 
+    @RequestMapping(value="/certificates/list/filter", method = RequestMethod.POST)
+    String certificatesFilteredList(@RequestParam("filter") String regione) {
+        Context context = new Context();
+        MapSqlParameterSource filterSearch = new MapSqlParameterSource().addValue("filter", regione);
+        String GetCertificates= "SELECT a_name, cert_date, details, regions from certification JOIN animal on animal_id = a_id where user_id=999 AND regions ILIKE concat('%',:filter ,'%')"; //user=999 to be replaced by current_user
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(GetCertificates, filterSearch);
+        
+        if(rows.isEmpty()){
+            context.setVariable("error", "No registered animal in that region");
+            String html = templateEngine.process("personaltableError", context);
+            return html;
+        }
+
+        List<String> AnimalsName = new ArrayList<String>();
+        List<String> AnimalsDescription = new ArrayList<String>();
+        List<String> AnimalsRegions = new ArrayList<String>();
+        List<Date> CertificatesDate = new ArrayList<Date>();
+
+        for (Map<String, Object> row : rows) {
+            String name = (String) row.get("a_name");
+            Date certDate = (Date) row.get("cert_date");
+            String details = (String) row.get("details");
+            String region = (String) row.get("regions");
+            
+            AnimalsName.add(name);
+            AnimalsDescription.add(details);
+            AnimalsRegions.add(region);
+            CertificatesDate.add(certDate);
+            
+        }
+        context.setVariable("animalsNameRegistered", AnimalsName);
+        context.setVariable("animalsDescriptionRegistered", AnimalsDescription);
+        context.setVariable("animalsRegionsRegistered", AnimalsRegions);
+        context.setVariable("certificateDate", CertificatesDate);
+
+        String html = templateEngine.process("personaltablefiltered", context);
+        return html;
+    }
+
     @RequestMapping("/certificates/image")
     String ShowImage(@RequestParam("animal") String name) {
         //Shows the last uploaded image for the selected certificate
