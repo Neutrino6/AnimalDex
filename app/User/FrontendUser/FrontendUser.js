@@ -1,5 +1,7 @@
 const express = require('express'); 
 const fs = require('fs');
+const sha256 = require('crypto-js/sha256');
+const cookieParser = require('cookie-parser');
 const path = require('path');
 const axios = require('axios'); // Per effettuare richieste HTTP
 /*const { Pool } = require('pg');
@@ -15,6 +17,7 @@ const pool = new Pool({
 */
 
 const app = express();
+app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, './public')));
 
@@ -25,9 +28,24 @@ app.get('/', (req, res) => {
 });
 
 
+app.get('/Redirect/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  res.redirect('/PersonalPageUser/'+userId);
+});
+
 app.get('/PersonalPageUser/:userId', async (req, res) => {
   const userId = req.params.userId;
   console.log(userId);
+
+  if (req.cookies && req.cookies.authCookie) {
+    const authCookie = req.cookies.authCookie;
+    if (!authCookie || !isValidAuthCookie(authCookie,userId)) {
+      return res.redirect('http://localhost:3000/LoginUser.html');
+    }
+  }
+  else{
+    return res.redirect('http://localhost:3000/LoginUser.html');
+  }
 
   try {
     // Effettua la richiesta al servizio esterno
@@ -111,7 +129,19 @@ app.use((req, res, next) => {
 });
 
 
+function isValidAuthCookie(cookieValue, userId) {
+  // Calcola l'hash SHA-256 della stringa fissa concatenata con l'ID dell'utente
+  const expectedLoginCookieValue = sha256("LOGIN:" + userId).toString();
+  const expectedOauthCookieValue = sha256("GOOGLE_OAUTH:" + userId).toString();
 
+  // Confronta il valore del cookie con il valore atteso
+  console.log(cookieValue);
+  console.log(expectedLoginCookieValue);
+  console.log(expectedOauthCookieValue);
+  console.log(cookieValue === expectedLoginCookieValue);
+  console.log(cookieValue === expectedOauthCookieValue);
+  return cookieValue === expectedLoginCookieValue || cookieValue === expectedOauthCookieValue;
+}
 
 /* ORIGINALE ALE
 app.use((req, res) => {

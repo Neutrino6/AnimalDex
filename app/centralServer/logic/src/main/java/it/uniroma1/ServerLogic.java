@@ -11,6 +11,11 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,6 +27,10 @@ import java.util.List;
 
 import java.io.IOException;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.codec.digest.DigestUtils;
 import javax.sql.DataSource;
 import javax.validation.constraints.Null;
 
@@ -40,6 +49,9 @@ public class ServerLogic {
     
     @Autowired
     NamedParameterJdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private HttpServletResponse response;
 
     @RequestMapping("/hello")
     public String hello(){
@@ -148,7 +160,13 @@ public class ServerLogic {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         if (encoder.matches(password, realPassword)) {
             // Se il login è corretto, reindirizza alla pagina personal page con l'id utente allegato
-            ModelAndView modelAndView = new ModelAndView("redirect:http://localhost:3000/PersonalPageUser/" + userId);
+
+            String cookieValue = DigestUtils.sha256Hex("LOGIN:" + userId);
+            Cookie authCookie = new Cookie("authCookie", cookieValue);
+            authCookie.setPath("/");
+            response.addCookie(authCookie);
+
+            ModelAndView modelAndView = new ModelAndView("redirect:http://localhost:3000/Redirect/" + userId);
             //modelAndView.addObject("userId", userId); // Aggiungi l'id utente come attributo per il reindirizzamento
             return modelAndView;
         } else {
