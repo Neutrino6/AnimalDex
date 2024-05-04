@@ -5,9 +5,9 @@
     <title>Upload a new certificate</title>
 </head>
 <body>
-    <a href='/certificates/list'> Go back </a>
+    <a th:href='${link1}'> Go back </a>
     <br>
-    <form action="/certificates/list/filter" method="post" enctype="multipart/form-data">
+    <form th:action="${link2}" method="post" enctype="multipart/form-data">
         <label for="filter">Filter by Region</label>
         <input type="radio" id="filter" name="filter" value="North">North Region</input>
         <input type="radio" id="filter" name="filter" value="Central">Central Region</input>

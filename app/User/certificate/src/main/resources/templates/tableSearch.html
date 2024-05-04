@@ -5,8 +5,8 @@
     <title>Upload a new certificate</title>
 </head>
 <body>
-    <a href='/certificates/animals'> Go back </a>
-    <form action="/certificates/animals/search" method="post" enctype="multipart/form-data">
+    <a th:href='${link1}'> Go back </a>
+    <form th:action="${link2}" method="post" enctype="multipart/form-data">
         <label for="searchAnimal">Search</label>
         <input type="text" id="searchAnimal" name="searchAnimal" maxlength="50" size="20" placeholder="Search an animal" required></input>
         <input type="submit" value="Search">

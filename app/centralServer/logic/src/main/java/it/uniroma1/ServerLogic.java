@@ -59,17 +59,17 @@ public class ServerLogic {
     }
 
     @RequestMapping(value = "/newCertificate", method = RequestMethod.POST)
-    public ResponseEntity<String> newCertificate(@RequestBody String requestBody) {
+    public ResponseEntity<String> newCertificate(@RequestParam("user_id") int user_id,@RequestBody String requestBody) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode jsonNode = mapper.readTree(requestBody);
 
-            Integer exampleUserId=new Integer(999);
+            //Integer exampleUserId=new Integer(999);
         
             if (jsonNode.has("animalName")) {
                 String animalName = jsonNode.get("animalName").asText();
                 if (!animalName.isEmpty()) {
-                    return certificateManagement(animalName,exampleUserId);
+                    return certificateManagement(animalName,user_id);
                 } else {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Void value for animalName");
                 }

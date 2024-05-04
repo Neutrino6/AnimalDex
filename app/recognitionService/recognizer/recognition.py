@@ -35,6 +35,7 @@ def predict():
         return jsonify({'error': 'No file part'}), 400
     
     file = request.files['fileInput']
+    user_id = request.form['userId']
     
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
@@ -50,9 +51,9 @@ def predict():
     
     # Sending the POST request with the prediction result back to the specified endpoint
     if float(prediction[0][2]) > 0.65: # set a threshold value
-        url = "http://host.docker.internal:7777/certificates/upload?data="+prediction[0][1] # change to localhost when executing without docker 
+        url = "http://host.docker.internal:7777/"+user_id+"/certificates/upload?data="+prediction[0][1] # change to localhost when executing without docker 
     else:
-        url = "http://host.docker.internal:7777/certificates/upload?data=UNRECOGNIZED"
+        url = "http://host.docker.internal:7777/"+user_id+"/certificates/upload?data=UNRECOGNIZED"
         
     response = requests.post(url, files=files)
     

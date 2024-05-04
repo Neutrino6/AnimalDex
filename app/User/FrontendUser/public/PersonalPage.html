@@ -52,7 +52,7 @@ fare per modificare i vari campi -->
                 <ul class="dropdown-menu text-center">
                   <li><a class="dropdown-item" href="chisiamo.html">Chi siamo</a></li>
                   <li><a class="dropdown-item" href="dovesiamo.html">Dove siamo</a></li>
-                  <li><a class="dropdown-item" href="corsi.html">Corsi</a></li>
+                  <li><a class="dropdown-item" id="certificate_link" href="">Certificates</a></li>
                   <li><a class="dropdown-item" href="gallery.html">Gallery</a></li>
                   <li><a class="dropdown-item" href="eventi.html">Eventi</a></li>
                   <li><a class="dropdown-item" href="contatti.html">Contatti</a></li>
@@ -86,6 +86,17 @@ fare per modificare i vari campi -->
 <!-- form con tutti i dati-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script type="text/javascript" language="javascript">
+      function getUserIdFromUrl() {
+        const url = window.location.href;
+        const userIdIndex = url.lastIndexOf("/") + 1; // Trova l'indice dell'ultimo "/" nell'URL
+        const userId = url.substring(userIdIndex); // Estrai l'ID dell'utente dalla parte finale dell'URL
+        return userId;
+      }
+
+      const userId = getUserIdFromUrl();
+
+      var link = document.getElementById("certificate_link");
+      link.href="http://localhost:7777/"+userId+"/certificates";
       const axios = require('axios');
 
       var userData = JSON.parse(`<<userData>>`);
@@ -113,13 +124,6 @@ fare per modificare i vari campi -->
             $(inputs[8]).prop('checked', false);
         }
       });
-
-      function getUserIdFromUrl() {
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get('userId');
-}
-
-const userId = getUserIdFromUrl();
 
      function deleteAccount() {
   // Effettua una richiesta HTTP DELETE per eliminare l'account
