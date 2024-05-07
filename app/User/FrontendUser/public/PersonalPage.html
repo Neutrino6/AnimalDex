@@ -86,7 +86,7 @@ fare per modificare i vari campi -->
 <!-- form con tutti i dati-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script type="text/javascript" language="javascript">
-      const axios = require('axios');
+      /* const axios = require('axios'); */
 
       var userData = JSON.parse(`<<userData>>`);
 
@@ -114,7 +114,7 @@ fare per modificare i vari campi -->
         }
       });
 
-      function getUserIdFromUrl() {
+   /*    function getUserIdFromUrl() {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get('userId');
 }
@@ -128,14 +128,14 @@ const userId = getUserIdFromUrl();
     .then(response => {
       alert(response.data); // Mostra un messaggio di successo
       // Puoi reindirizzare l'utente a una pagina di login o fare altre azioni dopo l'eliminazione
-      /* res.redirect("/LoginUser.html"); //intuizione mia */
+      /* res.redirect("/LoginUser.html"); //intuizione mia
       window.location.href = 'LoginUser.html';
     })
     .catch(error => {
       console.error('Errore durante l\'eliminazione dell\'account:', error);
       alert('Si è verificato un errore durante l\'eliminazione dell\'account.');
     });
-    }
+    } */
 
       
     </script>
@@ -209,16 +209,33 @@ const userId = getUserIdFromUrl();
          
 <br><br><br>
 
-<!-- delete account-->    
-<!-- <form action = "delete.php" class = "form-signin m-auto"
-  method = "POST" name = "deleteacc" onSubmit = "return validaIscrizione()"> -->
+<script>
+
+$(document).ready(function() {
+  // Ottieni l'user_id dall'URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const userId = urlParams.get('user_id');
   
+  // Assegna l'user_id all'input nascosto nella form
+  let userIdInput = $("form #userIdInput");
+
+  $(inputs[userIdInput]).val(userId);
+})
+</script>
+
+
+<!-- delete account-->    
+ <form action =  "http://localhost:6039/deleteAccountUser" class = "form-signin m-auto"
+  method = "POST" name = "deleteacc" onSubmit = "return validaIscrizione()"> 
+
+  <input type="hidden" name="user_id" id="userIdInput" value="">
+
   <button class = "btn btn-lg btn-primary" name ="delete"
-  type = "submit" onclick="deleteAccount()"> Delete my account </button>    
+  type = "submit"> Delete my account </button>    
   <br>
   <br>    
   <br><br><br><br>
-<!-- </form> -->
+ </form> 
 
 
 

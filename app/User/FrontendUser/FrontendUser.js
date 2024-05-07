@@ -95,7 +95,7 @@ app.get('/PersonalPageOperator/:opCode', async (req, res) => {
   }
 });
 
-app.delete('/deleteAccount/:userId', async (req, res) => {
+/*  app.delete('/deleteAccount/:userId', async (req, res) => {
   const userId = req.params.userId;
   
   try {
@@ -109,7 +109,7 @@ app.delete('/deleteAccount/:userId', async (req, res) => {
     console.error('Errore durante l\'eliminazione dell\'account:', error.message);
     res.status(500).send('Errore durante l\'eliminazione dell\'account.');
   }
-});
+});  */
 
 
 
