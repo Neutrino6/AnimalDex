@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Upload a new certificate</title>
+</head>
+<body>
+    <a th:href='${link1}'> Go back </a>
+    <form th:action="${link2}" method="post" enctype="multipart/form-data">
+        <label for="searchAnimal">Search</label>
+        <input type="text" id="searchAnimal" name="searchAnimal" maxlength="50" size="20" placeholder="Search an animal" required></input>
+        <input type="submit">
+    </form>
+    <br>
+    <h1>Bad Luck</h1>
+    <p th:text="${error}"></p>
+</body>
+</html>

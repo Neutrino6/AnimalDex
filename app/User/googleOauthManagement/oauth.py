@@ -1,8 +1,9 @@
+import hashlib
 import os
 import json
 import flask
 import requests
-from flask import redirect
+from flask import redirect, make_response
 
 app = flask.Flask(__name__)
 
@@ -32,19 +33,21 @@ def index():
             url = "http://host.docker.internal:6039/UserOauth"
             response = requests.post(url, json=user_info)
             if response.status_code == 200:
-                url = "http://host.docker.internal:3000/PersonalPageUser/"
                 user_id = response.text
                 app.logger.info(f'Oauth OK. User ID: {user_id}')
-                url = url + user_id
-                return redirect(url, 307)
+                url = "http://localhost:3000/Redirect/" + user_id
+                hash_value = generate_hash("GOOGLE_OAUTH:" + user_id)
+                response = make_response(redirect(url))
+                response.set_cookie('authCookie', value=hash_value, max_age=86400, path='/') # Durata: 1 giorno
+                return response
             else:
-                url = "http://host.docker.internal:3000/LoginUser.html?err=990"
+                url = "http://localhost:3000/LoginUser.html?err=990"
                 app.logger.error('Oauth KO')
-                return redirect(url, 307)
+                return redirect(url)
         else:
-            url = "http://host.docker.internal:3000/LoginUser.html?err=990"
+            url = "http://localhost:3000/LoginUser.html?err=990"
             app.logger.error('Failed to retrieve user info from Google')
-            return redirect(url, 307)
+            return redirect(url)
 
 @app.route('/callback')
 def callback():
@@ -62,6 +65,9 @@ def callback():
         r = requests.post('https://oauth2.googleapis.com/token', data=data)
         flask.session['credentials'] = r.text
         return flask.redirect(flask.url_for('index'))
+    
+def generate_hash(input):
+    return hashlib.sha256(input.encode()).hexdigest()
 
 
 if __name__ == '__main__':
@@ -69,4 +75,3 @@ if __name__ == '__main__':
     app.secret_key = str(uuid.uuid4())
     app.debug = False
     app.run(debug=True, host='0.0.0.0', port=8080)
-
