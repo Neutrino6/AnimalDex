@@ -358,26 +358,20 @@ public class ServerLogic {
         return ResponseEntity.ok(jsonResponse);
     }
 
-     @RequestMapping(value = "/deleteAccountUser", method = RequestMethod.POST)
-public ModelAndView deleteAccountUser(@RequestParam(value = "user_id") Integer userId) {
-    
-        // Esegui la logica per eliminare l'account utente dal database
-        String deleteQuery = "DELETE FROM users WHERE user_id = :user_id";
-        MapSqlParameterSource source = new MapSqlParameterSource().addValue("user_id", userId);
-        int rowsAffected = jdbcTemplate.update(deleteQuery, source);
+    @RequestMapping(value = "/deleteAccountUser", method = RequestMethod.POST)
+    public ModelAndView deleteAccountUser(@RequestParam(value = "user_id") Integer userId) {
+        safeUserDeletion(userId);
         return new ModelAndView("redirect:http://localhost:3000/RegistrationUser.html");
-       /*  if (rowsAffected > 0) { */
-            // Account eliminato con successo
-             
-            /* return ResponseEntity.ok("Account utente eliminato con successo."); */
-         /* else {
-            // Se non è stato trovato alcun account corrispondente all'ID specificato
-             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nessun account utente trovato con l'ID specificato."); 
-        } */
     } 
 
-
-
+    @Transactional
+    private void safeUserDeletion(Integer userId){
+        MapSqlParameterSource source = new MapSqlParameterSource().addValue("user_id", userId);
+        String deleteCertifiacates = "DELETE FROM certification WHERE user_id = :user_id";
+        jdbcTemplate.update(deleteCertifiacates, source);
+        String deleteQuery = "DELETE FROM users WHERE user_id = :user_id";
+        jdbcTemplate.update(deleteQuery, source);
+    }
 
     @Transactional
     private ResponseEntity<String> certificateManagement(String animalName,int user_id) throws JsonProcessingException{
