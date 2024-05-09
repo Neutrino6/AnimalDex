@@ -67,7 +67,15 @@ fare per modificare i vari campi -->
 <!-- form con tutti i dati-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script type="text/javascript" language="javascript">
+      function getOperCodeFromUrl() {
+        const url = window.location.href;
+        const operCodeIndex = url.lastIndexOf("/") + 1; // Trova l'indice dell'ultimo "/" nell'URL
+        const operCode= url.substring(operCodeIndex); // Estrai l'ID dell'utente dalla parte finale dell'URL
+        return operCode;
+      }
 
+      const operCode = getOperCodeFromUrl();
+      /*
       const urlParams = new URLSearchParams(window.location.search);
       // Recupera i valori dei parametri dall'URL
       const email = urlParams.get('email');
@@ -75,16 +83,17 @@ fare per modificare i vari campi -->
       const firstname = urlParams.get('firstname');
       const surname = urlParams.get('surname');
       const birthday = urlParams.get('dob');
-      
+      */
+      var operData = JSON.parse(`<<operData>>`);
       $(document).ready(function() {
         // Seleziona tutti gli input nella form
         let inputs = $("form :input");
 
         // Assegna i valori ai campi input
-        $(inputs[0]).val(email);
-        $(inputs[1]).val(firstname);
-        $(inputs[2]).val(surname);
-        $(inputs[3]).val(birthday);
+        $(inputs[0]).val(operData.email);
+        $(inputs[1]).val(operData.firstname);
+        $(inputs[2]).val(operData.surname);
+        $(inputs[3]).val(operData.dob);
       });
       
     </script>
@@ -138,12 +147,24 @@ fare per modificare i vari campi -->
     <h5 style="text-align: center;"><a class="link" href="Reports.html">View reports</a></h5>
 
 <br><br><br><br>
+<script>
+  $(document).ready(function() {
+    // Ottieni l'user_id dall'URL
     
+    const operCode=getOperCodeFromUrl();
+    
+    // Assegna l'user_id all'input nascosto nella form
+    let operCodeInput = $("form #operCodeInput");
+  
+    $(operCodeInput).val(operCode);
+  })
+  </script>
 
 <!-- delete account-->    
-<form action = "delete.php" class = "form-signin m-auto"
+<form action = "http://localhost:6039/deleteAccountOperator" class = "form-signin m-auto"
   method = "POST" name = "deleteacc" onSubmit = "return validaIscrizione()">
-  
+
+  <input type="hidden" name="operCode" id="operCodeInput" value="">
   <button class = "btn btn-lg btn-primary" name ="delete"
   type = "submit" > Delete my account </button>    
   <br>

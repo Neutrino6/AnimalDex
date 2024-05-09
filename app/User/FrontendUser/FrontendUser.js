@@ -94,7 +94,7 @@ app.get('/PersonalPageOperator/:opCode', async (req, res) => {
     // Ricevuta la risposta, puoi manipolarla come desideri
     const operData = response.data; // Supponendo che la risposta contenga i dati dell'utente
     console.log(operData);
-
+    /*
     // Concatena ogni valore della userData alla URL di reindirizzamento
     let redirectURL = "http://localhost:3000/PersonalPageOperator.html?";
     for (const [key, value] of Object.entries(operData)) {
@@ -106,6 +106,22 @@ app.get('/PersonalPageOperator/:opCode', async (req, res) => {
 
     // Effettua il reindirizzamento alla URL composta
     res.redirect(redirectURL);
+    */
+    const filePath = path.join(__dirname, './public/PersonalPageOperator.html');
+
+    // Effettua il reindirizzamento alla URL composta
+    fs.readFile(filePath, 'utf8', (err, data) => {
+      if (err) {
+        console.error('Errore durante la lettura del file HTML:', err);
+        return res.status(500).send('Errore durante la lettura del file HTML');
+      }
+      
+      // Sostituisci <<userData>> con i dati utente
+      const modifiedHTML = data.replace('<<operData>>', JSON.stringify(operData));
+      
+      // Invia il contenuto modificato come risposta
+      res.send(modifiedHTML);
+    });
   } catch (error) {
     // Gestione degli errori nel caso in cui la richiesta fallisca
     console.error('Errore durante la richiesta al servizio:', error.message);
