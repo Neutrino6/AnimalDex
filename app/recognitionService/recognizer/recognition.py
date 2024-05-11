@@ -48,10 +48,13 @@ def predict():
         return jsonify({'error': 'No prediction found'}), 400
     
     files = {'fileInput': (file.filename, img_bytes, 'image/jpeg')}
+    app.logger.info("result = %s , %f",prediction[0][1],prediction[0][2])
     
+    prediction_class = prediction[0][1].split("_")[-1]
+
     # Sending the POST request with the prediction result back to the specified endpoint
-    if float(prediction[0][2]) > 0.65: # set a threshold value
-        url = "http://host.docker.internal:7777/"+user_id+"/certificates/upload?data="+prediction[0][1] # change to localhost when executing without docker 
+    if float(prediction[0][2]) > 0.35: # set a threshold value
+        url = "http://host.docker.internal:7777/"+user_id+"/certificates/upload?data="+prediction_class # change to localhost when executing without docker 
     else:
         url = "http://host.docker.internal:7777/"+user_id+"/certificates/upload?data=UNRECOGNIZED"
         

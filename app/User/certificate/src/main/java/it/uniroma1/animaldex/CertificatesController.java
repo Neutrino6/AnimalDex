@@ -150,7 +150,7 @@ public class CertificatesController {
         // If data is UNRECOGNIZED, handle the fileInput
         if (data.equals("UNRECOGNIZED")) {
             // Return a response message or perform further actions based on the file content
-            return "File unrecognized. <a href='http://localhost:7777/certificates'>Click here to insert a new certificate</a>";
+            return "File unrecognized. <a href='http://localhost:7777/"+user_id+"/certificates'>Click here to insert a new certificate</a>";
         } else {
 
             System.out.println("Animal name: " + data);

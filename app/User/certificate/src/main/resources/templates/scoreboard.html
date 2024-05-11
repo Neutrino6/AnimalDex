@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ScoreBoard</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h2>ScoreBoard</h2>
+    <table>
+        <tr> 
+            <th>Username</th>
+            <th>Points</th>
+            <th>Email</th>
+            <th>Favorite animal</th>
+        </tr>
+                
+        <tr th:each="item : ${users}">
+            <td th:text="${item.get('Username')}"></td> 
+            <td th:text="${item.get('Points')}"></td>
+            <td th:text="${item.get('Email')}"></td>
+            <td th:text="${item.get('Favorite animal')}"></td>            
+        </tr>
+    </table>
+</body>
+</html>

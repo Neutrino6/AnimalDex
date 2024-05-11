@@ -15,10 +15,12 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.json.JSONObject;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -84,6 +86,45 @@ public class ServerLogic {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
+        }
+    }
+
+    @RequestMapping(value = "/getScoreBoard")
+    public ResponseEntity<String> getScoreBoard() {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode responseJson = mapper.createObjectNode();
+
+        String getScoreBoard = "select u.username, u.email, u.points, a.a_name from users u left join animal a on a.a_id=u.fav_animal where user_id!=999 order by points desc;";
+        MapSqlParameterSource params=new MapSqlParameterSource();
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(getScoreBoard,params);
+
+        ArrayNode usersArray = mapper.createArrayNode();
+        for (Map<String, Object> result : rows) {
+            String username = (String) result.get("username");
+            String email = (String) result.get("email");
+            int points = (int) result.get("points");
+            String favAnimal = (String) result.get("fav_animal");
+
+            ObjectNode userNode = mapper.createObjectNode();
+            userNode.put("Username", username);
+            userNode.put("Email", email);
+            userNode.put("Points", points);
+            if(favAnimal==null){
+                userNode.put("Favorite animal", "");
+            }
+            else userNode.put("Favorite animal", favAnimal);
+
+            usersArray.add(userNode);
+        }
+
+        responseJson.set("users", usersArray);
+
+        try {
+            String jsonResponse = mapper.writeValueAsString(responseJson);
+            return ResponseEntity.ok(jsonResponse);
+        } catch (Exception e) {
+            // Handle exception
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while processing the request.");
         }
     }
 
