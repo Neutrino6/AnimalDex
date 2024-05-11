@@ -414,6 +414,21 @@ public class ServerLogic {
         jdbcTemplate.update(deleteQuery, source);
     }
 
+    @RequestMapping(value = "/deleteAccountOperator", method = RequestMethod.POST)
+    public ModelAndView deleteAccountOperator(@RequestParam(value = "operCode") String operCode) {
+        safeOperDeletion(operCode);
+        return new ModelAndView("redirect:http://localhost:3000/RegistrationOperator.html");
+    } 
+
+    @Transactional
+    private void safeOperDeletion(String operCode){
+        MapSqlParameterSource source = new MapSqlParameterSource().addValue("operCode", operCode);
+        //String deleteCertifiacates = "DELETE FROM certification WHERE user_id = :user_id";
+        //jdbcTemplate.update(deleteCertifiacates, source);
+        String deleteQuery = "DELETE FROM operator WHERE code = :operCode";
+        jdbcTemplate.update(deleteQuery, source);
+    }
+
     @Transactional
     private ResponseEntity<String> certificateManagement(String animalName,int user_id) throws JsonProcessingException{
 
