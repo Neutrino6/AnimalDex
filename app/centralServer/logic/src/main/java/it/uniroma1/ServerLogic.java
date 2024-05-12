@@ -429,6 +429,52 @@ public class ServerLogic {
         jdbcTemplate.update(deleteQuery, source);
     }
 
+    @RequestMapping(value = "/changeCredentialsUser", method = RequestMethod.POST)
+    public ModelAndView changeCredentialsUser(
+    @RequestParam(value = "user_id") Integer userId, 
+    @RequestParam(value = "email") String email, 
+    @RequestParam(value = "username") String username, 
+    @RequestParam(value = "name") String firstname, 
+    @RequestParam(value = "surname") String surname, 
+    @RequestParam(value = "password") String password, 
+    @RequestParam(value = "dateofbirth") String dob, 
+    @RequestParam(value = "animal") Integer animal, 
+    @RequestParam(value = "forum") Boolean forum, 
+    @RequestParam(value = "emergencies") Boolean emergencies) {
+        System.out.println(forum);
+        LocalDateTime dob2 = null;
+        if(!dob.isEmpty()){
+            dob+="T00:00:00";
+            dob2 = LocalDateTime.parse(dob);
+        }
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        password = encoder.encode(password);
+        MapSqlParameterSource source = new MapSqlParameterSource()
+        .addValue("user_id", userId)
+        .addValue("email", email)
+        .addValue("username", username)
+        .addValue("firstname", firstname)
+        .addValue("surname", surname)
+        .addValue("password", password)
+        .addValue("dob", dob2)
+        .addValue("animal", animal)
+        .addValue("forum", forum)
+        .addValue("emergencies", emergencies);
+        String updateQuery = "UPDATE users SET " +
+                         "email = :email, " +
+                         "username = :username, " +
+                         "firstname = :firstname, " +
+                         "surname = :surname, " +
+                         "passw = :password, " +
+                         "birthday = :dob, " +
+                         "fav_animal = :animal, " +
+                         "forum_notify = :forum, " +
+                         "emergency_notify = :emergencies " +
+                         "WHERE user_id = :user_id";
+        jdbcTemplate.update(updateQuery, source);
+        return new ModelAndView("redirect:http://localhost:3000/Redirect/" + userId);
+    }
+
     @Transactional
     private ResponseEntity<String> certificateManagement(String animalName,int user_id) throws JsonProcessingException{
 

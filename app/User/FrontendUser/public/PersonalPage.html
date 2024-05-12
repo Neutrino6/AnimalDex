@@ -3,25 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    
     <link rel="stylesheet" href="../1 bootstrap/css/bootstrap.css" />
-    
     <script src="../1 bootstrap/js/bootstrap.bundle.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
-    
     <link rel = "stylesheet" href = "../generale.css" />
-
-    
-    
-
     <title> Personal Page </title>
-    
-<!--  aggiungere modifica immagine e vedere come
-fare per modificare i vari campi -->
-
-
+    <style>
+      .custom-btn {
+          background-color: transparent; /* Imposta il colore di sfondo */
+          color: rgba(39, 240, 69, 0.918); /* Imposta il colore del testo */
+          cursor: pointer; /* Imposta il cursore al passaggio del mouse */
+          border: none;
+      }
+      .custom-btn-del {
+          background-color: transparent; /* Imposta il colore di sfondo */
+          color: rgba(250, 2, 2, 0.918); /* Imposta il colore del testo */
+          cursor: pointer; /* Imposta il cursore al passaggio del mouse */
+          border: none;
+      }
+    </style>
 </head>
 
 <body>
@@ -87,6 +87,56 @@ fare per modificare i vari campi -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script type="text/javascript" language="javascript">
 
+      function rendiInputModificabili(formId, checkboxId) {
+        // Seleziona la form
+        var form = document.getElementById(formId);
+        // Se la form esiste
+        if (form) {
+          // Seleziona la checkbox
+          var checkbox = document.getElementById(checkboxId);
+          // Se la checkbox esiste
+          if (checkbox) {
+            // Aggiungi un listener per l'evento onchange della checkbox
+            checkbox.addEventListener('change', function() {
+              // Se la checkbox è selezionata
+              if (this.checked) {
+                // Seleziona tutti gli elementi input con attributo readonly all'interno della form
+                var inputElements = form.querySelectorAll('input[readonly]');
+                var selectElements = form.querySelectorAll('select[disabled]');
+                // Itera su tutti gli elementi input trovati
+                inputElements.forEach(function(input) {
+                  // Rimuovi l'attributo readonly
+                  input.removeAttribute('readonly');
+                });
+                selectElements.forEach(function(input) {
+                  // Rimuovi l'attributo readonly
+                  input.removeAttribute('disabled');
+                });
+                
+              } else {
+                // Se la checkbox non è selezionata
+                // Seleziona tutti gli elementi input senza attributo readonly all'interno della form
+                var inputElements = form.querySelectorAll('input:not([readonly])');
+                var selectElements = form.querySelectorAll('select:not([disabled])');
+                // Itera su tutti gli elementi input trovati
+                inputElements.forEach(function(input) {
+                  // Aggiungi l'attributo readonly
+                  input.setAttribute('readonly', 'readonly');
+                });
+                selectElements.forEach(function(input) {
+                  // Aggiungi l'attributo readonly
+                  input.setAttribute('disabled', 'disabled');
+                });
+              }
+            });
+          } else {
+            console.error('Checkbox non trovata con id: ' + checkboxId);
+          }
+        } else {
+          console.error('Form non trovata con id: ' + formId);
+        }
+      }
+
       function getUserIdFromUrl() {
         const url = window.location.href;
         const userIdIndex = url.lastIndexOf("/") + 1; // Trova l'indice dell'ultimo "/" nell'URL
@@ -94,161 +144,135 @@ fare per modificare i vari campi -->
         return userId;
       }
 
-      const userId = getUserIdFromUrl();
-
-      var link = document.getElementById("certificate_link");
-      link.href="http://localhost:7777/"+userId+"/certificates";
-      //const axios = require('axios');
-
-
-      var userData = JSON.parse(`<<userData>>`);
-
       $(document).ready(function() {
-        // Seleziona tutti gli input nella form
-        let inputs = $("form :input");
+
+        var userData = JSON.parse(`<<userData>>`);
+        //console.log(userData);
+
+        rendiInputModificabili('PersPage', 'CredentialModify');
+        const userId = getUserIdFromUrl();
+
+        var link = document.getElementById("certificate_link");
+        link.href="http://localhost:7777/"+userId+"/certificates";
+        // Ottieni l'user_id dall'URL
+
+        // Assegna l'user_id all'input nascosto nella form
+        let userIdInput = $("form #userIdInput");
+        $(userIdInput).val(userId);
+
+        // Seleziona tutti gli input nella prima form
+        let email = $("form #email");
+        let points = $("form #points");
+        let username = $("form #username");
+        let name = $("form #name");
+        let surname = $("form #surname");
+        let dob = $("form #dob");
+        //let passw = $("form #passw");
+        let animal = $("form #animal");
+        let forum = $("form #forum");
+        let emergency = $("form #emergencies");
+        
 
         // Assegna i valori ai campi input
-        $(inputs[0]).val(userData.email);
-        $(inputs[1]).val(userData.username);
-        $(inputs[2]).val(userData.firstname);
-        $(inputs[3]).val(userData.surname);
-        $(inputs[4]).val(userData.points);
-        $(inputs[5]).val(userData.dob);
-        $(inputs[6]).val(userData.fav_animal);
+        $(email).val(userData.email);
+        $(username).val(userData.username);
+        $(name).val(userData.firstname);
+        $(surname).val(userData.surname);
+        $(points).val(userData.points);
+        $(dob).val(userData.dob);
+        $(animal).val(userData.fav_animal);
+        
+        //cercare di correggere notifications perchè quando invio la modifica non mi appare l'update a schermo
         if (userData.forum_notify === true) {
-          $(inputs[7]).prop('checked', true);
+          $(forum).val("1");
+          //$(forum).prop('checked', true);
         } else {
-            $(inputs[7]).prop('checked', false);
+            $(forum).val("0");
+            //$(forum).prop('checked', false);
         }
-        if (userData.emergency_notify === false) {
-            $(inputs[8]).prop('checked', true);
+        if (userData.emergency_notify === true) {
+            $(emergency).val("1");
+            //$(emergency).prop('checked', true);
         } else {
-            $(inputs[8]).prop('checked', false);
+            $(emergency).val("0");
+            //$(emergency).prop('checked', false);
         }
       });
-
-   /*    function getUserIdFromUrl() {
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get('userId');
-}
-
-const userId = getUserIdFromUrl();
-
-     function deleteAccount() {
-  // Effettua una richiesta HTTP DELETE per eliminare l'account
-  const userId = getUserIdFromUrl(); // Ottieni l'ID dell'utente dall'URL
-  axios.delete(`/deleteAccount/${userId}`)
-    .then(response => {
-      alert(response.data); // Mostra un messaggio di successo
-      // Puoi reindirizzare l'utente a una pagina di login o fare altre azioni dopo l'eliminazione
-      /* res.redirect("/LoginUser.html"); //intuizione mia
-      window.location.href = 'LoginUser.html';
-    })
-    .catch(error => {
-      console.error('Errore durante l\'eliminazione dell\'account:', error);
-      alert('Si è verificato un errore durante l\'eliminazione dell\'account.');
-    });
-    } */
-
-      
     </script>
+    
+    <form action = "http://localhost:6039/changeCredentialsUser" class = "form-signin m-auto" method = "POST" id = "PersPage" onSubmit = "return validaIscrizione()">
+            <input type="checkbox" id="CredentialModify" on>
+            <h5 style="color: aliceblue;"> Change my credentials</h5><br>
+            <button class = "custom-btn" name ="change" type = "submit"> Confirm credential changes </button>
+            <br><br>
 
-    <form action = "" class = "form-signin m-auto"
-        method = "POST" name = "perpag" onSubmit = "return validaIscrizione()">
-
-        
-            <input type="email" name="email" 
-            placeholder = "Email"
-            class = "form-control">
-            
-            <a class="link" href="gallery.html">Change e-mail</a>
+            <input type="email" name="email"  id="email" placeholder = "Email" class = "form-control" readonly>
+            <p>Email</p>
             <br><br>
               
-            <input type="text" id="username" name="username"  
-            placeholder = "Username"
-            class = "form-control">
-            <a class="link" href="gallery.html">Change username</a>
-
-    <br><br>
-            <input type="text" name="name" 
-                placeholder = "Name"
-                class = "form-control">
-                <a class="link" href="gallery.html">Change name</a>
+            <input type="text" id="username" name="username" id="username" placeholder = "Username" class = "form-control" readonly>
+            <p>Username</p>
+            <br><br>
+            <input type="text" name="name" id="name" placeholder = "Name" class = "form-control" readonly>
+            <p>Firstname</p>
             <br><br>
             
-            <input type="text" name="surname" 
-            placeholder = "Surname"
-            class = "form-control">
-            <a class="link" href="gallery.html">Change surname</a>
+            <input type="text" name="surname" id="surname" placeholder = "Surname" class = "form-control" readonly>
+            <p>Surname</p>
             <br><br> 
-        <!--
-        <input type="password" name="password"
-        placeholder = "Password" minlength="8" class = "form-control" required />
-        <a class="link" href="gallery.html">Change password</a>
-        <br><br> -->
-              <input type="text" name="points"
-              placeholder = "points" class = "form-control" readonly/>
-              <p class="link" href="gallery.html">Current points</p>
-              <br><br>
 
-              <input type="date" name="dateofbirth"
-                class = "form-control">
-                <a class="link" href="gallery.html">Change date of birth</a>
+            <input type="password" name="password" id="password" placeholder = "Password" minlength="8" class = "form-control" readonly>
+            <p>Password</p>
+            <br><br>
 
-    <br><br>
+            <textarea type="text" name="points" id="points" placeholder = "points" class = "form-control" readonly></textarea>
+            <p>Current points</p>
+            <br><br>
 
-    
-        
-        
-           <h5 style="color: aliceblue;">Favourite animal:</h5>
-          <br>
-          <select name="animal">
-            <option></option>
-            <option value="Hip-Hop">Cane</option>
-            <option value="Street Dance">Gatto</option>
-            <option value="Contemporaneo">Lontra</option>
-            <option value="Break-Dance">Scimmia</option>
+            <input type="date" name="dateofbirth" id="dob" class = "form-control" readonly>
+            <p>Date of birth</p>
+            <br><br>
+            <h5 style="color: aliceblue;">Favourite animal:</h5>
+            <br>
+            <select name="animal" id="animal" disabled>
+              <option></option>
+              <option value="1">Cane</option>
+              <option value="2">Gatto</option>
+              <option value="3">Lontra</option>
             </select>
             <br><br><br>
             <br>
-            <input type="checkbox" name="forum">
+            <h5 style="color: aliceblue;"> Allow forum notification</h5><br>
+            <select name="forum" id="forum" disabled>
+              <option value="0">No</option>
+              <option value="1">Yes</option>
+            </select>
+            <h5 style="color: aliceblue;" > Allow emergencies notification</h5><br>
+            <select name="emergencies" id="emergencies" disabled>
+              <option value="0">No</option>
+              <option value="1">Yes</option>
+            </select>
+            <!--
+            <input type="checkbox" name="forum" id="forum" value="return getForumValue()" disabled>
             <h5 style="color: aliceblue;"> Allow forum notification</h5><br>
 
-            <input type="checkbox" name="emergencies">
+            <input type="checkbox" name="emergencies" id="emergencies" value="return getEmergencyValue()" disabled>
             <h5 style="color: aliceblue;" > Allow emergencies notification</h5><br>
-      
- 
+            -->
+            <input type="hidden" name="user_id" id="userIdInput" value="">
     </form>
          
-<br><br><br>
+    <br><br><br>
+    <!-- delete account-->    
+    <form action =  "http://localhost:6039/deleteAccountUser" class = "form-signin m-auto" method = "POST" id="deleteform" onSubmit = "return validaIscrizione()"> 
 
-<script>
+      <input type="hidden" name="user_id" id="userIdInput" value="">
 
-$(document).ready(function() {
-  // Ottieni l'user_id dall'URL
-  
-  const userId=getUserIdFromUrl();
-  
-  // Assegna l'user_id all'input nascosto nella form
-  let userIdInput = $("form #userIdInput");
-
-  $(userIdInput).val(userId);
-})
-</script>
-
-
-<!-- delete account-->    
- <form action =  "http://localhost:6039/deleteAccountUser" class = "form-signin m-auto"
-  method = "POST" id="deleteform" onSubmit = "return validaIscrizione()"> 
-
-  <input type="hidden" name="user_id" id="userIdInput" value="">
-
-  <button class = "btn btn-lg btn-primary" name ="delete"
-  type = "submit"> Delete my account </button>    
-  <br>
-  <br>    
-  <br><br><br><br>
- </form> 
+      <button class = "custom-btn-del" name ="delete" type = "submit"> Delete my account </button>    
+      <br>
+      <br>    
+      <br><br><br><br>
+    </form> 
 
 
 
