@@ -77,7 +77,7 @@
         </div>
 
         <div class="col-4 ">
-            
+      <div id="winner"></div>
     <img src="../corona.png" alt="Corona" class="corona">
         </div>
       </div>
@@ -144,6 +144,21 @@
         return userId;
       }
 
+      async function fetchData(url) {
+        try {
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.text();
+            return data;
+        } catch (error) {
+            console.error('There was a problem with the fetch operation:', error);
+        }
+      }
+
       $(document).ready(function() {
 
         var userData = JSON.parse(`<<userData>>`);
@@ -151,6 +166,15 @@
 
         rendiInputModificabili('PersPage', 'CredentialModify');
         const userId = getUserIdFromUrl();
+
+        //User Winner
+        /*fetchData('https://localhost:6040/checkWinner?userId='+userId)
+            .then(result => {
+                let condition = "User "+userId+" is a winner";  
+                if(result===condition){
+                  document.getElementById("winner").innerHTML="<img src=''../cup.png' alt='Cup' class='cup'>";
+                }
+            });*/
 
         var link = document.getElementById("certificate_link");
         link.href="http://localhost:7777/"+userId+"/certificates";

@@ -128,6 +128,13 @@ public class ServerLogic {
         }
     }
 
+    @RequestMapping("getWinners")
+    public ResponseEntity<List<Integer>> getWinners(){
+        String sql = "SELECT user_id FROM users WHERE points = (SELECT MAX(points) FROM users where user_id!=999) and user_id!=999";
+        List<Integer> updatedUsersWithMaxPoints = jdbcTemplate.queryForList(sql, new MapSqlParameterSource(), Integer.class);
+        return ResponseEntity.ok(updatedUsersWithMaxPoints);
+    }
+
     @RequestMapping(value = "/userSignUp", method = RequestMethod.POST)
     public ModelAndView userSignUp(@RequestParam(value = "email", required = true) String email, 
                                 @RequestParam(value = "password", required = true) String password,

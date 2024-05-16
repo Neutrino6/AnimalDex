@@ -3,6 +3,7 @@ package it.uniroma1.animaldex;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Date;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
@@ -35,6 +36,7 @@ public class ScoreBoardController {
     public String scoreboard(@PathVariable int user_id,@CookieValue(value = "authCookie", defaultValue = "") String authCookieValue) {
         int check=isValidAuthCookie(authCookieValue,user_id);
         JSONObject jsonObject;
+        String deadline;
         if(check==0){
             Context context = new Context();
             context.setVariable("error", "You are not authorized to perform this action.");
@@ -67,11 +69,36 @@ public class ScoreBoardController {
             String html = templateEngine.process("errorPage", context);
             return html;
         }
+
+        request = new HttpPost("http://host.docker.internal:6040/getDeadline"); 
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
+            CloseableHttpResponse response = client.execute(request);
+            int statusCode = response.getStatusLine().getStatusCode();
+            HttpEntity entity = response.getEntity();
+            String responseBody = EntityUtils.toString(entity);
+
+        
+            System.out.println("Status code: " + statusCode);
+            System.out.println("Response body: " + responseBody);
+
+            deadline = responseBody;
+
+        } catch (IOException e) {
+            String error="Error: " + e.getMessage();
+            System.err.println(error);
+            e.printStackTrace(); // Print detailed stack trace for debugging
+            Context context = new Context();
+            context.setVariable("error", error);
+            context.setVariable("redirectUrl","http://localhost:3000/LoginUser.html");
+            String html = templateEngine.process("errorPage", context);
+            return html;
+        }
         
         Context context=new Context();
 
         JSONArray users = jsonObject.getJSONArray("users");
         context.setVariable("users", users);
+        context.setVariable("deadline", "The new winners will be announced on "+deadline);
         String html = templateEngine.process("scoreboard", context);
         return html;
     }

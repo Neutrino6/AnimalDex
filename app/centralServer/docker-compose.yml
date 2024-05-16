@@ -28,10 +28,19 @@ services:
     build:
       context: "./logic"
     ports: 
-      - "6039:6039"   
+      - "6039:6039" 
+  time:
+    build:
+      context: "./time"
+    volumes:
+      - storage:/storage
+    ports: 
+      - "6040:6040"   
 networks:
   pg_network:
     driver: bridge
 volumes:
   db-data-central:
+    driver: local
+  storage:
     driver: local
