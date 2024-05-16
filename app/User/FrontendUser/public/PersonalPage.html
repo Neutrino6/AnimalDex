@@ -69,11 +69,45 @@
 <br>
 
         <br>
+        <script>
+          // Funzione per visualizzare l'immagine selezionata prima dell'upload
+          document.getElementById('profileImage').addEventListener('change', function(event) {
+              var file = event.target.files[0];
+              var reader = new FileReader();
+              reader.onload = function(e) {
+                  document.getElementById('profileImageDisplay').src = e.target.result;
+              };
+              reader.readAsDataURL(file);
+          });
+
+          
+        function uploadImage() {
+            var formData = new FormData();
+            var fileInput = document.getElementById('profileImage');
+            var file = fileInput.files[0];
+            formData.append('profileImage', file);
+
+            // Invia la richiesta AJAX al server
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'http://localhost:6039/changeProfileImage', true);
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    // Se la richiesta ha avuto successo, aggiorna l'immagine del profilo
+                    var imageUrl = URL.createObjectURL(file);
+                    document.getElementById('profileImageDisplay').src = imageUrl;
+                }
+            };
+            xhr.send(formData);
+        }
+  
+      </script>
+
+
 <!-- colonne per immagine profilo e corona-->
   <div class="container-fluid">
       <div class="row justify-content-end">
         <div class="col-4 text-center">
-           <img src="../avatar.jpg" alt="Avatar" class="avatar">
+           <img src="../avatar.jpg" alt="Profile Image" class="avatar" id="profileImageDisplay">
         </div>
 
         <div class="col-4 ">
@@ -83,6 +117,15 @@
       </div>
     <br>
 <br>
+
+ <!-- Form per l'upload dell'immagine -->
+ <form id="profileImageForm" enctype="multipart/form-data">
+  <label for="profileImage">Select Profile Image:</label>
+  <input type="file" id="profileImage" name="profileImage" accept="image/*">
+  <input type="button" value="Upload" onclick="uploadImage()">
+</form>
+
+
 <!-- form con tutti i dati-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script type="text/javascript" language="javascript">

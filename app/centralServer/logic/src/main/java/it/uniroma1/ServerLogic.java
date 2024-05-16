@@ -342,7 +342,8 @@ public class ServerLogic {
         Integer points = (Integer) userMap.get("points");
         Integer fav_animal = (Integer) userMap.get("fav_animal"); 
         Boolean forum_not = (Boolean) userMap.get("forum_notify");
-        Boolean emergency_not = (Boolean) userMap.get("emergency_notify"); 
+        Boolean emergency_not = (Boolean) userMap.get("emergency_notify");
+        Byte[] profileImage = (Byte[]) user.Map.get("profile_image");
         
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode responseJson = mapper.createObjectNode();
@@ -357,6 +358,7 @@ public class ServerLogic {
         responseJson.put("fav_animal", fav_animal);
         responseJson.put("emergency_not", emergency_not);
         responseJson.put("forum_not", forum_not);
+        responseJson.put("profileImage", profile_image);
 
         String jsonResponse = mapper.writeValueAsString(responseJson);
         return ResponseEntity.ok(jsonResponse);
@@ -477,6 +479,24 @@ public class ServerLogic {
                          "fav_animal = :animal, " +
                          "forum_notify = :forum, " +
                          "emergency_notify = :emergencies " +
+                         "WHERE user_id = :user_id";
+        jdbcTemplate.update(updateQuery, source);
+        return new ModelAndView("redirect:http://localhost:3000/Redirect/" + userId);
+    }
+
+
+    @RequestMapping(value = "/changeProfileImage", method = RequestMethod.POST)
+    public ModelAndView changeProfileImage(
+    @RequestParam(value = "user_id") Integer userId, 
+    @RequestParam(value = "profile_image") MultipartFile profileImage
+    ) {
+        byte[] imageBytes = profileImage.getBytes();
+        MapSqlParameterSource source = new MapSqlParameterSource()
+         .addValue("user_id", userId)
+        .addValue("profile_image", imageBytes);
+        
+        String updateQuery = "UPDATE users SET " +
+                         "profile_image = :profileImage " +
                          "WHERE user_id = :user_id";
         jdbcTemplate.update(updateQuery, source);
         return new ModelAndView("redirect:http://localhost:3000/Redirect/" + userId);
