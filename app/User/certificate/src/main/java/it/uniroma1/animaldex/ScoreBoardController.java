@@ -99,6 +99,7 @@ public class ScoreBoardController {
         JSONArray users = jsonObject.getJSONArray("users");
         context.setVariable("users", users);
         context.setVariable("deadline", "The new winners will be announced on "+deadline);
+        context.setVariable("link1", "/"+user_id+"/certificates");
         String html = templateEngine.process("scoreboard", context);
         return html;
     }

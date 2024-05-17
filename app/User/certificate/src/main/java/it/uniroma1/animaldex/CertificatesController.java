@@ -88,6 +88,7 @@ public class CertificatesController {
         context.setVariable("userId", ""+user_id+"");
         context.setVariable("link1", "/"+user_id+"/certificates/list");
         context.setVariable("link2", "/"+user_id+"/certificates/animals");
+        context.setVariable("link3", "/"+user_id+"/scoreboard");
         String html = templateEngine.process("certificates", context);
         return html;
     }

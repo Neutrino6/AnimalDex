@@ -50,9 +50,11 @@ app.get('/PersonalPageUser/:userId', async (req, res) => {
   try {
     // Effettua la richiesta al servizio esterno
     const response = await axios.get("http://host.docker.internal:6039/PersonalPageUser?user_id="+ userId);
+    const response1 = await axios.get("http://host.docker.internal:6040/checkWinner?userId="+ userId);
 
     // Ricevuta la risposta, puoi manipolarla come desideri
     const userData = response.data; // Supponendo che la risposta contenga i dati dell'utente
+    const winner = (response1.data === "User " + userId + " is a winner");
     console.log(userData);
 
     /*// Costruisci l'URL con i dati dell'utente come parametri query
@@ -71,8 +73,9 @@ app.get('/PersonalPageUser/:userId', async (req, res) => {
       }
       
       // Sostituisci <<userData>> con i dati utente
-      const modifiedHTML = data.replace('<<userData>>', JSON.stringify(userData));
-      
+      let modifiedHTML = data.replace('<<userData>>', JSON.stringify(userData));
+      modifiedHTML = modifiedHTML.replace('<<winner>>', JSON.stringify(winner));
+
       // Invia il contenuto modificato come risposta
       res.send(modifiedHTML);
     });
