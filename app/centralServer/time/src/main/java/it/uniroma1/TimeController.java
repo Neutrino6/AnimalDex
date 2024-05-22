@@ -42,9 +42,9 @@ public class TimeController {
     public TimeController() throws ClientProtocolException, IOException {
         retrieveDeadlineFromStorage();
         if (deadline == null || deadline.isBefore(LocalDateTime.now())) {
+            updateUsersWithMaxPoints();
             setNextMidnightDeadline();
             storeDeadlineToStorage();
-            updateUsersWithMaxPoints();
         }
         loadWinnersFromStorage();
         scheduleMidnightTask();

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Create a new event</title>
+    <script>
+        function check() {
+            var endDate = new Date(document.querySelector('input[name="end_date"]').value);
+            var today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (endDate <= today) {
+                alert("The end date must be greater than today's date.");
+                return false;
+            }
+            return true;
+        }
+    </script>
+</head>
+<body>
+    <a th:href="${link1}"> Go back </a> <br>
+    <h3 th:text="${msg}"></h3>
+    <label>Insert a new event:</label><br>
+    <form action="http://localhost:6039/newSpecialEvent" method="post" enctype="multipart/form-data" onSubmit = "return check()">
+        <input type="text" id="user_id" name="user_id" hidden required th:value="${userId}">
+        <label for="end_date">Choose the end date:</label>
+        <input type="date" name="end_date" class = "form-control" required>
+        <br>
+        <label for="animal_name">Choose an animal:</label>
+        <select name="animal_name" id="animal_name" required>
+            <option th:each="item : ${names}" th:value="${item}" th:text="${item}"></option>
+        </select><br>
+        <label for="bonus_points">Bonus points:</label>
+        <input type="number" id="bonus_points" name="bonus_points" min="1" max="100" required>
+        <input type="submit" value="Create event">
+    </form>
+    <br>
+</body>
+</html>
