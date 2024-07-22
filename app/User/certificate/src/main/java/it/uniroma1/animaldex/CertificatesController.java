@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.Date;
@@ -31,6 +32,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+
 import java.io.IOException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -79,9 +82,6 @@ public class CertificatesController {
         }
 
         Context context = new Context();
-        if(check==2){
-            context.setVariable("googleDriveAuthUrl", "http://localhost:8080/auth/google");
-        }
         //this is an example if you want to add same variable to your context to add in the template
         //context.setVariable("name", "John Doe");
         // first argument of processe is the name of the template you want to use
@@ -89,7 +89,82 @@ public class CertificatesController {
         context.setVariable("link1", "/"+user_id+"/certificates/list");
         context.setVariable("link2", "/"+user_id+"/certificates/animals");
         context.setVariable("link3", "/"+user_id+"/scoreboard");
+        context.setVariable("link4", "/"+user_id+"/specialEvents");
+        context.setVariable("link5", "/"+user_id+"/events");
         String html = templateEngine.process("certificates", context);
+        return html;
+    }
+
+    @RequestMapping("/{user_id}/specialEvents")
+    public String specialEvents(@PathVariable int user_id,
+                                @CookieValue(value = "authCookie", defaultValue = "") String authCookieValue,
+                                @RequestParam(value = "sort", defaultValue = "enddate") String sort) { // Default sort by enddate
+        int check=isValidAuthCookie(authCookieValue,user_id);
+        if(check==0){
+            Context context = new Context();
+            //this is an example if you want to add same variable to your context to add in the template
+            context.setVariable("error", "You are not authorized to perform this action.");
+            context.setVariable("redirectUrl","http://localhost:3000/LoginUser.html");
+            // first argument of processe is the name of the template you want to use
+            String html = templateEngine.process("errorPage", context);
+            return html;
+        }
+
+        JSONArray jsonArray;
+        HttpPost request = new HttpPost("http://host.docker.internal:6039/getSpecialEvents");  //communication between different containers
+        
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
+            CloseableHttpResponse response = client.execute(request);
+            int statusCode = response.getStatusLine().getStatusCode();
+            HttpEntity entity = response.getEntity();
+            String responseBody = EntityUtils.toString(entity);
+
+        
+            System.out.println("Status code: " + statusCode);
+            System.out.println("Response body: " + responseBody);
+
+            jsonArray = new JSONArray(responseBody);
+
+        } catch (IOException e) {
+            String error="Error: " + e.getMessage();
+            System.err.println(error);
+            e.printStackTrace(); // Print detailed stack trace for debugging
+            Context context = new Context();
+            context.setVariable("error", error);
+            context.setVariable("redirectUrl","http://localhost:3000/LoginUser.html");
+            String html = templateEngine.process("errorPage", context);
+            return html;
+        }
+
+        List<Map<String, Object>> specialEvents = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+            specialEvents.add(jsonObject.toMap());
+        }
+
+        // Sort list based on the sort parameter
+        specialEvents.sort((e1, e2) -> {
+            if ("bonuspoints".equals(sort)) {
+                BigDecimal bp1 = (BigDecimal) e1.get("bonuspoints");
+                BigDecimal bp2 = (BigDecimal) e2.get("bonuspoints");
+                return bp2.compareTo(bp1); // Sort in descending order
+            } else {
+                String endDate1 = (String) e1.get("enddate");
+                String endDate2 = (String) e2.get("enddate");
+                return endDate1.compareTo(endDate2); // Sort in ascending order
+            }
+        });
+
+        Context context = new Context();
+        //this is an example if you want to add same variable to your context to add in the template
+        //context.setVariable("name", "John Doe");
+        // first argument of process is the name of the template you want to use
+        context.setVariable("userId", ""+user_id+"");
+        context.setVariable("link1", "/"+user_id+"/certificates");
+        context.setVariable("link2", "/"+user_id+"/specialEvents?sort=enddate");
+        context.setVariable("link3", "/"+user_id+"/specialEvents?sort=bonuspoints");
+        context.setVariable("specialEvents", specialEvents);
+        String html = templateEngine.process("specialEvents", context);
         return html;
     }
 

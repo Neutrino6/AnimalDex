@@ -10,14 +10,12 @@
         <input type="text" id="userId" name="userId" hidden required th:value="${userId}"><br><br>
         <input type="file" id="fileInput" name="fileInput" accept="image/*" required><br><br>
         <input type="submit" value="Upload certificate">
-        
-        <th:block th:if="${googleDriveAuthUrl}">
-            <a th:href="${googleDriveAuthUrl}">Upload from Google Drive</a>
-        </th:block>
     </form>
     <br>
     <a th:href="${link1}"> My Certificates </a> <br>
     <a th:href="${link2}"> Animaldex </a> <br>
-    <a th:href="${link3}"> ScoreBoard </a>
+    <a th:href="${link3}"> ScoreBoard </a> <br>
+    <a th:href="${link4}"> Special Events </a> <br>
+    <a th:href="${link5}"> Add a Special Events </a>
 </body>
 </html>

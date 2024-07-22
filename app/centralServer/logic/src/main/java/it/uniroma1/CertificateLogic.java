@@ -223,4 +223,14 @@ public class CertificateLogic {
         }
         return new ModelAndView("redirect:http://localhost:7777/"+user_id+"/events?msg=KO");   
     }
+
+    @RequestMapping("getSpecialEvents")
+    public ResponseEntity<List<Map<String, Object>>> getSpecialEvents(){
+        LocalDateTime start_date=LocalDateTime.now();
+        MapSqlParameterSource source1 = new MapSqlParameterSource()
+            .addValue("now", start_date);
+        String getSpecialEventsQuery="select a.a_name as animalName, s.enddate as endDate, round(100*s.bonuspoints/a.std_points,2) as bonusPoints from specialevent s join animal a on s.animal_id=a.a_id where :now<enddate";
+        List<Map<String, Object>> specialEvents = jdbcTemplate.queryForList(getSpecialEventsQuery, source1);
+        return ResponseEntity.ok(specialEvents);
+    }
 }

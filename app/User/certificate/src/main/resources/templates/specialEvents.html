@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Special Events</title>
+    <style>
+        .bonus-points {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>Special Events</h1>
+    <a th:href="${link1}">Go back</a> <br>
+
+    <a th:href="${link2}">Sort by End Date</a> |
+    <a th:href="${link3}">Sort by Bonus Points</a>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Animal Name</th>
+                <th>End Date</th>
+                <th>Bonus Points</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="event : ${specialEvents}">
+                <td th:text="${event['animalname']}"></td>
+                <td th:text="${event['enddate']}"></td>
+                <td th:text="${event['bonuspoints']}" class="bonus-points"></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
