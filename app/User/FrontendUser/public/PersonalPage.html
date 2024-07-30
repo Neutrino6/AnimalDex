@@ -21,6 +21,15 @@
           cursor: pointer; /* Imposta il cursore al passaggio del mouse */
           border: none;
       }
+      .custom-btn-list {
+        background-color: transparent; /* Imposta il colore di sfondo */
+        color: rgba(201, 231, 65, 0.918); /* Imposta il colore del testo */
+        cursor: pointer; /* Imposta il cursore al passaggio del mouse */
+        border: none;
+    }
+      #adminform {
+        display: none;    /* Nasconde la form di default */
+      }
     </style>
 </head>
 
@@ -218,6 +227,7 @@
         let animal = $("form #animal");
         let forum = $("form #forum");
         let emergency = $("form #emergencies");
+        let admin = $("form #adminInput");
         
 
         // Assegna i valori ai campi input
@@ -228,6 +238,7 @@
         $(points).val(userData.points);
         $(dob).val(userData.dob);
         $(animal).val(userData.fav_animal);
+        $(admin).val(userData.admin);
         
         //cercare di correggere notifications perchè quando invio la modifica non mi appare l'update a schermo
         if (userData.forum_notify === true) {
@@ -243,6 +254,12 @@
         } else {
             $(emergency).val("0");
             //$(emergency).prop('checked', false);
+        }
+
+        if (userData.admin === true) {
+
+          // Mostra la form
+          document.getElementById('adminform').style.display = 'block';
         }
       });
     </script>
@@ -299,13 +316,7 @@
               <option value="0">No</option>
               <option value="1">Yes</option>
             </select>
-            <!--
-            <input type="checkbox" name="forum" id="forum" value="return getForumValue()" disabled>
-            <h5 style="color: aliceblue;"> Allow forum notification</h5><br>
 
-            <input type="checkbox" name="emergencies" id="emergencies" value="return getEmergencyValue()" disabled>
-            <h5 style="color: aliceblue;" > Allow emergencies notification</h5><br>
-            -->
             <input type="hidden" name="user_id" id="userIdInput" value="">
     </form>
          
@@ -318,7 +329,17 @@
       <button class = "custom-btn-del" name ="delete" type = "submit"> Delete my account </button>    
       <br>
       <br>    
-      <br><br><br><br>
+    </form> 
+
+    <!-- list of all users (only admin) -->
+    <form action =  "http://localhost:6039/UsersList" class = "form-signin m-auto" method = "POST" id="adminform"> 
+
+      <input type="hidden" name="user_id" id="userIdInput" value="">
+      <input type="hidden" name="admin" id="adminInput" value="">
+
+      <button class = "custom-btn-list" name ="list" type = "submit"> Show all subscribed users </button>    
+      <br>
+      <br>    
     </form> 
 
 

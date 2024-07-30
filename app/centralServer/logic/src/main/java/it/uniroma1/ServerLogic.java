@@ -252,6 +252,7 @@ public class ServerLogic {
         Integer fav_animal = (Integer) userMap.get("fav_animal"); 
         Boolean forum_not = (Boolean) userMap.get("forum_notify");
         Boolean emergency_not = (Boolean) userMap.get("emergency_notify");
+        Boolean admin = (Boolean) userMap.get("administrator");
         //Byte[] profileImage = (Byte[]) user.Map.get("profile_image");
         
         ObjectMapper mapper = new ObjectMapper();
@@ -268,6 +269,7 @@ public class ServerLogic {
         responseJson.put("emergency_not", emergency_not);
         responseJson.put("forum_not", forum_not);
         //responseJson.put("profileImage", profile_image);
+        responseJson.put("admin", admin);
 
         String jsonResponse = mapper.writeValueAsString(responseJson);
         return ResponseEntity.ok(jsonResponse);
