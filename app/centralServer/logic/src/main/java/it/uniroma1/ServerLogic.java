@@ -29,10 +29,13 @@ import java.util.UUID;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.springframework.web.multipart.MultipartFile;
+
+
 
 @RestController
 public class ServerLogic {
-    
+
     @Autowired
     NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -219,6 +222,7 @@ public class ServerLogic {
         }
     }
 
+
     @RequestMapping(value = "/PersonalPageUser")
     public ResponseEntity<String> PersonalePageUser(@RequestParam(value = "user_id") Integer user_id) throws JsonProcessingException {
         MapSqlParameterSource source1 = new MapSqlParameterSource().addValue("user_id", user_id);
@@ -253,7 +257,7 @@ public class ServerLogic {
         Boolean forum_not = (Boolean) userMap.get("forum_notify");
         Boolean emergency_not = (Boolean) userMap.get("emergency_notify");
         Boolean admin = (Boolean) userMap.get("administrator");
-        //Byte[] profileImage = (Byte[]) user.Map.get("profile_image");
+        byte[] profileImage = (byte[]) userMap.get("profile_image");
         
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode responseJson = mapper.createObjectNode();
@@ -268,7 +272,7 @@ public class ServerLogic {
         responseJson.put("fav_animal", fav_animal);
         responseJson.put("emergency_not", emergency_not);
         responseJson.put("forum_not", forum_not);
-        //responseJson.put("profileImage", profile_image);
+        responseJson.put("profile_image", profileImage);
         responseJson.put("admin", admin);
 
         String jsonResponse = mapper.writeValueAsString(responseJson);
@@ -395,23 +399,21 @@ public class ServerLogic {
         return new ModelAndView("redirect:http://localhost:3000/Redirect/" + userId);
     }
 
+    @RequestMapping(value = "/changeProfileImage", method = RequestMethod.POST)
+        public ModelAndView handleFileUpload(@RequestParam(value = "user_id") Integer userId , @RequestParam(value = "profile_image") MultipartFile file) throws IOException {
+ 
+            byte[] imageBytes = file.getBytes();
+            MapSqlParameterSource source = new MapSqlParameterSource()
+            .addValue("user_id", userId)
+            .addValue("profile_image", imageBytes);
+            
+            String updateQuery = "UPDATE users SET " +
+                            "profile_image = :profile_image " +
+                            "WHERE user_id = :user_id";
+            jdbcTemplate.update(updateQuery, source);
 
-    /*@RequestMapping(value = "/changeProfileImage", method = RequestMethod.POST)
-    public ModelAndView changeProfileImage(
-    @RequestParam(value = "user_id") Integer userId, 
-    @RequestParam(value = "profile_image") MultipartFile profileImage
-    ) {
-        byte[] imageBytes = profileImage.getBytes();
-        MapSqlParameterSource source = new MapSqlParameterSource()
-         .addValue("user_id", userId)
-        .addValue("profile_image", imageBytes);
-        
-        String updateQuery = "UPDATE users SET " +
-                         "profile_image = :profileImage " +
-                         "WHERE user_id = :user_id";
-        jdbcTemplate.update(updateQuery, source);
-        return new ModelAndView("redirect:http://localhost:3000/Redirect/" + userId);
-    }*/
+            return new ModelAndView("redirect:http://localhost:3000/Redirect/" + userId);
+        }
 
     @RequestMapping(value = "/UserOauth", method = RequestMethod.POST)
     public ResponseEntity<String> UserOauth(@RequestBody String requestBody){

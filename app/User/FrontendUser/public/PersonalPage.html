@@ -76,194 +76,32 @@
 
 <br>
 <br>
-
-        <br>
-        <script>
-          // Funzione per visualizzare l'immagine selezionata prima dell'upload
-          document.getElementById('profileImage').addEventListener('change', function(event) {
-              var file = event.target.files[0];
-              var reader = new FileReader();
-              reader.onload = function(e) {
-                  document.getElementById('profileImageDisplay').src = e.target.result;
-              };
-              reader.readAsDataURL(file);
-          });
-
-          
-        function uploadImage() {
-            var formData = new FormData();
-            var fileInput = document.getElementById('profileImage');
-            var file = fileInput.files[0];
-            formData.append('profileImage', file);
-
-            // Invia la richiesta AJAX al server
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', 'http://localhost:6039/changeProfileImage', true);
-            xhr.onload = function () {
-                if (xhr.status === 200) {
-                    // Se la richiesta ha avuto successo, aggiorna l'immagine del profilo
-                    var imageUrl = URL.createObjectURL(file);
-                    document.getElementById('profileImageDisplay').src = imageUrl;
-                }
-            };
-            xhr.send(formData);
-        }
-  
-      </script>
-
-
-<!-- colonne per immagine profilo e corona-->
-  <div class="container-fluid">
-      <div class="row justify-content-end">
-        <div class="col-4 text-center">
-           <img src="../avatar.jpg" alt="Profile Image" class="avatar" id="profileImageDisplay">
-        </div>
-
-        <div class="col-4 ">
-      <div id="winner"></div>
-    <img src="../corona.png" alt="Corona" class="corona">
-        </div>
-      </div>
-    <br>
 <br>
-
- <!-- Form per l'upload dell'immagine -->
- <form id="profileImageForm" enctype="multipart/form-data">
-  <label for="profileImage">Select Profile Image:</label>
-  <input type="file" id="profileImage" name="profileImage" accept="image/*">
-  <input type="button" value="Upload" onclick="uploadImage()">
-</form>
-
-
-<!-- form con tutti i dati-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script type="text/javascript" language="javascript">
-
-      function rendiInputModificabili(formId, checkboxId) {
-        // Seleziona la form
-        var form = document.getElementById(formId);
-        // Se la form esiste
-        if (form) {
-          // Seleziona la checkbox
-          var checkbox = document.getElementById(checkboxId);
-          // Se la checkbox esiste
-          if (checkbox) {
-            // Aggiungi un listener per l'evento onchange della checkbox
-            checkbox.addEventListener('change', function() {
-              // Se la checkbox è selezionata
-              if (this.checked) {
-                // Seleziona tutti gli elementi input con attributo readonly all'interno della form
-                var inputElements = form.querySelectorAll('input[readonly]');
-                var selectElements = form.querySelectorAll('select[disabled]');
-                // Itera su tutti gli elementi input trovati
-                inputElements.forEach(function(input) {
-                  // Rimuovi l'attributo readonly
-                  input.removeAttribute('readonly');
-                });
-                selectElements.forEach(function(input) {
-                  // Rimuovi l'attributo readonly
-                  input.removeAttribute('disabled');
-                });
-                
-              } else {
-                // Se la checkbox non è selezionata
-                // Seleziona tutti gli elementi input senza attributo readonly all'interno della form
-                var inputElements = form.querySelectorAll('input:not([readonly])');
-                var selectElements = form.querySelectorAll('select:not([disabled])');
-                // Itera su tutti gli elementi input trovati
-                inputElements.forEach(function(input) {
-                  // Aggiungi l'attributo readonly
-                  input.setAttribute('readonly', 'readonly');
-                });
-                selectElements.forEach(function(input) {
-                  // Aggiungi l'attributo readonly
-                  input.setAttribute('disabled', 'disabled');
-                });
-              }
-            });
-          } else {
-            console.error('Checkbox non trovata con id: ' + checkboxId);
-          }
-        } else {
-          console.error('Form non trovata con id: ' + formId);
-        }
-      }
-
-      function getUserIdFromUrl() {
-        const url = window.location.href;
-        const userIdIndex = url.lastIndexOf("/") + 1; // Trova l'indice dell'ultimo "/" nell'URL
-        const userId = url.substring(userIdIndex); // Estrai l'ID dell'utente dalla parte finale dell'URL
-        return userId;
-      }
-
-      $(document).ready(function() {
-
-        var userData = JSON.parse(`<<userData>>`);
-        var winner = JSON.parse('<<winner>>');
-        //console.log(userData);
-        if(winner){
-          document.getElementById("winner").innerHTML="<img src='../cup.png' alt='Cup' class='cup'>";
-        }
-
-        rendiInputModificabili('PersPage', 'CredentialModify');
-        const userId = getUserIdFromUrl();
-
-        var link = document.getElementById("certificate_link");
-        link.href="http://localhost:7777/"+userId+"/certificates";
-        // Ottieni l'user_id dall'URL
-
-        // Assegna l'user_id all'input nascosto nella form
-        let userIdInput = $("form #userIdInput");
-        $(userIdInput).val(userId);
-
-        // Seleziona tutti gli input nella prima form
-        let email = $("form #email");
-        let points = $("form #points");
-        let username = $("form #username");
-        let name = $("form #name");
-        let surname = $("form #surname");
-        let dob = $("form #dob");
-        //let passw = $("form #passw");
-        let animal = $("form #animal");
-        let forum = $("form #forum");
-        let emergency = $("form #emergencies");
-        let admin = $("form #adminInput");
-        
-
-        // Assegna i valori ai campi input
-        $(email).val(userData.email);
-        $(username).val(userData.username);
-        $(name).val(userData.firstname);
-        $(surname).val(userData.surname);
-        $(points).val(userData.points);
-        $(dob).val(userData.dob);
-        $(animal).val(userData.fav_animal);
-        $(admin).val(userData.admin);
-        
-        //cercare di correggere notifications perchè quando invio la modifica non mi appare l'update a schermo
-        if (userData.forum_notify === true) {
-          $(forum).val("1");
-          //$(forum).prop('checked', true);
-        } else {
-            $(forum).val("0");
-            //$(forum).prop('checked', false);
-        }
-        if (userData.emergency_notify === true) {
-            $(emergency).val("1");
-            //$(emergency).prop('checked', true);
-        } else {
-            $(emergency).val("0");
-            //$(emergency).prop('checked', false);
-        }
-
-        if (userData.admin === true) {
-
-          // Mostra la form
-          document.getElementById('adminform').style.display = 'block';
-        }
-      });
-    </script>
     
+
+    <!-- colonne per immagine profilo e corona-->
+    <div class="container-fluid">
+        <div class="row justify-content-end">
+          <div class="col-4 text-center">
+            <img src="../avatar.jpg" alt="Profile Image" class="avatar" id="profileImageDisplay">
+          </div>
+
+          <div class="col-4 ">
+        <div id="winner"></div>
+      <img src="../corona.png" alt="Corona" class="corona">
+          </div>
+        </div>
+      <br>
+    <br>
+
+    <!-- Form per l'upload dell'immagine -->
+    <form action = "http://localhost:6039/changeProfileImage" method = "POST" id="profileImageForm" enctype="multipart/form-data">
+    <label for="profileImage">Select Profile Image:</label>
+    <input type="file" name="profile_image" id="profileImage" name="profileImage" accept="image/*">
+    <input type="hidden" name="user_id" id="userIdInput" value="">
+    <button type="submit" value="Submit">Submit</button>
+    </form>
+        
     <form action = "http://localhost:6039/changeCredentialsUser" class = "form-signin m-auto" method = "POST" id = "PersPage" onSubmit = "return validaIscrizione()">
             <input type="checkbox" id="CredentialModify" on>
             <h5 style="color: aliceblue;"> Change my credentials</h5><br>
@@ -407,6 +245,155 @@
     </footer>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" language="javascript">
+
+      function rendiInputModificabili(formId, checkboxId) {
+        // Seleziona la form
+        var form = document.getElementById(formId);
+        // Se la form esiste
+        if (form) {
+          // Seleziona la checkbox
+          var checkbox = document.getElementById(checkboxId);
+          // Se la checkbox esiste
+          if (checkbox) {
+            // Aggiungi un listener per l'evento onchange della checkbox
+            checkbox.addEventListener('change', function() {
+              // Se la checkbox è selezionata
+              if (this.checked) {
+                // Seleziona tutti gli elementi input con attributo readonly all'interno della form
+                var inputElements = form.querySelectorAll('input[readonly]');
+                var selectElements = form.querySelectorAll('select[disabled]');
+                // Itera su tutti gli elementi input trovati
+                inputElements.forEach(function(input) {
+                  // Rimuovi l'attributo readonly
+                  input.removeAttribute('readonly');
+                });
+                selectElements.forEach(function(input) {
+                  // Rimuovi l'attributo readonly
+                  input.removeAttribute('disabled');
+                });
+                
+              } else {
+                // Se la checkbox non è selezionata
+                // Seleziona tutti gli elementi input senza attributo readonly all'interno della form
+                var inputElements = form.querySelectorAll('input:not([readonly])');
+                var selectElements = form.querySelectorAll('select:not([disabled])');
+                // Itera su tutti gli elementi input trovati
+                inputElements.forEach(function(input) {
+                  // Aggiungi l'attributo readonly
+                  input.setAttribute('readonly', 'readonly');
+                });
+                selectElements.forEach(function(input) {
+                  // Aggiungi l'attributo readonly
+                  input.setAttribute('disabled', 'disabled');
+                });
+              }
+            });
+          } else {
+            console.error('Checkbox non trovata con id: ' + checkboxId);
+          }
+        } else {
+          console.error('Form non trovata con id: ' + formId);
+        }
+      }
+
+      function getUserIdFromUrl() {
+        const url = window.location.href;
+        const userIdIndex = url.lastIndexOf("/") + 1; // Trova l'indice dell'ultimo "/" nell'URL
+        const userId = url.substring(userIdIndex); // Estrai l'ID dell'utente dalla parte finale dell'URL
+        return userId;
+      }
+
+      // Funzione per visualizzare l'immagine selezionata prima dell'upload (Immagine caricata su db, ma non visulaizzabile in pagina)
+      document.getElementById('profileImage').addEventListener('change', function(event) {
+        var file = event.target.files[0];
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('profileImageDisplay').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+      
+      /*
+      function base64ToImage(base64String) {
+        // Crea un elemento immagine
+        let img = new Image();
+        // Imposta la fonte dell'immagine con il prefisso corretto per base64
+        img.src = 'data:image/jpeg;base64,' + base64String;
+        return img;
+      }
+      */
+
+      $(document).ready(function() {
+
+        var userData = JSON.parse(`<<userData>>`);
+        var winner = JSON.parse('<<winner>>');
+        //console.log(userData);
+        if(winner){
+          document.getElementById("winner").innerHTML="<img src='../cup.png' alt='Cup' class='cup'>";
+        }
+
+        rendiInputModificabili('PersPage', 'CredentialModify');
+        const userId = getUserIdFromUrl();
+
+        var link = document.getElementById("certificate_link");
+        link.href="http://localhost:7777/"+userId+"/certificates";
+        // Ottieni l'user_id dall'URL
+
+        // Assegna l'user_id all'input nascosto nella form
+        let userIdInput = $("form #userIdInput");
+        $(userIdInput).val(userId);
+
+        // Seleziona tutti gli input nella prima form
+        let email = $("form #email");
+        let points = $("form #points");
+        let username = $("form #username");
+        let name = $("form #name");
+        let surname = $("form #surname");
+        let dob = $("form #dob");
+        //let passw = $("form #passw");
+        let animal = $("form #animal");
+        let forum = $("form #forum");
+        let emergency = $("form #emergencies");
+        let admin = $("form #adminInput");
+        let fileInput = $("form #profileImageDisplay")
+
+        
+        // Assegna i valori ai campi input
+        $(email).val(userData.email);
+        $(username).val(userData.username);
+        $(name).val(userData.firstname);
+        $(surname).val(userData.surname);
+        $(points).val(userData.points);
+        $(dob).val(userData.dob);
+        $(animal).val(userData.fav_animal);
+        $(admin).val(userData.admin);
+        $(fileInput).val(userData.profileImage);
+
+        //cercare di correggere notifications perchè quando invio la modifica non mi appare l'update a schermo
+        if (userData.forum_notify === true) {
+          $(forum).val("1");
+          //$(forum).prop('checked', true);
+        } else {
+            $(forum).val("0");
+            //$(forum).prop('checked', false);
+        }
+        if (userData.emergency_notify === true) {
+            $(emergency).val("1");
+            //$(emergency).prop('checked', true);
+        } else {
+            $(emergency).val("0");
+            //$(emergency).prop('checked', false);
+        }
+
+        if (userData.admin === true) {
+
+          // Mostra la form
+          document.getElementById('adminform').style.display = 'block';
+        }
+      });
+    </script>
 
 
 </body>
