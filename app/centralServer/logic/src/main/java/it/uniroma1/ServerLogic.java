@@ -28,6 +28,7 @@ import java.util.UUID;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -413,6 +414,75 @@ public class ServerLogic {
             jdbcTemplate.update(updateQuery, source);
 
             return new ModelAndView("redirect:http://localhost:3000/Redirect/" + userId);
+        }
+
+    @RequestMapping(value = "/UsersList", method = RequestMethod.POST)
+        public String usersList(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "admin") Boolean admin ) {
+
+            MapSqlParameterSource source = new MapSqlParameterSource()
+                .addValue("user_id", userId)
+                .addValue("admin", admin);
+
+            // Verifica se l'utente esiste
+            String verifyAdminQuery = "SELECT COUNT(*) FROM users WHERE user_id = :user_id";
+            Integer adminCount = jdbcTemplate.queryForObject(verifyAdminQuery, source, Integer.class);
+
+            if (adminCount == null || adminCount <= 0) {
+                // User not in db
+                return "<html><body><h1>Error</h1><p>User not found in database</p></body></html>";
+            }
+
+            if (!admin) {
+                // User not admin
+                return "<html><body><h1>Error</h1><p>User is not an admin</p></body></html>";
+            }
+
+            // Recupera tutti gli utenti dal database, escludendo la password
+            String getUsersQuery = "SELECT user_id, email, username, firstname, surname, points, birthday, fav_animal, forum_notify, emergency_notify, administrator FROM users";
+            List<Map<String, Object>> users = jdbcTemplate.queryForList(getUsersQuery, new MapSqlParameterSource());
+
+            StringBuilder html = new StringBuilder();
+            html.append("<html>");
+            html.append("<head><title>Users List</title></head>");
+            html.append("<body>");
+            html.append("<h1>Users List</h1>");
+            html.append("<table border='1'>");
+            html.append("<tr>")
+                .append("<th>User ID</th>")
+                .append("<th>Email</th>")
+                .append("<th>Username</th>")
+                .append("<th>First Name</th>")
+                .append("<th>Surname</th>")
+                .append("<th>Points</th>")
+                .append("<th>Birthday</th>")
+                .append("<th>Fav Animal</th>")
+                .append("<th>Forum Notify</th>")
+                .append("<th>Emergency Notify</th>")
+                .append("<th>Administrator</th>")
+                .append("</tr>");
+
+            for (Map<String, Object> user : users) {
+                html.append("<tr>")
+                    .append("<td>").append(user.get("user_id")).append("</td>")
+                    .append("<td>").append(user.get("email")).append("</td>")
+                    .append("<td>").append(user.get("username")).append("</td>")
+                    .append("<td>").append(user.get("firstname")).append("</td>")
+                    .append("<td>").append(user.get("surname")).append("</td>")
+                    .append("<td>").append(user.get("points")).append("</td>")
+                    .append("<td>").append(user.get("birthday")).append("</td>")
+                    .append("<td>").append(user.get("fav_animal")).append("</td>")
+                    .append("<td>").append(user.get("forum_notify")).append("</td>")
+                    .append("<td>").append(user.get("emergency_notify")).append("</td>")
+                    .append("<td>").append(user.get("administrator")).append("</td>")
+                    .append("</tr>");
+            }
+
+            html.append("</table>");
+            html.append("</body>");
+            html.append("</html>");
+
+            // Ritorna l'HTML generato
+            return html.toString();
         }
 
     @RequestMapping(value = "/UserOauth", method = RequestMethod.POST)
