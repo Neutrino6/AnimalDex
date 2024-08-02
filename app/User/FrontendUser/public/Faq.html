@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="1 bootstrap/css/bootstrap.css" />
+    <script src="1 bootstrap/js/bootstrap.bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel = "stylesheet" href = "generale.css" />
+    <title> FAQ </title>
+    <style>
+      .custom-btn {
+          background-color: transparent; /* Imposta il colore di sfondo */
+          color: rgba(39, 240, 69, 0.918); /* Imposta il colore del testo */
+          cursor: pointer; /* Imposta il cursore al passaggio del mouse */
+          border: none;
+      }
+      .custom-btn-del {
+          background-color: transparent; /* Imposta il colore di sfondo */
+          color: rgba(250, 2, 2, 0.918); /* Imposta il colore del testo */
+          cursor: pointer; /* Imposta il cursore al passaggio del mouse */
+          border: none;
+      }
+      .custom-btn-list {
+        background-color: transparent; /* Imposta il colore di sfondo */
+        color: rgba(201, 231, 65, 0.918); /* Imposta il colore del testo */
+        cursor: pointer; /* Imposta il cursore al passaggio del mouse */
+        border: none;
+    }
+      #adminform {
+        display: none;    /* Nasconde la form di default */
+      }
+    </style>
+</head>
+
+<body>
+<!-- navbar in alto -->
+    <nav class="navbar navbar-expand-lg bg-light">
+        <div class="container-fluid">
+            <a id="logo" class="navbar-brand" href="#">
+                </a>
+
+            <div>
+          <button class="navbar-toggler" type="button"
+          data-bs-toggle="collapse" data-bs-target="#target"
+          aria-controls="target" aria-expanded="false"
+          aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="target">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link" href="home.html">Home</a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                  Menù
+                </a>
+                <ul class="dropdown-menu text-center">
+                  <li><a class="dropdown-item" href="chisiamo.html">Chi siamo</a></li>
+                  <li><a class="dropdown-item" href="dovesiamo.html">Dove siamo</a></li>
+                  <li><a class="dropdown-item" id="certificate_link" href="">Certificates</a></li>
+                  <li><a class="dropdown-item" href="Faq.html">FAQ</a></li>
+                  <li><a class="dropdown-item" href="eventi.html">Eventi</a></li>
+                  <li><a class="dropdown-item" href="contatti.html">Contatti</a></li>
+                </ul>
+            </li>
+        </ul>
+        </div>
+        </div>
+     </div>
+</nav>
+
+
+<br>
+<br>
+<br>
+
+        
+<div class="container" style="color: aliceblue; text-align: center;">
+    <h1> FAQ </h1>
+    <br><br><br>
+            
+    <h3 style="color:orangered"> Where can I find my certificates?</h3>
+    <br><br>
+    <h5> On top of the page, click on the Menu toggler and click on "Certificates"</h5>
+
+    <br><br><br>
+            
+    <h3 style="color:orangered"> I have just a few points. How can I earn more points?</h3>
+    <br><br>
+    <h5> You can earn more points by partecipating at the special events. You can find them at the Events' page</h5>
+
+    <br><br><br>
+
+    <h3 style="color:orangered"> How can I partecipate to the events?</h3>
+    <br><br>
+    <h5> You can partecipate in any event just by clicking on "Partecipate" in the Events' page</h5>
+
+    <br><br><br>
+            
+    <h3 style="color:orangered"> I've just seen a wounded animal. Is there something I can do?</h3>
+    <br><br>
+    <h5> Yes, you can send an alert through your Personal Page. An operator will reach your position and help the wounded animal</h5>
+
+    <br><br><br>
+            
+    <h3 style="color:orangered"> Still can't find the answer?</h3>
+    <br><br>
+    <h5> Write us at animaldex@gmail.com, we will reach you out as soon as possible</h5>
+
+</div>
+
+<br><br><br><br><br><br><br><br><br>
+
+<!-- footer -->
+ <footer class="page-footer font-small teal pt-4" style="background-color: white;">
+      <div class="container-fluid">
+        <div class="row justify-content-center">
+    
+             
+          <div class="col-lg-4 text-center">
+            <br><br> <br><br>
+            <h5 class="font-weight-bold">Contatti</h5>
+            <br> 
+            Sede:<br><br>
+            Via di Priscilla, 35 - Roma
+            <br><br>
+            
+            
+            
+          </div>
+    
+          <div class="col-lg-4 text-center">
+              <br><br>
+            
+            <br><br><br>
+          </div>
+         
+    
+          <div class="col-lg-4 text-center">
+    
+            <br><br>
+            <h2 class="font-weight-bold">AnimalDex</h2>
+            <br>
+            
+            Telefono:<br>
+            <a href="tel:+390644254639" style="color:black; font-size: medium">
+              +39 06 5525 4639</a>
+              <br>
+              <br>
+            E-mail:<br>
+            <a href="mailto:tinystepcrew@gmail.com" style="color:black; font-size: medium">
+              animaldex@gmail.com
+          </a>
+          
+          <br><br>
+          
+        
+          </div>
+    
+    </div>
+      
+      <div class="footer-copyright py-3 text-center">
+        <br>
+          <p style="color:black">© 2020 Copyright: AnimalDex</p>
+          
+      </div>
+      
+      
+    </footer>
+</div>
+
+
+</body>
+</html>
