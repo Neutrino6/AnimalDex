@@ -83,7 +83,7 @@
     <div class="container-fluid">
         <div class="row justify-content-end">
           <div class="col-4 text-center">
-            <img src="../avatar.jpg" alt="Profile Image" class="avatar" id="profileImageDisplay">
+            <img src="" alt="Profile Image" class="avatar" id="profileImageDisplay">
           </div>
 
           <div class="col-4 ">
@@ -96,7 +96,7 @@
 
     <!-- Form per l'upload dell'immagine -->
     <form action = "http://localhost:6039/changeProfileImage" method = "POST" id="profileImageForm" enctype="multipart/form-data">
-    <label for="profileImage">Select Profile Image:</label>
+    <label for="profileImage">Select Profile Image (only png format, max 1MB):</label>
     <input type="file" name="profile_image" id="profileImage" name="profileImage" accept="image/*">
     <input type="hidden" name="user_id" id="userIdInput" value="">
     <button type="submit" value="Submit">Submit</button>
@@ -325,10 +325,16 @@
       }
       */
 
+        
+  
+
+
+
       $(document).ready(function() {
 
         var userData = JSON.parse(`<<userData>>`);
         var winner = JSON.parse('<<winner>>');
+        
         //console.log(userData);
         if(winner){
           document.getElementById("winner").innerHTML="<img src='../cup.png' alt='Cup' class='cup'>";
@@ -357,7 +363,7 @@
         let forum = $("form #forum");
         let emergency = $("form #emergencies");
         let admin = $("form #adminInput");
-        let fileInput = $("form #profileImageDisplay")
+        /* let fileInput = $("form #profileImageDisplay") */
 
         
         // Assegna i valori ai campi input
@@ -369,7 +375,21 @@
         $(dob).val(userData.dob);
         $(animal).val(userData.fav_animal);
         $(admin).val(userData.admin);
-        $(fileInput).val(userData.profileImage);
+        /* $(fileInput).val(userData.profileImage);    non si può usare perché non è testo ma è un tag img */  
+
+          // Imposta l'immagine di profilo
+          let profileImageDisplay = document.getElementById('profileImageDisplay');
+          if (profileImageDisplay) {
+              if (userData.profile_image) {
+                  // Assicurati che userData.profileImage contenga una stringa base64 valida
+                  profileImageDisplay.src = 'data:image/png;base64,' + userData.profile_image;
+              } else {
+                  // Se profileImage è null o vuoto, imposta una immagine di default
+                  profileImageDisplay.src = '../avatar.jpg'; // Immagine di default
+              }
+          } else {
+              console.error('Element with id "profileImageDisplay" not found.');
+          }
 
         //cercare di correggere notifications perchè quando invio la modifica non mi appare l'update a schermo
         if (userData.forum_notify === true) {
