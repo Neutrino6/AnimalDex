@@ -16,6 +16,8 @@
     <a th:href="${link2}"> Animaldex </a> <br>
     <a th:href="${link3}"> ScoreBoard </a> <br>
     <a th:href="${link4}"> Special Events </a> <br>
-    <a th:href="${link5}"> Add a Special Events </a>
+    <th:block th:if="${link5}">
+        <a th:href="${link5}"> Add a Special Events </a>
+    </th:block>
 </body>
 </html>

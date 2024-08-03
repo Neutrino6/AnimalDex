@@ -69,7 +69,7 @@ public class CertificatesController {
     private TemplateEngine templateEngine;
 
     @RequestMapping("/{user_id}/certificates")
-    public String certificates(@PathVariable int user_id,@CookieValue(value = "authCookie", defaultValue = "") String authCookieValue) {
+    public String certificates(@PathVariable int user_id,@CookieValue(value = "authCookie", defaultValue = "") String authCookieValue,@CookieValue(value = "admin", defaultValue = "") String adminCookieValue) {
         int check=isValidAuthCookie(authCookieValue,user_id);
         if(check==0){
             Context context = new Context();
@@ -90,7 +90,7 @@ public class CertificatesController {
         context.setVariable("link2", "/"+user_id+"/certificates/animals");
         context.setVariable("link3", "/"+user_id+"/scoreboard");
         context.setVariable("link4", "/"+user_id+"/specialEvents");
-        context.setVariable("link5", "/"+user_id+"/events");
+        if( isValidAdminCookie(adminCookieValue,user_id) == 1 ) context.setVariable("link5", "/"+user_id+"/newSpecialEvents");
         String html = templateEngine.process("certificates", context);
         return html;
     }
@@ -197,6 +197,11 @@ public class CertificatesController {
         String expectedOauthCookieValue = sha256("GOOGLE_OAUTH:" + userId);
         if(cookieValue.equals(expectedOauthCookieValue)) return 2;
         if(cookieValue.equals(expectedLoginCookieValue)) return 1;
+        return 0;
+    }
+    private int isValidAdminCookie(String adminValue,int userId) {
+        String expectedAdminValue = sha256("ADMIN:" + userId);
+        if(adminValue.equals(expectedAdminValue)) return 1;
         return 0;
     }
 

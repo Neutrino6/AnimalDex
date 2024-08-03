@@ -57,6 +57,18 @@ app.get('/PersonalPageUser/:userId', async (req, res) => {
     const winner = (response1.data === "User " + userId + " is a winner");
     console.log(userData);
 
+    // Set cookie if admin is true
+    if (userData.admin === true) {
+      const adminCookieValue = sha256("ADMIN:" + userId).toString();
+      res.cookie('admin', adminCookieValue, {
+        domain: 'localhost',
+        path: '/',
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000 // Cookie valid for 1 day
+      });
+      console.log('Admin cookie set');
+    }
+
     /*// Costruisci l'URL con i dati dell'utente come parametri query
     let redirectURL = `?userId=${userId}`;
     for (const [key, value] of Object.entries(userData)) {

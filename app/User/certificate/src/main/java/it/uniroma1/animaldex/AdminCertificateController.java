@@ -24,10 +24,12 @@ public class AdminCertificateController {
     @Autowired
     private TemplateEngine templateEngine;
 
-    @RequestMapping("/{user_id}/events")
-    public String events(@PathVariable int user_id,@CookieValue(value = "authCookie", defaultValue = "") String authCookieValue,@RequestParam(value = "msg", required = false) String msg) {
-        int check=isValidAuthCookie(authCookieValue,user_id);
-        if(check==0){
+    @RequestMapping("/{user_id}/newSpecialEvents")
+    public String events(@PathVariable int user_id,@CookieValue(value = "authCookie", defaultValue = "") String authCookieValue,
+                        @CookieValue(value = "admin", defaultValue = "") String adminCookieValue,@RequestParam(value = "msg", required = false) String msg) {
+        int check1=isValidAuthCookie(authCookieValue,user_id);
+        int check2=isValidAdminCookie(adminCookieValue,user_id);
+        if(check1==0 || check2==0){
             Context context = new Context();
             //this is an example if you want to add same variable to your context to add in the template
             context.setVariable("error", "You are not authorized to perform this action.");
@@ -85,6 +87,11 @@ public class AdminCertificateController {
         String expectedOauthCookieValue = sha256("GOOGLE_OAUTH:" + userId);
         if(cookieValue.equals(expectedOauthCookieValue)) return 2;
         if(cookieValue.equals(expectedLoginCookieValue)) return 1;
+        return 0;
+    }
+    private int isValidAdminCookie(String adminValue,int userId) {
+        String expectedAdminValue = sha256("ADMIN:" + userId);
+        if(adminValue.equals(expectedAdminValue)) return 1;
         return 0;
     }
 
