@@ -26,8 +26,11 @@
         color: rgba(201, 231, 65, 0.918); /* Imposta il colore del testo */
         cursor: pointer; /* Imposta il cursore al passaggio del mouse */
         border: none;
-    }
+      }
       #adminform {
+          display: none;    /* Nasconde la form di default */
+      }
+      #adminform2 {
         display: none;    /* Nasconde la form di default */
       }
     </style>
@@ -178,7 +181,18 @@
       <button class = "custom-btn-list" name ="list" type = "submit"> Show all subscribed users </button>    
       <br>
       <br>    
-    </form> 
+    </form>
+    
+    <!-- list of all users (only admin) -->
+    <form action =  "http://localhost:6039/OpersList" class = "form-signin m-auto" method = "POST" id="adminform2"> 
+
+      <input type="hidden" name="user_id" id="userIdInput" value="">
+      <input type="hidden" name="admin" id="adminInput" value="">
+
+      <button class = "custom-btn-list" name ="list" type = "submit"> Show all subscribed opertators </button>    
+      <br>
+      <br>    
+    </form>
 
 
 
@@ -311,20 +325,6 @@
         reader.readAsDataURL(file);
       });
       
-      /*
-      function base64ToImage(base64String) {
-        // Crea un elemento immagine
-        let img = new Image();
-        // Imposta la fonte dell'immagine con il prefisso corretto per base64
-        img.src = 'data:image/jpeg;base64,' + base64String;
-        return img;
-      }
-      */
-
-        
-  
-
-
 
       $(document).ready(function() {
 
@@ -407,6 +407,8 @@
 
           // Mostra la form
           document.getElementById('adminform').style.display = 'block';
+          // Mostra la form
+          document.getElementById('adminform2').style.display = 'block';
         }
       });
     </script>

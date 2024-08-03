@@ -231,7 +231,6 @@ public class ServerLogic {
         Integer count = jdbcTemplate.queryForObject(checkId, source1, Integer.class);
         if (count == null || count <= 0) {
             // User not in db
-            Integer err2=95;
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("user not found");
         }
         
@@ -287,7 +286,6 @@ public class ServerLogic {
         Integer count = jdbcTemplate.queryForObject(checkId, source1, Integer.class);
         if (count == null || count <= 0) {
             // Operator not in db
-            Integer err2=95;
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("operator not found");
         }
         
@@ -416,6 +414,21 @@ public class ServerLogic {
             return new ModelAndView("redirect:http://localhost:3000/Redirect/" + userId);
         }
 
+    @RequestMapping(value = "/banUser", method = RequestMethod.POST)
+        public ModelAndView banUser(@RequestParam(value = "user_id") Integer userId2, @RequestParam(value = "user_id_admin") Integer userId) {
+            safeUserBan(userId2);
+            return new ModelAndView("redirect:http://localhost:3000/Redirect/" + userId);
+        } 
+    
+    @Transactional
+        private void safeUserBan(Integer userId2){
+            MapSqlParameterSource source = new MapSqlParameterSource().addValue("user_id", userId2);
+            String deleteCertifiacates = "DELETE FROM certification WHERE user_id = :user_id";
+            jdbcTemplate.update(deleteCertifiacates, source);
+            String deleteQuery = "DELETE FROM users WHERE user_id = :user_id";
+            jdbcTemplate.update(deleteQuery, source);
+        }
+
     @RequestMapping(value = "/UsersList", method = RequestMethod.POST)
         public String usersList(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "admin") Boolean admin ) {
 
@@ -474,6 +487,92 @@ public class ServerLogic {
                     .append("<td>").append(user.get("forum_notify")).append("</td>")
                     .append("<td>").append(user.get("emergency_notify")).append("</td>")
                     .append("<td>").append(user.get("administrator")).append("</td>")
+                    .append("<td>")
+                    .append("<form action='/banUser' method='post'>")
+                    .append("<input type='hidden' name='user_id' value='").append(user.get("user_id")).append("'>")
+                    .append("<input type='hidden' name='user_id_admin' value='").append(userId).append("'>")
+                    .append("<button type='submit'> Permanent Ban </button>")
+                    .append("</form>")
+                    .append("</td>")
+                    .append("</tr>");
+            }
+
+            html.append("</table>");
+            html.append("</body>");
+            html.append("</html>");
+
+            // Ritorna l'HTML generato
+            return html.toString();
+        }
+
+    @RequestMapping(value = "/banOperator", method = RequestMethod.POST)
+        public ModelAndView banOperator(@RequestParam(value = "operCode") String operCode, @RequestParam(value = "user_id_admin") String userId) {
+            safeOperBan(operCode);
+            return new ModelAndView("redirect:http://localhost:3000/Redirect/" + userId);
+        } 
+
+    @Transactional
+        private void safeOperBan(String operCode){
+            MapSqlParameterSource source = new MapSqlParameterSource().addValue("operCode", operCode);
+            //String deleteCertifiacates = "DELETE FROM certification WHERE user_id = :user_id";
+            //jdbcTemplate.update(deleteCertifiacates, source);
+            String deleteQuery = "DELETE FROM operator WHERE code = :operCode";
+            jdbcTemplate.update(deleteQuery, source);
+        }
+
+    @RequestMapping(value = "/OpersList", method = RequestMethod.POST)
+        public String opersList(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "admin") Boolean admin) {
+
+            MapSqlParameterSource source = new MapSqlParameterSource()
+                .addValue("user_id", userId)
+                .addValue("admin", admin);
+
+            // Verifica se l'utente esiste
+            String verifyAdminQuery = "SELECT COUNT(*) FROM users WHERE user_id = :user_id";
+            Integer adminCount = jdbcTemplate.queryForObject(verifyAdminQuery, source, Integer.class);
+
+            if (adminCount == null || adminCount <= 0) {
+                // User not in db
+                return "<html><body><h1>Error</h1><p>User not found in database</p></body></html>";
+            }
+
+            if (!admin) {
+                // User not admin
+                return "<html><body><h1>Error</h1><p>User is not an admin</p></body></html>";
+            }
+
+            // Recupera tutti gli utenti dal database, escludendo la password
+            String getUsersQuery = "SELECT o_email, code, firstname, surname, birthday FROM operator";
+            List<Map<String, Object>> opers = jdbcTemplate.queryForList(getUsersQuery, new MapSqlParameterSource());
+
+            StringBuilder html = new StringBuilder();
+            html.append("<html>");
+            html.append("<head><title>Users List</title></head>");
+            html.append("<body>");
+            html.append("<h1>Users List</h1>");
+            html.append("<table border='1'>");
+            html.append("<tr>")
+                .append("<th>Oper Code</th>")
+                .append("<th>Email</th>")
+                .append("<th>First Name</th>")
+                .append("<th>Surname</th>")
+                .append("<th>Birthday</th>")
+                .append("</tr>");
+
+            for (Map<String, Object> oper : opers) {
+                html.append("<tr>")
+                    .append("<td>").append(oper.get("code")).append("</td>")
+                    .append("<td>").append(oper.get("o_email")).append("</td>")
+                    .append("<td>").append(oper.get("firstname")).append("</td>")
+                    .append("<td>").append(oper.get("surname")).append("</td>")
+                    .append("<td>").append(oper.get("birthday")).append("</td>")
+                    .append("<td>")
+                    .append("<form action='/banOperator' method='post'>")
+                    .append("<input type='hidden' name='operCode' value='").append(oper.get("code")).append("'>")
+                    .append("<input type='hidden' name='user_id_admin' value='").append(userId).append("'>")
+                    .append("<button type='submit'> Permanent Ban </button>")
+                    .append("</form>")
+                    .append("</td>")
                     .append("</tr>");
             }
 

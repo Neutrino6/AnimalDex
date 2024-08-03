@@ -160,5 +160,6 @@ INSERT INTO animal (a_name, details, regions, std_points) VALUES
 
 
 INSERT INTO users (user_id,email, passw, username, firstname, surname, birthday, fav_animal, forum_notify, emergency_notify, administrator, profile_image)
-VALUES (999,'example@example.com', 'password123', 'example_user', 'John', 'Doe', '1990-01-01', 1, true, false, true, null);
+VALUES (999,'doe@mail.com', 'password123', 'user999', 'John', 'Doe', '1990-01-01', 1, false, false, false, null), 
+        (1000,'berardi@mail.com', '12345678', 'user1000', 'Mimmo', 'Berardi', '1994-08-01', 1, false, false, false, null);
 
