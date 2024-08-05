@@ -65,7 +65,13 @@
                   <li><a class="dropdown-item" href="chisiamo.html">Chi siamo</a></li>
                   <li><a class="dropdown-item" href="dovesiamo.html">Dove siamo</a></li>
                   <li><a class="dropdown-item" id="certificate_link" href="">Certificates</a></li>
-                  <li><a class="dropdown-item" href="gallery.html">Gallery</a></li>
+                  <li>
+                  <form action =  "http://localhost:6039/Forum" class = "form-signin m-auto" method = "POST" id="forumform"> 
+                    <input type="hidden" name="user_id" id="userIdInput" value="">
+                    <input type="hidden" name="admin" id="adminInput2" value="">
+                    <button class = "dropdown-item" name ="forum" type = "submit"> Forum </button>        
+                  </form>
+                  </li>
                   <li><a class="dropdown-item" href="eventi.html">Eventi</a></li>
                   <li><a class="dropdown-item" href="contatti.html">Contatti</a></li>
                 </ul>
@@ -98,13 +104,15 @@
     <br>
 
     <!-- Form per l'upload dell'immagine -->
-    <form action = "http://localhost:6039/changeProfileImage" method = "POST" id="profileImageForm" enctype="multipart/form-data">
-      <label for="profileImage">Select Profile Image (only png format, max 1MB):</label>
-      <input type="file" name="profile_image" id="profileImage" name="profileImage" accept="image/*">
-      <input type="hidden" name="user_id" id="userIdInput" value="">
-      <button type="submit" value="Submit">Submit</button>
-    </form>
-        
+     <div class="form-signin m-auto">
+      <form action = "http://localhost:6039/changeProfileImage" method = "POST" id="profileImageForm" enctype="multipart/form-data">
+        <label for="profileImage">Select Profile Image (only png format, max 1MB):</label>
+        <input type="file" name="profile_image" id="profileImage" name="profileImage" accept="image/*">
+        <input type="hidden" name="user_id" id="userIdInput" value="">
+        <button type="submit" id="submitImage" value="Submit">Submit</button>
+      </form>
+    </div>
+
     <form action = "http://localhost:6039/changeCredentialsUser" class = "form-signin m-auto" method = "POST" id = "PersPage" onSubmit = "return validaIscrizione()">
             <input type="checkbox" id="CredentialModify" on>
             <h5 style="color: aliceblue;"> Change my credentials</h5><br>
@@ -315,10 +323,25 @@
         return userId;
       }
 
-      // Funzione per visualizzare l'immagine selezionata prima dell'upload (Immagine caricata su db, ma non visulaizzabile in pagina)
+      function checkFileValidity() {
+          var fileInput = document.getElementById('profileImage');
+          var file = fileInput.files[0];
+          var submitButton = document.getElementById('submitImage');
+
+          // Controllo formato immagine (deve essere PNG) e dimensione del file (deve essere massimo 1 MB)
+          if (file.size <= 1 * 1024 * 1024) {
+              submitButton.disabled = false; // Abilita il bottone
+          } else {
+              alert("You must choose an image size less or equal than 1 MB!!")
+              submitButton.disabled = true; // Disabilita il bottone
+          }
+      }
+
+      // Funzione per visualizzare l'immagine selezionata prima dell'upload 
       document.getElementById('profileImage').addEventListener('change', function(event) {
         var file = event.target.files[0];
         var reader = new FileReader();
+        checkFileValidity();
         reader.onload = function(e) {
             document.getElementById('profileImageDisplay').src = e.target.result;
         };
@@ -333,7 +356,7 @@
         
         //console.log(userData);
         if(winner){
-          document.getElementById("winner").innerHTML="<img src='../cup.png' alt='Cup' class='cup'>";
+          document.getElementById("winner").innerHTML="<img src='../cup.jpg' alt='Cup' class='cup'>";
         }
 
         rendiInputModificabili('PersPage', 'CredentialModify');
@@ -359,6 +382,8 @@
         let forum = $("form #forum");
         let emergency = $("form #emergencies");
         let admin = $("form #adminInput");
+        let admin2 = $("form #adminInput2");
+
         //let fileInput = $("form #profileImageDisplay")
 
         
@@ -371,10 +396,13 @@
         $(dob).val(userData.dob);
         $(animal).val(userData.fav_animal);
         $(admin).val(userData.admin);
+        $(admin2).val(userData.admin);
         //$(fileInput).val(userData.profileImage);
+
 
         // Imposta l'immagine di profilo
         let profileImageDisplay = document.getElementById('profileImageDisplay');
+        
         if (profileImageDisplay) {
             if (userData.profile_image) {
                 // Assicurati che userData.profileImage contenga una stringa base64 valida

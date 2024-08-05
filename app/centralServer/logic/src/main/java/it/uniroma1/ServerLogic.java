@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -400,7 +402,7 @@ public class ServerLogic {
 
     @RequestMapping(value = "/changeProfileImage", method = RequestMethod.POST)
         public ModelAndView handleFileUpload(@RequestParam(value = "user_id") Integer userId , @RequestParam(value = "profile_image") MultipartFile file) throws IOException {
- 
+
             byte[] imageBytes = file.getBytes();
             MapSqlParameterSource source = new MapSqlParameterSource()
             .addValue("user_id", userId)
@@ -547,9 +549,9 @@ public class ServerLogic {
 
             StringBuilder html = new StringBuilder();
             html.append("<html>");
-            html.append("<head><title>Users List</title></head>");
+            html.append("<head><title>Operators List</title></head>");
             html.append("<body>");
-            html.append("<h1>Users List</h1>");
+            html.append("<h1>Operators List</h1>");
             html.append("<table border='1'>");
             html.append("<tr>")
                 .append("<th>Oper Code</th>")
@@ -583,6 +585,326 @@ public class ServerLogic {
             // Ritorna l'HTML generato
             return html.toString();
         }
+
+        //FORUM-----------------------------------------------------------------
+
+        @RequestMapping(value = "/addComment", method = RequestMethod.POST)
+        public String addComment(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "admin") Boolean admin, @RequestParam(value = "c_content") String c_content, 
+                                       @RequestParam(value = "username") String username, @RequestParam(value = "date") String date) {
+
+            LocalDateTime date2 = null;
+            if(!date.isEmpty()){
+                date+="T00:00:00";
+                date2 = LocalDateTime.parse(date);
+            }
+            //Esegui l'aggiunta del commento al db e reindirizza a forum una volta finito
+
+            // Creazione di un'istanza MapSqlParameterSource per i parametri di query
+            MapSqlParameterSource source = new MapSqlParameterSource()
+            .addValue("user_id", userId)
+            .addValue("username", username)
+            .addValue("c_date", date2) // Aggiungi la data corrente
+            .addValue("c_content", c_content);
+            
+            
+
+            // Query SQL per inserire il commento nel database
+            String insertCommentQuery = "INSERT INTO comment (user_id, username, c_date, c_content) VALUES (:user_id, :username, :c_date,  :c_content)";
+
+            // Esegui l'inserimento del commento
+            jdbcTemplate.update(insertCommentQuery, source);
+
+            // Costruisci una risposta HTML con uno script di redirezione POST
+            System.out.println(admin);
+            StringBuilder html = new StringBuilder();
+            html.append("<html>")
+                .append("<body onload='document.forms[\"postForm\"].submit()'>")
+                .append("<form name='postForm' method='post' action='http://localhost:6039/Forum'>")
+                .append("<input type='hidden' name='user_id' value='").append(userId).append("'/>")
+                .append("<input type='hidden' name='admin' value='").append(admin).append("'/>")
+                .append("</form>")
+                .append("</body>")
+                .append("</html>");
+
+            return html.toString();
+        }
+
+        @RequestMapping(value = "/addReply", method = RequestMethod.POST)
+        public String addReply(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "admin") Boolean admin, @RequestParam(value = "c_content") String c_content, 
+                                       @RequestParam(value = "username") String username, @RequestParam(value = "date") String date, @RequestParam(value = "c_id") Integer c_id) {
+
+            LocalDateTime date2 = null;
+            if(!date.isEmpty()){
+                date+="T00:00:00";
+                date2 = LocalDateTime.parse(date);
+            }
+            //Esegui l'aggiunta del commento al db e reindirizza a forum una volta finito
+
+            // Creazione di un'istanza MapSqlParameterSource per i parametri di query
+            MapSqlParameterSource source = new MapSqlParameterSource()
+            .addValue("user_id", userId)
+            .addValue("username", username)
+            .addValue("c_date", date2) // Aggiungi la data corrente
+            .addValue("c_content", c_content)
+            .addValue("c_id", c_id);
+            
+            
+
+            // Query SQL per inserire il commento nel database
+            String insertCommentQuery = "INSERT INTO reply (user_id, username, c_date, c_content, c_id_orig) VALUES (:user_id, :username, :c_date, :c_content, :c_id)";
+
+            // Esegui l'inserimento del commento
+            jdbcTemplate.update(insertCommentQuery, source);
+
+            // Costruisci una risposta HTML con uno script di redirezione POST
+            System.out.println(admin);
+            StringBuilder html = new StringBuilder();
+            html.append("<html>")
+                .append("<body onload='document.forms[\"postForm\"].submit()'>")
+                .append("<form name='postForm' method='post' action='http://localhost:6039/Forum'>")
+                .append("<input type='hidden' name='user_id' value='").append(userId).append("'/>")
+                .append("<input type='hidden' name='admin' value='").append(admin).append("'/>")
+                .append("</form>")
+                .append("</body>")
+                .append("</html>");
+
+            return html.toString();
+        }
+
+        @RequestMapping(value = "/Forum", method = RequestMethod.POST)
+        public String Forum(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "admin") Boolean admin) {
+            if(!admin) {
+
+                MapSqlParameterSource source = new MapSqlParameterSource()
+                    .addValue("user_id", userId);
+
+                // Verifica se l'utente esiste
+                String verifyuserQuery = "SELECT COUNT(*) FROM users WHERE user_id = :user_id";
+                Integer Count = jdbcTemplate.queryForObject(verifyuserQuery, source, Integer.class);
+
+                if (Count == null || Count <= 0) {
+                    // User not in db
+                    return "<html><body><h1>Error</h1><p>User not found in database</p></body></html>";
+                }
+
+                // Recupera tutti i commenti e le risposte dal database, escludendo la password
+                String getCommentsQuery = "SELECT c_id, username, c_date, c_content FROM comment";
+                String getRepliesQuery = "SELECT c_id_reply, user_id, username, c_date, c_content, c_id_orig FROM reply";
+                List<Map<String, Object>> comments = jdbcTemplate.queryForList(getCommentsQuery, new MapSqlParameterSource());
+                List<Map<String, Object>> replies = jdbcTemplate.queryForList(getRepliesQuery, new MapSqlParameterSource());
+                String userQuery = "SELECT username FROM users WHERE user_id = :user_id";
+                String username = jdbcTemplate.queryForObject(userQuery, source, String.class);
+
+                StringBuilder html = new StringBuilder();
+                html.append("<html>");
+                html.append("<head><title>Animaldex Comment</title></head>");
+                html.append("<body>");
+                html.append("<h1>Welcome to the Animaldex forum!!</h1>");
+                html.append("<table border='1'>");
+                html.append("<tr>")
+                    .append("<th>Username</th>")
+                    .append("<th>Date</th>")
+                    .append("<th>Comment</th>")
+                    .append("<th>Actions</th>")
+                    .append("</tr>");
+
+                for (Map<String, Object> comment : comments) {
+                    html.append("<tr>")
+                        .append("<td>").append(comment.get("username")).append("</td>")
+                        .append("<td>").append(comment.get("c_date")).append("</td>")
+                        .append("<td>").append(comment.get("c_content")).append("</td>")
+                        .append("<td>");
+                        if(comment.get("user_id").equals(userId)) {
+                            html.append("<form action='/deleteComment' method='post'>")
+                            .append("<input type='hidden' name='c_id' value='").append(comment.get("c_id")).append("'>")
+                            .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
+                            .append("<button type='submit'>Delete</button>")
+                            .append("</form>")
+                            .append("<form action='/modifyComment' method='post'>")
+                            .append("<input type='hidden' name='c_id' value='").append(comment.get("c_id")).append("'>")
+                            .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
+                            .append("<button type='submit'>Modify</button>")
+                            .append("</form>");
+                        }
+                        //Add reply to comment section
+                        html.append("<form action='/addReply' method='post'>")
+                        .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
+                        .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
+                        .append("<textarea name='c_content' rows='4' cols='50'></textarea><br>")
+                        .append("<input type='hidden' name='username' value='").append(username).append("'>")
+                        .append("<input type='hidden' name='date' value='").append(LocalDate.now()).append("'>")
+                        .append("<input type='hidden' name='c_id' value='").append(comment.get("c_id")).append("'>")
+                        .append("<button type='submitReply'> Reply </button>")
+                        .append("</form>")
+                        .append("</td>")
+                        .append("</tr>");
+                    for (Map<String, Object> reply : replies) {
+                        if (reply.get("c_id_orig").equals(comment.get("c_id"))) {
+                            html.append("<tr>")
+                                .append("<td></td>") // Empty cell to indent the reply
+                                .append("<td>").append(reply.get("username")).append("</td>")
+                                .append("<td>").append(reply.get("c_date")).append("</td>")
+                                .append("<td>").append(reply.get("c_content")).append("</td>")
+                                .append("<td>");
+                                if(reply.get("user_id").equals(userId)) {
+                                    html.append("<form action='/deleteReply' method='post'>")
+                                    .append("<input type='hidden' name='c_id_reply' value='").append(reply.get("c_id_reply")).append("'>")
+                                    .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
+                                    .append("<button type='submit'>Delete</button>")
+                                    .append("</form>")
+                                    .append("<form action='/modifyReply' method='post'>")
+                                    .append("<input type='hidden' name='c_id_reply' value='").append(reply.get("c_id_reply")).append("'>")
+                                    .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
+                                    .append("<button type='submit'>Modify</button>")
+                                    .append("</form>");
+                                }
+                                html.append("</td>")
+                                .append("</tr>")
+                                .append("</td>")
+                                .append("</tr>");
+                        }
+                    }
+                }
+
+                html.append("</table>");
+
+                // Aggiungi textarea e bottone per scrivere un commento e aggiungerlo al db
+                html.append("<h2>Add a new comment</h2>")
+                    .append("<form action='/addComment' method='post'>")
+                    .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
+                    .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
+                    .append("<textarea name='c_content' rows='4' cols='50'></textarea><br>")
+                    .append("<input type='hidden' name='username' value='").append(username).append("'>")
+                    .append("<input type='hidden' name='date' value='").append(LocalDate.now()).append("'>")
+                    .append("<button type='submitComment'> Add Comment </button>")
+                    .append("</form>");
+
+                html.append("</body>");
+                html.append("</html>");
+
+                // Ritorna l'HTML generato
+                return html.toString();
+            }
+            else {
+                MapSqlParameterSource source = new MapSqlParameterSource()
+                    .addValue("user_id", userId);
+
+                // Verifica se l'utente esiste
+                String verifyuserQuery = "SELECT COUNT(*) FROM users WHERE user_id = :user_id";
+                Integer Count = jdbcTemplate.queryForObject(verifyuserQuery, source, Integer.class);
+
+                if (Count == null || Count <= 0) {
+                    // User not in db
+                    return "<html><body><h1>Error</h1><p>User not found in database</p></body></html>";
+                }
+
+                // Recupera tutti i commenti e le risposte dal database, escludendo la password
+                String getCommentsQuery = "SELECT c_id, user_id, username, c_date, c_content FROM comment";
+                String getRepliesQuery = "SELECT c_id_reply, user_id, username, c_date, c_content, c_id_orig FROM reply";
+                List<Map<String, Object>> comments = jdbcTemplate.queryForList(getCommentsQuery, new MapSqlParameterSource());
+                List<Map<String, Object>> replies = jdbcTemplate.queryForList(getRepliesQuery, new MapSqlParameterSource());
+                String userQuery = "SELECT username FROM users WHERE user_id = :user_id";
+                String username = jdbcTemplate.queryForObject(userQuery, source, String.class);
+
+                StringBuilder html = new StringBuilder();
+                html.append("<html>");
+                html.append("<head><title>Animaldex Comment</title></head>");
+                html.append("<body>");
+                html.append("<h1>Welcome to the Animaldex forum!!</h1>");
+                html.append("<table border='1'>");
+                html.append("<tr>")
+                    .append("<th>Username</th>")
+                    .append("<th>Date</th>")
+                    .append("<th>Comment</th>")
+                    .append("<th>Actions</th>")
+                    .append("</tr>");
+
+                for (Map<String, Object> comment : comments) {
+                    html.append("<tr>")
+                        .append("<td>").append(comment.get("username")).append("</td>")
+                        .append("<td>").append(comment.get("c_date")).append("</td>")
+                        .append("<td>").append(comment.get("c_content")).append("</td>")
+                        .append("<td>")
+                        .append("<form action='/deleteComment' method='post'>")
+                        .append("<input type='hidden' name='c_id' value='").append(comment.get("c_id")).append("'>")
+                        .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
+                        .append("<button type='submit'>Delete</button>")
+                        .append("</form>");
+                        if(comment.get("user_id").equals(userId)) {
+                            html.append("<form action='/modifyComment' method='post'>")
+                            .append("<input type='hidden' name='c_id' value='").append(comment.get("c_id")).append("'>")
+                            .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
+                            .append("<button type='submit'>Modify</button>")
+                            .append("</form>");
+                        }
+                        //Add reply to comment section
+                        html.append("<form action='/addReply' method='post'>")
+                        .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
+                        .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
+                        .append("<textarea name='c_content' rows='4' cols='50'></textarea><br>")
+                        .append("<input type='hidden' name='username' value='").append(username).append("'>")
+                        .append("<input type='hidden' name='date' value='").append(LocalDate.now()).append("'>")
+                        .append("<input type='hidden' name='c_id' value='").append(comment.get("c_id")).append("'>")
+                        .append("<button type='submitReply'> Reply </button>")
+                        .append("</form>")
+                        .append("</td>")
+                        .append("</tr>");
+                        //Add reply to comment section
+
+                        html.append("</td>")
+                        .append("</tr>");
+                    for (Map<String, Object> reply : replies) {
+                        if (reply.get("c_id_orig").equals(comment.get("c_id"))) {
+                            html.append("<tr>")
+                                .append("<td></td>") // Empty cell to indent the reply
+                                .append("<td>").append(reply.get("username")).append("</td>")
+                                .append("<td>").append(reply.get("c_date")).append("</td>")
+                                .append("<td>").append(reply.get("c_content")).append("</td>")
+                                .append("<td>")
+                                .append("<form action='/deleteReply' method='post'>")
+                                .append("<input type='hidden' name='c_id_reply' value='").append(reply.get("c_id_reply")).append("'>")
+                                .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
+                                .append("<button type='submit'>Delete</button>")
+                                .append("</form>");
+                                if(reply.get("user_id").equals(userId)) {
+                                    html.append("<form action='/modifyReply' method='post'>")
+                                    .append("<input type='hidden' name='c_id_reply' value='").append(reply.get("c_id_reply")).append("'>")
+                                    .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
+                                    .append("<button type='submit'>Modify</button>")
+                                    .append("</form>");
+                                }
+                                html.append("</td>")
+                                .append("</tr>")
+                                .append("</td>")
+                                .append("</tr>")
+                                .append("</td>")
+                                .append("</tr>");
+                        }
+                    }
+                }
+
+                html.append("</table>");
+                
+                // Aggiungi textarea e bottone per scrivere un commento e aggiungerlo al db
+                html.append("<h2>Add a new comment</h2>")
+                    .append("<form action='/addComment' method='post'>")
+                    .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
+                    .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
+                    .append("<textarea name='c_content' rows='4' cols='50'></textarea><br>")
+                    .append("<input type='hidden' name='username' value='").append(username).append("'>")
+                    .append("<input type='hidden' name='date' value='").append(LocalDate.now()).append("'>")
+                    .append("<button type='submitComment'> Add Comment </button>")
+                    .append("</form>");
+
+                html.append("</body>");
+                html.append("</html>");
+
+                // Ritorna l'HTML generato
+                return html.toString();
+            }
+        }
+    
+    //OAUTH---------------------------------------------------------------------------------------------
 
     @RequestMapping(value = "/UserOauth", method = RequestMethod.POST)
     public ResponseEntity<String> UserOauth(@RequestBody String requestBody){

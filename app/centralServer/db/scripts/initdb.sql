@@ -50,9 +50,22 @@ CREATE TABLE operator (
 
 CREATE TABLE comment (
     c_id serial PRIMARY KEY,
-    c_date date,
-    c_content varchar(2000)    
+    user_id int not NULL,
+    username varchar(255) not null,
+    c_date date DEFAULT CURRENT_DATE,
+    c_content varchar(2000) NOT NULL
 );
+
+CREATE TABLE reply (
+    c_id_reply serial PRIMARY KEY,
+    user_id int not NULL,
+    username varchar(255) not null,
+    c_date date DEFAULT CURRENT_DATE,
+    c_content varchar(2000) NOT NULL,
+    c_id_orig int NOT NULL,
+    CONSTRAINT reply_comment FOREIGN KEY (c_id_orig) REFERENCES comment(c_id) ON DELETE CASCADE
+);
+
 
 CREATE TABLE notify (
     n_id serial PRIMARY KEY,
