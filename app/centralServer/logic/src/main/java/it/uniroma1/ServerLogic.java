@@ -587,7 +587,8 @@ public class ServerLogic {
         }
 
         //FORUM-----------------------------------------------------------------
-
+        // se comment e/o reply sono vuote, non far inviare
+        // se elimino reply, non elimina tutto
         @RequestMapping(value = "/addComment", method = RequestMethod.POST)
         public String addComment(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "admin") Boolean admin, @RequestParam(value = "c_content") String c_content, 
                                        @RequestParam(value = "username") String username, @RequestParam(value = "date") String date) {
@@ -671,6 +672,39 @@ public class ServerLogic {
             return html.toString();
         }
 
+        @RequestMapping(value = "/deleteComment", method = RequestMethod.POST)
+        public String deleteComment(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "c_id") Integer c_id, @RequestParam(value = "admin") Boolean admin) {
+            safeDeleteComment(c_id); 
+
+            // Costruisci una risposta HTML con uno script di redirezione POST
+            
+            StringBuilder html = new StringBuilder();
+            html.append("<html>")
+                .append("<body onload='document.forms[\"postForm\"].submit()'>")
+                .append("<form name='postForm' method='post' action='http://localhost:6039/Forum'>")
+                .append("<input type='hidden' name='user_id' value='").append(userId).append("'/>")
+                .append("<input type='hidden' name='admin' value='").append(admin).append("'/>")
+                .append("</form>")
+                .append("</body>")
+                .append("</html>");
+
+            return html.toString();
+        }
+
+         @Transactional
+        private void safeDeleteComment(Integer c_id){
+             MapSqlParameterSource source = new MapSqlParameterSource()
+            .addValue("c_id", c_id);
+           
+            // Query SQL per inserire il commento nel database
+            String deleteCommentQuery = "DELETE FROM comment WHERE c_id = :c_id";
+
+            // Esegui l'inserimento del commento
+            jdbcTemplate.update(deleteCommentQuery, source);
+            
+        }
+            
+        
         @RequestMapping(value = "/Forum", method = RequestMethod.POST)
         public String Forum(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "admin") Boolean admin) {
             if(!admin) {
@@ -688,7 +722,7 @@ public class ServerLogic {
                 }
 
                 // Recupera tutti i commenti e le risposte dal database, escludendo la password
-                String getCommentsQuery = "SELECT c_id, username, c_date, c_content FROM comment";
+                String getCommentsQuery = "SELECT c_id, user_id, username, c_date, c_content FROM comment";
                 String getRepliesQuery = "SELECT c_id_reply, user_id, username, c_date, c_content, c_id_orig FROM reply";
                 List<Map<String, Object>> comments = jdbcTemplate.queryForList(getCommentsQuery, new MapSqlParameterSource());
                 List<Map<String, Object>> replies = jdbcTemplate.queryForList(getRepliesQuery, new MapSqlParameterSource());
@@ -718,11 +752,13 @@ public class ServerLogic {
                             html.append("<form action='/deleteComment' method='post'>")
                             .append("<input type='hidden' name='c_id' value='").append(comment.get("c_id")).append("'>")
                             .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
+                            .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
                             .append("<button type='submit'>Delete</button>")
                             .append("</form>")
                             .append("<form action='/modifyComment' method='post'>")
                             .append("<input type='hidden' name='c_id' value='").append(comment.get("c_id")).append("'>")
                             .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
+                            .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
                             .append("<button type='submit'>Modify</button>")
                             .append("</form>");
                         }
@@ -740,21 +776,30 @@ public class ServerLogic {
                         .append("</tr>");
                     for (Map<String, Object> reply : replies) {
                         if (reply.get("c_id_orig").equals(comment.get("c_id"))) {
-                            html.append("<tr>")
-                                .append("<td></td>") // Empty cell to indent the reply
+                            html.append("<td></td>") // Empty cell to indent the reply
+                                .append("<table border='1'>")
+                                .append("<tr>")
+                                .append("<th>Username</th>")
+                                .append("<th>Date</th>")
+                                .append("<th>Comment</th>")
+                                .append("<th>Actions</th>")
+                                .append("</tr>")
+                                .append("<tr>")
                                 .append("<td>").append(reply.get("username")).append("</td>")
                                 .append("<td>").append(reply.get("c_date")).append("</td>")
                                 .append("<td>").append(reply.get("c_content")).append("</td>")
                                 .append("<td>");
                                 if(reply.get("user_id").equals(userId)) {
-                                    html.append("<form action='/deleteReply' method='post'>")
-                                    .append("<input type='hidden' name='c_id_reply' value='").append(reply.get("c_id_reply")).append("'>")
+                                    html.append("<form action='/deleteComment' method='post'>")
+                                    .append("<input type='hidden' name='c_id' value='").append(reply.get("c_id_reply")).append("'>")
                                     .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
+                                    .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
                                     .append("<button type='submit'>Delete</button>")
                                     .append("</form>")
                                     .append("<form action='/modifyReply' method='post'>")
-                                    .append("<input type='hidden' name='c_id_reply' value='").append(reply.get("c_id_reply")).append("'>")
+                                    .append("<input type='hidden' name='c_id' value='").append(reply.get("c_id_reply")).append("'>")
                                     .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
+                                    .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
                                     .append("<button type='submit'>Modify</button>")
                                     .append("</form>");
                                 }
@@ -834,6 +879,7 @@ public class ServerLogic {
                             html.append("<form action='/modifyComment' method='post'>")
                             .append("<input type='hidden' name='c_id' value='").append(comment.get("c_id")).append("'>")
                             .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
+                            .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
                             .append("<button type='submit'>Modify</button>")
                             .append("</form>");
                         }
@@ -855,21 +901,31 @@ public class ServerLogic {
                         .append("</tr>");
                     for (Map<String, Object> reply : replies) {
                         if (reply.get("c_id_orig").equals(comment.get("c_id"))) {
-                            html.append("<tr>")
-                                .append("<td></td>") // Empty cell to indent the reply
+
+                            html.append("<td></td>") // Empty cell to indent the reply
+                                .append("<table border='1'>")
+                                .append("<tr>")
+                                .append("<th>Username</th>")
+                                .append("<th>Date</th>")
+                                .append("<th>Comment</th>")
+                                .append("<th>Actions</th>")
+                                .append("</tr>")
+                                .append("<tr>")
                                 .append("<td>").append(reply.get("username")).append("</td>")
                                 .append("<td>").append(reply.get("c_date")).append("</td>")
                                 .append("<td>").append(reply.get("c_content")).append("</td>")
                                 .append("<td>")
-                                .append("<form action='/deleteReply' method='post'>")
-                                .append("<input type='hidden' name='c_id_reply' value='").append(reply.get("c_id_reply")).append("'>")
+                                .append("<form action='/deleteComment' method='post'>")
+                                .append("<input type='hidden' name='c_id' value='").append(reply.get("c_id_reply")).append("'>")
                                 .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
+                                .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
                                 .append("<button type='submit'>Delete</button>")
                                 .append("</form>");
                                 if(reply.get("user_id").equals(userId)) {
                                     html.append("<form action='/modifyReply' method='post'>")
-                                    .append("<input type='hidden' name='c_id_reply' value='").append(reply.get("c_id_reply")).append("'>")
+                                    .append("<input type='hidden' name='c_id' value='").append(reply.get("c_id_reply")).append("'>")
                                     .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
+                                    .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
                                     .append("<button type='submit'>Modify</button>")
                                     .append("</form>");
                                 }
