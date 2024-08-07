@@ -53,7 +53,8 @@ CREATE TABLE comment (
     user_id int not NULL,
     username varchar(255) not null,
     c_date date DEFAULT CURRENT_DATE,
-    c_content varchar(2000) NOT NULL
+    c_content varchar(2000) NOT NULL,
+    modify_date date DEFAULT null
 );
 
 CREATE TABLE reply (
@@ -63,6 +64,7 @@ CREATE TABLE reply (
     c_date date DEFAULT CURRENT_DATE,
     c_content varchar(2000) NOT NULL,
     c_id_orig int NOT NULL,
+    modify_date date DEFAULT null,
     CONSTRAINT reply_comment FOREIGN KEY (c_id_orig) REFERENCES comment(c_id) ON DELETE CASCADE
 );
 

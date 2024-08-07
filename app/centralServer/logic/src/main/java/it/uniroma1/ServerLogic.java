@@ -21,6 +21,8 @@ import java.io.IOException;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.Null;
+
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -734,6 +736,86 @@ public class ServerLogic {
             jdbcTemplate.update(deleteCommentQuery, source);
             
         }
+
+        @RequestMapping(value = "/modifyComment", method = RequestMethod.POST)
+        public String modifyComment(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "admin") Boolean admin, @RequestParam(value = "c_content") String c_content, 
+                                @RequestParam(value = "c_id") Integer c_id, @RequestParam(value = "date") String date) {
+
+            LocalDateTime date2 = null;
+            if(!date.isEmpty()){
+                date+="T00:00:00";
+                date2 = LocalDateTime.parse(date);
+            }
+            //Esegui l'aggiunta del commento al db e reindirizza a forum una volta finito
+
+            // Creazione di un'istanza MapSqlParameterSource per i parametri di query
+            MapSqlParameterSource source = new MapSqlParameterSource()
+            .addValue("user_id", userId)
+            .addValue("c_id", c_id)
+            .addValue("modify_date", date2) // Aggiungi la data corrente
+            .addValue("c_content", c_content);
+            
+            // Query SQL per inserire il commento nel database
+            String updateCommentQuery = "UPDATE comment SET modify_date = :modify_date, c_content = :c_content WHERE user_id=:user_id AND c_id = :c_id";
+
+            // Esegui l'inserimento del commento
+            jdbcTemplate.update(updateCommentQuery, source);
+
+            // Costruisci una risposta HTML con uno script di redirezione POST
+            //System.out.println(admin);
+            StringBuilder html = new StringBuilder();
+            html.append("<html>")
+                .append("<body onload='document.forms[\"postForm\"].submit()'>")
+                .append("<form name='postForm' method='post' action='http://localhost:6039/Forum'>")
+                .append("<input type='hidden' name='user_id' value='").append(userId).append("'/>")
+                .append("<input type='hidden' name='admin' value='").append(admin).append("'/>")
+                .append("</form>")
+                .append("</body>")
+                .append("</html>");
+
+            return html.toString();
+        }
+
+        @RequestMapping(value = "/modifyReply", method = RequestMethod.POST)
+        public String modifyReply(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "admin") Boolean admin, @RequestParam(value = "c_content") String c_content, 
+                                @RequestParam(value = "c_id") Integer c_id, @RequestParam(value = "date") String date) {
+
+            LocalDateTime date2 = null;
+            if(!date.isEmpty()){
+                date+="T00:00:00";
+                date2 = LocalDateTime.parse(date);
+            }
+            //Esegui l'aggiunta del commento al db e reindirizza a forum una volta finito
+
+            // Creazione di un'istanza MapSqlParameterSource per i parametri di query
+            MapSqlParameterSource source = new MapSqlParameterSource()
+            .addValue("user_id", userId)
+            .addValue("c_id", c_id)
+            .addValue("modify_date", date2) // Aggiungi la data corrente
+            .addValue("c_content", c_content);
+            
+            // Query SQL per inserire il commento nel database
+            String updateReplyQuery = "UPDATE reply SET modify_date = :modify_date, c_content = :c_content WHERE user_id=:user_id AND c_id_reply = :c_id";
+
+            // Esegui l'inserimento del commento
+            jdbcTemplate.update(updateReplyQuery, source);
+
+            // Costruisci una risposta HTML con uno script di redirezione POST
+            //System.out.println(admin);
+            StringBuilder html = new StringBuilder();
+            html.append("<html>")
+                .append("<body onload='document.forms[\"postForm\"].submit()'>")
+                .append("<form name='postForm' method='post' action='http://localhost:6039/Forum'>")
+                .append("<input type='hidden' name='user_id' value='").append(userId).append("'/>")
+                .append("<input type='hidden' name='admin' value='").append(admin).append("'/>")
+                .append("</form>")
+                .append("</body>")
+                .append("</html>");
+
+            return html.toString();
+        }
+
+        
             
         
         @RequestMapping(value = "/Forum", method = RequestMethod.POST)
@@ -752,8 +834,8 @@ public class ServerLogic {
                 }
 
                 // Recupera tutti i commenti e le risposte dal database, escludendo la password
-                String getCommentsQuery = "SELECT c_id, user_id, username, c_date, c_content FROM comment";
-                String getRepliesQuery = "SELECT c_id_reply, user_id, username, c_date, c_content, c_id_orig FROM reply";
+                String getCommentsQuery = "SELECT c_id, user_id, username, c_date, c_content, modify_date FROM comment";
+                String getRepliesQuery = "SELECT c_id_reply, user_id, username, c_date, c_content, c_id_orig, modify_date FROM reply";
                 List<Map<String, Object>> comments = jdbcTemplate.queryForList(getCommentsQuery, new MapSqlParameterSource());
                 List<Map<String, Object>> replies = jdbcTemplate.queryForList(getRepliesQuery, new MapSqlParameterSource());
                 String userQuery = "SELECT username FROM users WHERE user_id = :user_id";
@@ -772,18 +854,26 @@ public class ServerLogic {
                             .append("<th class='comment'>Comment</th>")
                             .append("<th class='comment'>Username</th>")
                             .append("<th class='comment'>Date</th>")
+                            .append("<th class='comment'>Last Modify</th>")
                             .append("<th class='comment'>Actions</th>")
                             .append("</tr>")
                             .append("<tr>")
                             .append("<td>").append(comment.get("c_content")).append("</td>")
                             .append("<td>").append(comment.get("username")).append("</td>")
-                            .append("<td>").append(comment.get("c_date")).append("</td>")
-                            .append("<td>");
+                            .append("<td>").append(comment.get("c_date")).append("</td>");
+                            if(comment.get("modify_date")==null) {
+                                html.append("<td>").append("-").append("</td>");
+                            }
+                            else {
+                                html.append("<td>").append(comment.get("modify_date")).append("</td>");
+                            }
+                            html.append("<td>");
                             if(comment.get("user_id").equals(userId)) {
                                 html.append("<form action='/modifyComment' method='post'>")
                                 .append("<input type='hidden' name='c_id' value='").append(comment.get("c_id")).append("'>")
                                 .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
                                 .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
+                                .append("<input type='hidden' name='modify_date' value='").append(LocalDate.now()).append("'>")
                                 .append("<textarea name='c_content' rows='4' cols='50' required></textarea><br>")
                                 .append("<button type='submit'>Modify comment</button>")
                                 .append("</form>")
@@ -814,13 +904,20 @@ public class ServerLogic {
                                     .append("<th class='reply'>Reply</th>")
                                     .append("<th class='reply'>Username</th>")
                                     .append("<th class='reply'>Date</th>")
+                                    .append("<th class='reply'>Last Modify</th>")
                                     .append("<th class='reply'>Actions</th>")
                                     .append("</tr>")
                                     .append("<tr>")
                                     .append("<td>").append(reply.get("c_content")).append("</td>")
                                     .append("<td>").append(reply.get("username")).append("</td>")
-                                    .append("<td>").append(reply.get("c_date")).append("</td>")
-                                    .append("<td>");
+                                    .append("<td>").append(reply.get("c_date")).append("</td>");
+                                    if(reply.get("modify_date")==null) {
+                                        html.append("<td>").append("-").append("</td>");
+                                    }
+                                    else {
+                                        html.append("<td>").append(reply.get("modify_date")).append("</td>");
+                                    }
+                                    html.append("<td>");
                                     if(reply.get("user_id").equals(userId)) {
                                         html.append("<form action='/deleteReply' method='post'>")
                                         .append("<input type='hidden' name='c_id' value='").append(reply.get("c_id_reply")).append("'>")
@@ -832,6 +929,7 @@ public class ServerLogic {
                                         .append("<input type='hidden' name='c_id' value='").append(reply.get("c_id_reply")).append("'>")
                                         .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
                                         .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
+                                        .append("<input type='hidden' name='date' value='").append(LocalDate.now()).append("'>")
                                         .append("<textarea name='c_content' rows='4' cols='50' required></textarea><br>")
                                         .append("<button type='submit'>Modify reply</button>")
                                         .append("</form>");
@@ -848,7 +946,7 @@ public class ServerLogic {
                 }
                 else {
                     html.append("<html>");
-                    html.append("<head><title>Animaldex Comment</title></head>");
+                    html.append("<head><title>Animaldex Comment</title><style> .comment {background-color: green; color: white; } .reply {background-color: red; color: white; }</style></head>");
                     html.append("<body>");
                     html.append("<h1>Welcome to the Animaldex forum!!</h1>");
                     html.append("<table border='1'>");
@@ -858,18 +956,26 @@ public class ServerLogic {
                             .append("<th class='comment'>Comment</th>")
                             .append("<th class='comment'>Username</th>")
                             .append("<th class='comment'>Date</th>")
+                            .append("<th class='comment'>Last Modify</th>")
                             .append("<th class='comment'>Actions</th>")
                             .append("</tr>")
                             .append("<tr>")
                             .append("<td>").append(comment.get("c_content")).append("</td>")
                             .append("<td>").append(comment.get("username")).append("</td>")
-                            .append("<td>").append(comment.get("c_date")).append("</td>")
-                            .append("<td>");
+                            .append("<td>").append(comment.get("c_date")).append("</td>");
+                            if(comment.get("modify_date")==null) {
+                                html.append("<td>").append("-").append("</td>");
+                            }
+                            else {
+                                html.append("<td>").append(comment.get("modify_date")).append("</td>");
+                            }
+                            html.append("<td>");
                             if(comment.get("user_id").equals(userId)) {
                                 html.append("<form action='/modifyComment' method='post'>")
                                 .append("<input type='hidden' name='c_id' value='").append(comment.get("c_id")).append("'>")
                                 .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
                                 .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
+                                .append("<input type='hidden' name='date' value='").append(LocalDate.now()).append("'>")
                                 .append("<textarea name='c_content' rows='4' cols='50' required></textarea><br>")
                                 .append("<button type='submit'>Modify comment</button>")
                                 .append("</form>");
@@ -903,13 +1009,20 @@ public class ServerLogic {
                                     .append("<th class='reply'>Reply</th>")
                                     .append("<th class='reply'>Username</th>")
                                     .append("<th class='reply'>Date</th>")
+                                    .append("<th class='reply'>Last Modify</th>")
                                     .append("<th class='reply'>Actions</th>")
                                     .append("</tr>")
                                     .append("<tr>")
                                     .append("<td>").append(reply.get("c_content")).append("</td>")
                                     .append("<td>").append(reply.get("username")).append("</td>")
-                                    .append("<td>").append(reply.get("c_date")).append("</td>")
-                                    .append("<td>")
+                                    .append("<td>").append(reply.get("c_date")).append("</td>");
+                                    if(reply.get("modify_date")==null) {
+                                        html.append("<td>").append("-").append("</td>");
+                                    }
+                                    else {
+                                        html.append("<td>").append(reply.get("modify_date")).append("</td>");
+                                    }
+                                    html.append("<td>")
                                     .append("<form action='/deleteReply' method='post'>")
                                     .append("<input type='hidden' name='c_id' value='").append(reply.get("c_id_reply")).append("'>")
                                     .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
@@ -921,6 +1034,7 @@ public class ServerLogic {
                                         .append("<input type='hidden' name='c_id' value='").append(reply.get("c_id_reply")).append("'>")
                                         .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
                                         .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
+                                        .append("<input type='hidden' name='date' value='").append(LocalDate.now()).append("'>")
                                         .append("<textarea name='c_content' rows='4' cols='50' required></textarea><br>")
                                         .append("<button type='submit'>Modify reply</button>")
                                         .append("</form>");
