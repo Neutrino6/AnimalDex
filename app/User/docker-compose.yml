@@ -1,43 +1,86 @@
 services:
-    postgres:
-        build: 
-            context: ./userdb
-        restart: unless-stopped
-        image: postgres
-        container_name: 'postgres'
-        environment:
-            - POSTGRES_DB=ANIMALDEXdb
-            - POSTGRES_USER=postgres
-            - POSTGRES_PASSWORD=postgres
-            - PGHOST=userdb
-        ports:
-            - "5432:5432"  
-        expose:
-            - "5432"
-        command: -p 5432
-        volumes:
-           - db-data:/var/lib/postgresql/data
-    pgadmin:
-        image: dpage/pgadmin4
-        environment:
-            - PGADMIN_DEFAULT_EMAIL=ale@gmail.com
-            - PGADMIN_DEFAULT_PASSWORD=9900
-        ports:
-            - "5050:80"
-    certificate:
-        build:
-            context: "./certificate"
-        ports:
-            - "7777:7777"
-    google-oauth:
-        build:
-            context: "./googleOauthManagement"
-        ports:
-            - "8080:8080"
-    nodejs:
-        build: ./FrontendUser
-        ports:
-            - "3000:3000"
+  postgres:
+    build: 
+      context: ./userdb
+    restart: unless-stopped
+    image: postgres
+    container_name: 'postgres'
+    environment:
+      - POSTGRES_DB=ANIMALDEXdb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - PGHOST=userdb
+    ports:
+      - "5432:5432"  
+    expose:
+      - "5432"
+    command: -p 5432
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - my_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=ale@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=9900
+    ports:
+      - "5050:80"
+    networks:
+      - my_network
+
+  certificate:
+    build:
+      context: "./certificate"
+    ports:
+      - "7777:7777"
+    networks:
+      - my_network
+
+  google-oauth:
+    build:
+      context: "./googleOauthManagement"
+    ports:
+      - "8080:8080"
+    networks:
+      - my_network
+
+  nodejs:
+    build: ./FrontendUser
+    ports:
+      - "3000:3000"
+    networks:
+      - my_network
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"  # Porta per RabbitMQ
+      - "15672:15672" # Porta per la dashboard di management
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - my_network
+
+  producer:
+    build:
+      context: ./new-report/producer
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    depends_on:
+      - rabbitmq
+    networks:
+      - my_network
+    restart: always
+
 volumes:
-    db-data:
-        driver: local 
+  db-data:
+    driver: local
+
+networks:
+  my_network:
+    driver: bridge
