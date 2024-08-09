@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Report</title>
+</head>
+<body>
+    <h1>Animal Report</h1>
+    <form id="reportForm">
+        <label for="comment">Comment:</label><br>
+        <input type="text" id="comment" name="comment" required><br><br>
+
+        <label for="address">Address:</label><br>
+        <input type="text" id="address" name="address" required><br><br>
+
+        <button type="submit">Submit Report</button>
+    </form>
+
+    <p id="responseMessage"></p>
+
+    <script>
+        document.getElementById('reportForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const urlPath = window.location.pathname;  // Gets the current URL path
+            const pathSegments = urlPath.split('/');  // Splits the path into segments
+            const userId = pathSegments[1];  // Assumes user_id is the second part of the path
+
+            const address = document.getElementById('address').value;
+            const comment = document.getElementById('comment').value;
+            const date = new Date().toISOString(); // Current date in ISO format
+
+            const report = {
+                user_id: userId,
+                position: address,
+                date: date,
+                comment: comment
+            };
+
+            fetch('http://localhost:3001/message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(report)
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('responseMessage').textContent = data;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('responseMessage').textContent = 'An error occurred while sending the report.';
+            });
+        });
+    </script>
+</body>
+</html>

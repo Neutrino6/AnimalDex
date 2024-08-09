@@ -76,6 +76,8 @@
                 <ul class="dropdown-menu text-center">
                   <li><a class="dropdown-item" href="">Login</a></li>
                   <li><a class="dropdown-item" id="certificate_link" href="">Certificates</a></li>
+                  <li><a class="dropdown-item" id="alarm_link" href="">Reports</a></li>
+                  <!--<li><a class="dropdown-item" href="http://localhost:3000/ViewReport.html">View Reports</a></li>-->
                   <li><a class="dropdown-item" href="eventi.html">Events</a></li>
                   <li><form action =  "http://localhost:6039/Forum" class = "dropdown-item" method = "POST" id="forumform"> 
                     <input type="hidden" name="user_id" id="userIdInput" value="">
@@ -375,6 +377,8 @@
 
         var link = document.getElementById("certificate_link");
         link.href="http://localhost:7777/"+userId+"/certificates";
+        var link = document.getElementById("alarm_link");
+        link.href="http://localhost:3000/"+userId+"/sendAlarm";
         var linkMap = document.getElementById("map_link");
         linkMap.href="/PersonalPageMap/"+userId;
         // Ottieni l'user_id dall'URL
