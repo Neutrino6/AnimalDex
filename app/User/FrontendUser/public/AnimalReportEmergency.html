@@ -23,11 +23,16 @@
         document.getElementById('reportForm').addEventListener('submit', function(event) {
             event.preventDefault();
 
+            const urlPath = window.location.pathname;  // Gets the current URL path
+            const pathSegments = urlPath.split('/');  // Splits the path into segments
+            const userId = pathSegments[1];  // Assumes user_id is the second part of the path
+
             const address = document.getElementById('address').value;
             const comment = document.getElementById('comment').value;
             const date = new Date().toISOString(); // Current date in ISO format
 
             const report = {
+                user_id: userId,
                 position: address,
                 date: date,
                 comment: comment

@@ -160,7 +160,27 @@ app.get('/PersonalPageOperator/:opCode', async (req, res) => {
   }
 });  */
 
+app.get('/:userId/sendAlarm', async (req, res) => {
+  const userId = req.params.userId;
+  console.log(userId);
 
+  if (req.cookies && req.cookies.authCookie) {
+    const authCookie = req.cookies.authCookie;
+    if (!authCookie || !isValidAuthCookie(authCookie,userId)) {
+      return res.redirect('http://localhost:3000/LoginUser.html');
+    }
+  }
+  else{
+    return res.redirect('http://localhost:3000/LoginUser.html');
+  }
+  try {
+    res.sendFile(path.join(__dirname, './public/AnimalReportEmergency.html'));
+  } catch (error) {
+    // Gestione degli errori nel caso in cui la richiesta fallisca
+    console.error('Errore durante la richiesta al servizio:', error.message);
+    res.status(500).send('Errore durante la richiesta al servizio esterno');
+  }
+});
 
 
 /*così funziona, nel dubbio la lascerei così*/

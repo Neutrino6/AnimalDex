@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Display</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        .message-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .message-content {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: left;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .message-content p {
+            margin: 5px 0;
+        }
+        .ok-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .ok-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="message-title">Received Message</div>
+        <div class="message-content" id="messageContent">Loading message...</div>
+        <button class="ok-button" onclick="sendOk()">OK</button>
+    </div>
+
+    <script>
+        // Function to load the message from the server
+        function loadMessage() {
+            fetch('http://localhost:3002/consume')
+                .then(response => response.json()) // Parse the response as JSON
+                .then(data => {
+                    // Parse the nested JSON message
+                    let parsedMessage;
+                    try {
+                        parsedMessage = JSON.parse(data.message);
+                    } catch (error) {
+                        parsedMessage = { error: "Invalid message format" };
+                    }
+
+                    // Display the message content dynamically
+                    const messageContentDiv = document.getElementById('messageContent');
+                    messageContentDiv.innerHTML = Object.entries(parsedMessage).map(([key, value]) => {
+                        return `<p><strong>${key.replace('_', ' ')}:</strong> ${value}</p>`;
+                    }).join('');
+                })
+                .catch(error => {
+                    console.error('Error fetching message:', error);
+                    document.getElementById('messageContent').textContent = 'Failed to load message.';
+                });
+        }
+
+        // Load the message when the page loads
+        window.onload = loadMessage;
+
+        // Function to handle OK button click
+        function sendOk() {
+            alert('OK clicked!');
+            // You can add any action you want here, such as sending a request back to the server
+        }
+    </script>
+</body>
+</html>

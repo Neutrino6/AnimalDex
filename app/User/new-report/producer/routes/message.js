@@ -49,23 +49,24 @@ router.post('/', (req, res) => {
     return res.status(500).send('Channel is not available');
   }
 
-  const { position, comment } = req.body;
+  const { position, user_id,comment } = req.body;
   const date = new Date().toISOString(); // Generate current date in ISO format
 
-  if (typeof position !== 'string' || typeof comment !== 'string') {
-    return res.status(400).send('Invalid input format. Both position and comment must be strings.');
+  if (!user_id || !position || !date || !comment) {
+    return res.status(400).send('Invalid input format. All fields must be provided.');
   }
 
   // Construct the structured message
   const message = {
-    position,
-    date,
-    comment
+    user_id: user_id,
+    position: position,
+    date: date,
+    comment: comment
   };
 
   // Send the message to RabbitMQ queue
-  channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)), { persistent: true });
-  res.send(`Successfully sent message: ${JSON.stringify(message)}`);
+  channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)));
+  res.render('index', { response: `Successfully sent message: ${JSON.stringify(message)}` });
 });
 
 module.exports = router;

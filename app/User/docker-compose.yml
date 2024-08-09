@@ -77,6 +77,17 @@ services:
       - my_network
     restart: always
 
+  consumer:
+    build:
+      context: ./new-report/consumer
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    depends_on:
+      - rabbitmq
+    networks:
+      - my_network
+
 volumes:
   db-data:
     driver: local
