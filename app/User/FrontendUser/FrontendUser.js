@@ -160,8 +160,67 @@ app.get('/PersonalPageOperator/:opCode', async (req, res) => {
   }
 });  */
 
+app.get('/PersonalPageUser/PersonalPageMap/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  
+  //question-mark as default if no image found
+  const defaultImagePath = path.join(__dirname, './public/images/question-mark.jpg');
+    const getDefaultImageBase64 = () => {
+      try {
+        const imageBuffer = fs.readFileSync(defaultImagePath);
+        return imageBuffer.toString('base64');
+      } catch (err) {
+        console.error('Errore durante la lettura dell\'immagine di default:', err);
+        return '';
+      }
+    };
+    const BackgroundImagePath = path.join(__dirname, './public/images/italyMap.jpg');
+    const getBackgroundImageBase64 = () => {
+      try {
+        const imageBuffer = fs.readFileSync(BackgroundImagePath);
+        return imageBuffer.toString('base64');
+      } catch (err) {
+        console.error('Errore durante la lettura dell\'immagine di default:', err);
+        return '';
+      }
+    };
+  try {
+    // ask for images to mapController
+    const response = await axios.get(`http://host.docker.internal:7777/${userId}/map`);
+    const images = response.data;
+    let { north, center, south, islands } = images;
+
+    north = north || getDefaultImageBase64();
+    center = center || getDefaultImageBase64();
+    south = south || getDefaultImageBase64();
+    islands = islands || getDefaultImageBase64();
+
+    const background = getBackgroundImageBase64();
+    const filePath = path.join(__dirname, './public/Map.html');  //html page
+
+    fs.readFile(filePath, 'utf8', (err, data) => {
+      if (err) {
+        console.error('Errore durante la lettura del file HTML:', err);
+        return res.status(500).send('Errore durante la lettura del file HTML');
+      }
+
+      let modifiedHTML = data
+        .replace('<<northImage>>', `data:image/jpeg;base64,${north}`)
+        .replace('<<centerImage>>', `data:image/jpeg;base64,${center}`)
+        .replace('<<southImage>>', `data:image/jpeg;base64,${south}`)
+        .replace('<<islandsImage>>', `data:image/jpeg;base64,${islands}`)
+        .replace('<<background>>', `data:image/jpeg;base64,${background}`)
+        .replace('<<userid>>', JSON.stringify(userId));
 
 
+      // send images to html page
+      res.send(modifiedHTML);
+    });
+  } catch (error) {
+    console.error('Errore durante la richiesta al servizio:', error.message);
+    res.status(500).send('Errore durante la richiesta al servizio esterno');
+  }
+});
 
 /*così funziona, nel dubbio la lascerei così*/
 // Route per le richieste non gestite

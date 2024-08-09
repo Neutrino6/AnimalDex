@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Immagine da Base64</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: black;
+        }
+
+        #image-container {
+            position: relative;
+            width: 80vw;  /* Larghezza adattabile alla viewport */
+            height: 80vw; /* Altezza uguale alla larghezza per mantenere il quadrato */
+            max-width: 600px;
+            max-height: 600px;
+            border: 5px solid #333;
+            background-image: url('<<background>>');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 10px;
+        }
+
+        .circle {
+            position: absolute;
+            width: 20%; /* Dimensione in proporzione al contenitore */
+            height: 20%;
+            border-radius: 50%;
+            border: 3px solid #333;
+            overflow: hidden;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        #north-circle {
+            top: 8%;
+            left: 35%;
+            transform: translateX(-50%);
+        }
+
+        #east-circle {
+            top: 45%;
+            right: 40%;
+            transform: translateY(-50%);
+        }
+
+        #south-circle {
+            bottom: 25%;
+            left: 75%;
+            transform: translateX(-50%);
+        }
+
+        #west-circle {
+            top: 80%;
+            left: 30%;
+            transform: translateY(-50%);
+        }
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="javascript:history.back()">
+        <button class="back-button">Back</button>
+    </a>
+    <div id="image-container">
+        <div id="north-circle" class="circle">
+            <img id="north-img" src="<<northImage>>" />
+        </div>
+        
+        <div id="east-circle" class="circle">
+            <img id="east-img" src="<<centerImage>>" />
+        </div>
+        
+        <div id="south-circle" class="circle">
+            <img id="south-img" src="<<southImage>>" />
+        </div>
+        
+        <div id="west-circle" class="circle">
+            <img id="west-img" src="<<islandsImage>>" />
+        </div>
+    </div>
+</body>
+</html>
