@@ -159,7 +159,7 @@ app.get('/PersonalPageOperator/:opCode', async (req, res) => {
     res.status(500).send('Errore durante l\'eliminazione dell\'account.');
   }
 });  */
-app.get('/PersonalPageUser/PersonalPageMap/:userId', async (req, res) => {
+app.get('/PersonalPageMap/:userId', async (req, res) => {
   const userId = req.params.userId;
   
   //question-mark as default if no image found

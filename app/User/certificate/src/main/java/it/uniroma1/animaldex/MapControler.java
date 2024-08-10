@@ -33,7 +33,7 @@ public class MapControler {
     @RequestMapping("/{user_id}/map")
     public ResponseEntity<String> certificates(@PathVariable int user_id) {
         String base64North = getImageBase64(user_id, "North");
-            String base64Center = getImageBase64(user_id, "Center");
+            String base64Center = getImageBase64(user_id, "Central");
             String base64South = getImageBase64(user_id, "South");
             String base64Islands = getImageBase64(user_id, "Islands");
 
