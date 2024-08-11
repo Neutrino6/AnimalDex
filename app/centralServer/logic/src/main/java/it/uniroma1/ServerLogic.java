@@ -21,7 +21,7 @@ import java.io.IOException;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.Null;
+//import javax.validation.constraints.Null;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -591,7 +591,7 @@ public class ServerLogic {
         //FORUM-----------------------------------------------------------------
 
         @RequestMapping(value = "/addComment", method = RequestMethod.POST)
-        public String addComment(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "admin") Boolean admin, @RequestParam(value = "c_content") String c_content, 
+        public ModelAndView addComment(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "admin") Boolean admin, @RequestParam(value = "c_content") String c_content, 
                                 @RequestParam(value = "username") String username, @RequestParam(value = "date") String date, @RequestParam(value = "sort") String sort) {
 
             LocalDateTime date2 = null;
@@ -615,23 +615,13 @@ public class ServerLogic {
             jdbcTemplate.update(insertCommentQuery, source);
 
             // Costruisci una risposta HTML con uno script di redirezione POST
-            System.out.println(admin);
-            StringBuilder html = new StringBuilder();
-            html.append("<html>")
-                .append("<body onload='document.forms[\"postForm\"].submit()'>")
-                .append("<form name='postForm' method='post' action='http://localhost:6039/Forum'>")
-                .append("<input type='hidden' name='user_id' value='").append(userId).append("'/>")
-                .append("<input type='hidden' name='admin' value='").append(admin).append("'/>")
-                .append("<input type='hidden' name='sort' value='").append(sort).append("'/>")
-                .append("</form>")
-                .append("</body>")
-                .append("</html>");
+            //System.out.println(admin);
 
-            return html.toString();
+            return new ModelAndView("redirect:http://localhost:3000/Forum/"+userId+"/"+admin+"/"+sort);
         }
 
         @RequestMapping(value = "/addReply", method = RequestMethod.POST)
-        public String addReply(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "admin") Boolean admin, @RequestParam(value = "c_content") String c_content, 
+        public ModelAndView addReply(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "admin") Boolean admin, @RequestParam(value = "c_content") String c_content, 
                                        @RequestParam(value = "username") String username, @RequestParam(value = "date") String date, @RequestParam(value = "c_id") Integer c_id, @RequestParam(value = "sort") String sort) {
 
             LocalDateTime date2 = null;
@@ -659,38 +649,17 @@ public class ServerLogic {
 
             // Costruisci una risposta HTML con uno script di redirezione POST
             System.out.println(admin);
-            StringBuilder html = new StringBuilder();
-            html.append("<html>")
-                .append("<body onload='document.forms[\"postForm\"].submit()'>")
-                .append("<form name='postForm' method='post' action='http://localhost:6039/Forum'>")
-                .append("<input type='hidden' name='user_id' value='").append(userId).append("'/>")
-                .append("<input type='hidden' name='admin' value='").append(admin).append("'/>")
-                .append("<input type='hidden' name='sort' value='").append(sort).append("'/>")
-                .append("</form>")
-                .append("</body>")
-                .append("</html>");
-
-            return html.toString();
+            
+            return new ModelAndView("redirect:http://localhost:3000/Forum/"+userId+"/"+admin+"/"+sort);
         }
 
         @RequestMapping(value = "/deleteComment", method = RequestMethod.POST)
-        public String deleteComment(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "c_id") Integer c_id, @RequestParam(value = "admin") Boolean admin, @RequestParam(value = "sort") String sort) {
+        public ModelAndView deleteComment(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "c_id") Integer c_id, @RequestParam(value = "admin") Boolean admin, @RequestParam(value = "sort") String sort) {
             safeDeleteComment(c_id); 
 
             // Costruisci una risposta HTML con uno script di redirezione POST
             
-            StringBuilder html = new StringBuilder();
-            html.append("<html>")
-                .append("<body onload='document.forms[\"postForm\"].submit()'>")
-                .append("<form name='postForm' method='post' action='http://localhost:6039/Forum'>")
-                .append("<input type='hidden' name='user_id' value='").append(userId).append("'/>")
-                .append("<input type='hidden' name='admin' value='").append(admin).append("'/>")
-                .append("<input type='hidden' name='sort' value='").append(sort).append("'/>")
-                .append("</form>")
-                .append("</body>")
-                .append("</html>");
-
-            return html.toString();
+            return new ModelAndView("redirect:http://localhost:3000/Forum/"+userId+"/"+admin+"/"+sort);
         }
 
          @Transactional
@@ -707,26 +676,15 @@ public class ServerLogic {
         }
 
         @RequestMapping(value = "/deleteReply", method = RequestMethod.POST)
-        public String deleteReply(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "c_id") Integer c_id, @RequestParam(value = "admin") Boolean admin, @RequestParam(value = "sort") String sort) {
+        public ModelAndView deleteReply(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "c_id") Integer c_id, @RequestParam(value = "admin") Boolean admin, @RequestParam(value = "sort") String sort) {
             safeDeleteReply(c_id); 
 
             // Costruisci una risposta HTML con uno script di redirezione POST
             
-            StringBuilder html = new StringBuilder();
-            html.append("<html>")
-                .append("<body onload='document.forms[\"postForm\"].submit()'>")
-                .append("<form name='postForm' method='post' action='http://localhost:6039/Forum'>")
-                .append("<input type='hidden' name='user_id' value='").append(userId).append("'/>")
-                .append("<input type='hidden' name='admin' value='").append(admin).append("'/>")
-                .append("<input type='hidden' name='sort' value='").append(sort).append("'/>")
-                .append("</form>")
-                .append("</body>")
-                .append("</html>");
-
-            return html.toString();
+            return new ModelAndView("redirect:http://localhost:3000/Forum/"+userId+"/"+admin+"/"+sort);
         }
 
-         @Transactional
+        @Transactional
         private void safeDeleteReply(Integer c_id){
              MapSqlParameterSource source = new MapSqlParameterSource()
             .addValue("c_id", c_id);
@@ -740,7 +698,7 @@ public class ServerLogic {
         }
 
         @RequestMapping(value = "/modifyComment", method = RequestMethod.POST)
-        public String modifyComment(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "admin") Boolean admin, @RequestParam(value = "c_content") String c_content, 
+        public ModelAndView modifyComment(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "admin") Boolean admin, @RequestParam(value = "c_content") String c_content, 
                                 @RequestParam(value = "c_id") Integer c_id, @RequestParam(value = "modify_date") String date, @RequestParam(value = "sort") String sort) {
 
             LocalDateTime date2 = null;
@@ -765,22 +723,11 @@ public class ServerLogic {
 
             // Costruisci una risposta HTML con uno script di redirezione POST
             //System.out.println(admin);
-            StringBuilder html = new StringBuilder();
-            html.append("<html>")
-                .append("<body onload='document.forms[\"postForm\"].submit()'>")
-                .append("<form name='postForm' method='post' action='http://localhost:6039/Forum'>")
-                .append("<input type='hidden' name='user_id' value='").append(userId).append("'/>")
-                .append("<input type='hidden' name='admin' value='").append(admin).append("'/>")
-                .append("<input type='hidden' name='sort' value='").append(sort).append("'/>")
-                .append("</form>")
-                .append("</body>")
-                .append("</html>");
-
-            return html.toString();
+            return new ModelAndView("redirect:http://localhost:3000/Forum/"+userId+"/"+admin+"/"+sort);
         }
 
         @RequestMapping(value = "/modifyReply", method = RequestMethod.POST)
-        public String modifyReply(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "admin") Boolean admin, @RequestParam(value = "c_content") String c_content, 
+        public ModelAndView modifyReply(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "admin") Boolean admin, @RequestParam(value = "c_content") String c_content, 
                                 @RequestParam(value = "c_id") Integer c_id, @RequestParam(value = "modify_date") String date, @RequestParam(value = "sort") String sort) {
 
             LocalDateTime date2 = null;
@@ -805,25 +752,11 @@ public class ServerLogic {
 
             // Costruisci una risposta HTML con uno script di redirezione POST
             //System.out.println(admin);
-            StringBuilder html = new StringBuilder();
-            html.append("<html>")
-                .append("<body onload='document.forms[\"postForm\"].submit()'>")
-                .append("<form name='postForm' method='post' action='http://localhost:6039/Forum'>")
-                .append("<input type='hidden' name='user_id' value='").append(userId).append("'/>")
-                .append("<input type='hidden' name='admin' value='").append(admin).append("'/>")
-                .append("<input type='hidden' name='sort' value='").append(sort).append("'/>")
-                .append("</form>")
-                .append("</body>")
-                .append("</html>");
-
-            return html.toString();
+            return new ModelAndView("redirect:http://localhost:3000/Forum/"+userId+"/"+admin+"/"+sort);
         }
-
         
-            
-        
-        @RequestMapping(value = "/Forum", method = RequestMethod.POST)
-        public String Forum(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "admin") Boolean admin, @RequestParam(value = "sort") String sort) {
+        @RequestMapping(value = "/Forum")
+        public ResponseEntity<String> Forum(@RequestParam(value = "user_id") Integer userId, @RequestParam(value = "admin") Boolean admin, @RequestParam(value = "sort") String sort) throws JsonProcessingException {
 
                 MapSqlParameterSource source = new MapSqlParameterSource()
                     .addValue("user_id", userId);
@@ -834,7 +767,7 @@ public class ServerLogic {
 
                 if (Count == null || Count <= 0) {
                     // User not in db
-                    return "<html><body><h1>Error</h1><p>User not found in database</p></body></html>";
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("user not found");
                 }
 
                 // Recupera tutti i commenti e le risposte dal database, escludendo la password
@@ -865,36 +798,46 @@ public class ServerLogic {
                     replies.sort((e1, e2) -> ((Date) e1.get("c_date")).compareTo((Date) e2.get("c_date")));
                 } else if ("mostreplies".equals(sort)) {
                     comments.sort((e1, e2) -> Long.compare((Long) e2.get("reply_count"), (Long) e1.get("reply_count")));
-                    replies.sort((e1, e2) -> Long.compare((Long) e2.get("reply_count"), (Long) e1.get("reply_count")));
+                    //replies.sort((e1, e2) -> Long.compare((Long) e2.get("reply_count"), (Long) e1.get("reply_count")));
                 } else if ("leastreplies".equals(sort)) {
                     comments.sort((e1, e2) -> Long.compare((Long) e1.get("reply_count"), (Long) e2.get("reply_count")));
-                    replies.sort((e1, e2) -> Long.compare((Long) e1.get("reply_count"), (Long) e2.get("reply_count")));
+                    //replies.sort((e1, e2) -> Long.compare((Long) e1.get("reply_count"), (Long) e2.get("reply_count")));
                 }
 
 
 
                 StringBuilder html = new StringBuilder();
-
-
-                if(!admin) {
-                    html.append("<html>");
+                html.append("<html>");
                     html.append("<head><title>Animaldex Comment</title><style> .comment {background-color: green; color: white; } .reply {background-color: red; color: white; }</style></head>");
                     html.append("<body>");
                     html.append("<h1>Welcome to the Animaldex forum!!</h1>");
-                    html.append("<form action='/Forum' method='post'>")
-                        .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
-                        .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
-                        .append("<label for='sort'>Sort by:</label>")
-                        .append("<select name='sort' id='sort'>")
-                        .append("<option value='newest'>Newest</option>")
-                        .append("<option value='oldest'>Oldest</option>")
-                        .append("<option value='mostreplies'>Most Replies</option>")
-                        .append("<option value='leastreplies'>Least Replies</option>")
-                        .append("</select>")
-                        .append("<button type='submit'>Sort</button>")
-                        .append("</form>");
+                    html.append("<label for='sort'>Sort by:</label>")
+                    .append("<select name='sort' id='sort'>")
+                    .append("<option value='newest'>Newest</option>")
+                    .append("<option value='oldest'>Oldest</option>")
+                    .append("<option value='mostreplies'>Most Replies</option>")
+                    .append("<option value='leastreplies'>Least Replies</option>")
+                    .append("</select>")
+                    .append("<a id='sortLink' href=''>Sort</a>");
+                    html.append("<script type='text/javascript'>");
+                    html.append("document.addEventListener('DOMContentLoaded', function() {");
+                    html.append("   var sortSelect = document.getElementById('sort');");
+                    html.append("   var sortLink = document.getElementById('sortLink');");
+                    html.append("   var userId = '").append(userId).append("';");  // Inserisci il valore reale di userId
+                    html.append("   var admin = '").append(admin).append("';");    // Inserisci il valore reale di admin
+                    html.append("   function updateSortLink() {");
+                    html.append("       var sortValue = sortSelect.value;");
+                    html.append("       sortLink.href = 'http://localhost:3000/Forum/' + userId + '/' + admin + '/' + sortValue;");
+                    html.append("   }");
+                    html.append("   sortSelect.addEventListener('change', updateSortLink);");
+                    html.append("   updateSortLink();");  // Inizializza l'href del link
+                    html.append("});");
+                    html.append("</script>");
                     html.append("<table border='1'>");
 
+
+                if(!admin) {
+                    
                     for (Map<String, Object> comment : comments) {
                             html.append("<tr>")
                             .append("<th class='comment'>Comment</th>")
@@ -915,7 +858,7 @@ public class ServerLogic {
                             }
                             html.append("<td>");
                             if(comment.get("user_id").equals(userId)) {
-                                html.append("<form action='/modifyComment' method='post'>")
+                                html.append("<form action='http://localhost:6039/modifyComment' method='post'>")
                                 .append("<input type='hidden' name='c_id' value='").append(comment.get("c_id")).append("'>")
                                 .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
                                 .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
@@ -924,7 +867,7 @@ public class ServerLogic {
                                 .append("<textarea name='c_content' rows='4' cols='50' required></textarea><br>")
                                 .append("<button type='submit'>Modify comment</button>")
                                 .append("</form>")
-                                .append("<form action='/deleteComment' method='post'>")
+                                .append("<form action='http://localhost:6039/deleteComment' method='post'>")
                                 .append("<input type='hidden' name='c_id' value='").append(comment.get("c_id")).append("'>")
                                 .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
                                 .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
@@ -933,7 +876,7 @@ public class ServerLogic {
                                 .append("</form>");
                             }
                             //Add reply to comment section
-                            html.append("<form action='/addReply' method='post'>")
+                            html.append("<form action='http://localhost:6039/addReply' method='post'>")
                             .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
                             .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
                             .append("<textarea name='c_content' rows='4' cols='50' required></textarea><br>")
@@ -968,14 +911,14 @@ public class ServerLogic {
                                     }
                                     html.append("<td>");
                                     if(reply.get("user_id").equals(userId)) {
-                                        html.append("<form action='/deleteReply' method='post'>")
+                                        html.append("<form action='http://localhost:6039/deleteReply' method='post'>")
                                         .append("<input type='hidden' name='c_id' value='").append(reply.get("c_id_reply")).append("'>")
                                         .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
                                         .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
                                         .append("<input type='hidden' name='sort' value='").append(sort).append("'/>")
                                         .append("<button type='submit'>Delete reply</button>")
                                         .append("</form>")
-                                        .append("<form action='/modifyReply' method='post'>")
+                                        .append("<form action='http://localhost:6039/modifyReply' method='post'>")
                                         .append("<input type='hidden' name='c_id' value='").append(reply.get("c_id_reply")).append("'>")
                                         .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
                                         .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
@@ -996,23 +939,6 @@ public class ServerLogic {
                     html.append("</table>");
                 }
                 else {
-                    html.append("<html>");
-                    html.append("<head><title>Animaldex Comment</title><style> .comment {background-color: green; color: white; } .reply {background-color: red; color: white; }</style></head>");
-                    html.append("<body>");
-                    html.append("<h1>Welcome to the Animaldex forum!!</h1>");
-                    html.append("<form action='/Forum' method='post'>")
-                        .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
-                        .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
-                        .append("<label for='sort'>Sort by:</label>")
-                        .append("<select name='sort' id='sort'>")
-                        .append("<option value='newest'>Newest</option>")
-                        .append("<option value='oldest'>Oldest</option>")
-                        .append("<option value='mostreplies'>Most Replies</option>")
-                        .append("<option value='leastreplies'>Least Replies</option>")
-                        .append("</select>")
-                        .append("<button type='submit'>Sort</button>")
-                        .append("</form>");
-                    html.append("<table border='1'>");
 
                     for (Map<String, Object> comment : comments) {
                             html.append("<tr>")
@@ -1034,7 +960,7 @@ public class ServerLogic {
                             }
                             html.append("<td>");
                             if(comment.get("user_id").equals(userId)) {
-                                html.append("<form action='/modifyComment' method='post'>")
+                                html.append("<form action='http://localhost:6039/modifyComment' method='post'>")
                                 .append("<input type='hidden' name='c_id' value='").append(comment.get("c_id")).append("'>")
                                 .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
                                 .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
@@ -1044,7 +970,7 @@ public class ServerLogic {
                                 .append("<button type='submit'>Modify comment</button>")
                                 .append("</form>");
                             }
-                            html.append("<form action='/deleteComment' method='post'>")
+                            html.append("<form action='http://localhost:6039/deleteComment' method='post'>")
                             .append("<input type='hidden' name='c_id' value='").append(comment.get("c_id")).append("'>")
                             .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
                             .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
@@ -1052,7 +978,7 @@ public class ServerLogic {
                             .append("<button type='submit'>Delete comment</button>")
                             .append("</form>");
                             //Add reply to comment section
-                            html.append("<form action='/addReply' method='post'>")
+                            html.append("<form action='http://localhost:6039/addReply' method='post'>")
                             .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
                             .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
                             .append("<textarea name='c_content' rows='4' cols='50' required></textarea><br>")
@@ -1089,7 +1015,7 @@ public class ServerLogic {
                                         html.append("<td>").append(reply.get("modify_date")).append("</td>");
                                     }
                                     html.append("<td>")
-                                    .append("<form action='/deleteReply' method='post'>")
+                                    .append("<form action='http://localhost:6039/deleteReply' method='post'>")
                                     .append("<input type='hidden' name='c_id' value='").append(reply.get("c_id_reply")).append("'>")
                                     .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
                                     .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
@@ -1097,7 +1023,7 @@ public class ServerLogic {
                                     .append("<button type='submit'>Delete reply</button>")
                                     .append("</form>");
                                     if(reply.get("user_id").equals(userId)) {
-                                        html.append("<form action='/modifyReply' method='post'>")
+                                        html.append("<form action='http://localhost:6039/modifyReply' method='post'>")
                                         .append("<input type='hidden' name='c_id' value='").append(reply.get("c_id_reply")).append("'>")
                                         .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
                                         .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
@@ -1121,7 +1047,7 @@ public class ServerLogic {
                 }
                 // Aggiungi textarea e bottone per scrivere un commento e aggiungerlo al db
                 html.append("<h2>Add a new comment</h2>")
-                .append("<form action='/addComment' method='post'>")
+                .append("<form action='http://localhost:6039/addComment' method='post'>")
                 .append("<input type='hidden' name='user_id' value='").append(userId).append("'>")
                 .append("<input type='hidden' name='admin' value='").append(admin).append("'>")
                 .append("<textarea name='c_content' rows='4' cols='50' required></textarea><br>")
@@ -1142,8 +1068,17 @@ public class ServerLogic {
 
                 html.append("</body>");
                 html.append("</html>");
+
+                ObjectMapper mapper = new ObjectMapper();
+                ObjectNode responseJson = mapper.createObjectNode();
+
+                responseJson.put("forumResponse", html.toString());
                 
-                return html.toString();
+
+                String jsonResponse = mapper.writeValueAsString(responseJson);
+                return ResponseEntity.ok(jsonResponse);
+                
+                //return html.toString();
         }
     
     //OAUTH---------------------------------------------------------------------------------------------

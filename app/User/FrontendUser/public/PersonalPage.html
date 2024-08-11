@@ -65,31 +65,25 @@
 
           <div class="collapse navbar-collapse" id="target">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <li class="nav-item">
-                <a class="nav-link" id="map_link" href="">Map</a>
-              </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button"
-                data-bs-toggle="dropdown" aria-expanded="false">
-                  Menù
-                </a>
+              <li class="nav-item"><a class="nav-link" id="map_link" href="">Map</a></li>
+              <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Menù</a>
                 <ul class="dropdown-menu text-center">
                   <li><a class="dropdown-item" href="">Login</a></li>
                   <li><a class="dropdown-item" id="certificate_link" href="">Certificates</a></li>
                   <li><a class="dropdown-item" id="alarm_link" href="">Reports</a></li>
                   <!--<li><a class="dropdown-item" href="http://localhost:3000/ViewReport.html">View Reports</a></li>-->
-                  <li><a class="dropdown-item" href="eventi.html">Events</a></li>
-                  <li><form action =  "http://localhost:6039/Forum" class = "dropdown-item" method = "POST" id="forumform"> 
+                  <li><a class="dropdown-item" id="forum">Forum</a></li>
+                  <li><a class="dropdown-item" href="">Events</a></li>
+                    
+                    <!--<form action =  "http://localhost:6039/Forum" class = "dropdown-item" method = "POST" id="forumform"> 
                     <input type="hidden" name="user_id" id="userIdInput" value="">
                     <input type="hidden" name="admin" id="adminInput2" value="">
                     <input type="hidden" name="sort" id="sort" value="newest">
                     <button class = "transparent-button" name ="forum" type = "submit"> Forum </button>        
-                  </form></li>
-                  
-                  
+                  </form>-->
                 </ul>
-            </li>
-        </ul>
+              </li>
+            </ul>
         </div>
         </div>
      </div>
@@ -375,12 +369,14 @@
         rendiInputModificabili('PersPage', 'CredentialModify');
         const userId = getUserIdFromUrl();
 
-        var link = document.getElementById("certificate_link");
-        link.href="http://localhost:7777/"+userId+"/certificates";
-        var link = document.getElementById("alarm_link");
-        link.href="http://localhost:3000/"+userId+"/sendAlarm";
+        var certificatelink = document.getElementById("certificate_link");
+        certificatelink.href="http://localhost:7777/"+userId+"/certificates";
+        var alarmlink = document.getElementById("alarm_link");
+        alarmlink.href="http://localhost:3000/"+userId+"/sendAlarm";
         var linkMap = document.getElementById("map_link");
         linkMap.href="http://localhost:3000/PersonalPageMap/"+userId;
+        var linkForum = document.getElementById("forum");
+        linkForum.href="http://localhost:3000/Forum/"+userId+"/"+userData.admin+"/newest";
         // Ottieni l'user_id dall'URL
 
         // Assegna l'user_id all'input nascosto nella form

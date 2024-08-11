@@ -244,6 +244,47 @@ app.get('/:userId/sendAlarm', async (req, res) => {
   }
 });
 
+
+app.get('/Forum/:userId/:admin/:sort', async (req, res) => {
+  const userId = req.params.userId;
+  const admin = req.params.admin;
+  const sort = req.params.sort;
+  //console.log(userId);
+
+  if (req.cookies && req.cookies.authCookie) {
+    const authCookie = req.cookies.authCookie;
+    if (!authCookie || !isValidAuthCookie(authCookie,userId)) {
+      return res.redirect('http://localhost:3000/LoginUser.html');
+    }
+  }
+  else{
+    return res.redirect('http://localhost:3000/LoginUser.html');
+  }
+
+  try {
+    // Effettua la richiesta al servizio esterno
+    const response = await axios.get(`http://host.docker.internal:6039/Forum?user_id=${userId}&admin=${admin}&sort=${sort}`);
+    
+
+    // Ricevuta la risposta, puoi manipolarla come desideri
+    const forumData = response.data; // Supponendo che la risposta contenga i dati dell'utente
+    const forumResponse = forumData.forumResponse;
+
+    console.log(forumResponse);
+
+    // Mostra l'HTML in forumResponse
+    res.send(forumResponse);
+
+  } catch (error) {
+    // Gestione degli errori nel caso in cui la richiesta fallisca
+    console.error('Errore durante la richiesta al servizio:', error.message);
+    res.status(500).send('Errore durante la richiesta al servizio esterno');
+  }
+});
+
+
+
+
 /*così funziona, nel dubbio la lascerei così*/
 // Route per le richieste non gestite
 app.use((req, res, next) => {
