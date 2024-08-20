@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px; /* Aumentato per più spazio */
+            width: 100%;
+            box-sizing: border-box; /* Assicura che il padding non influisca sulla larghezza totale */
+        }
+
+        .chat-box {
+            border: 1px solid #ccc;
+            height: 300px;
+            overflow-y: auto; /* Assicura che solo l'overflow verticale sia scrollabile */
+            margin-bottom: 10px;
+            padding: 10px;
+            box-sizing: border-box; /* Assicura che il padding non influisca sull'altezza totale */
+        }
+
+        .message {
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 5px;
+            word-wrap: break-word; /* Per evitare che il testo esca dalla chatbox */
+        }
+
+        .message:last-child {
+            border-bottom: none;
+        }
+
+        .input-group {
+            margin-bottom: 10px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; /* Assicura che il padding non influisca sulla larghezza totale */
+        }
+
+        .input-group textarea {
+            resize: vertical; /* Permette di ridimensionare verticalmente */
+        }
+
+        .input-group button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .input-group button:hover {
+            background-color: #45a049;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="chat-box" id="chatBox">
+        <!-- Messages will be loaded here -->
+    </div>
+
+    <div class="input-group">
+        <label for="u_id">User ID (u_id):</label>
+        <input type="number" id="u_id" required>
+    </div>
+
+    <div class="input-group">
+        <label for="o_id">Operator ID (o_id):</label>
+        <input type="text" id="o_id" required>
+    </div>
+
+    <div class="input-group">
+        <label for="text">Message:</label>
+        <textarea id="text" rows="4"></textarea>
+    </div>
+
+    <div class="input-group">
+        <button onclick="addMessage()">Send Message</button>
+    </div>
+
+    <div class="input-group">
+        <button onclick="getMessages()">Load Messages</button>
+    </div>
+
+    <div class="input-group">
+        <button onclick="deleteMessages()">Delete Messages</button>
+    </div>
+
+    <div class="error" id="error"></div>
+</div>
+
+<script>
+    function getMessages() {
+        const u_id = document.getElementById('u_id').value;
+        const o_id = document.getElementById('o_id').value;
+        const errorDiv = document.getElementById('error');
+
+        if (!u_id && !o_id) {
+            errorDiv.textContent = "Please enter at least one of 'u_id' or 'o_id'.";
+            return;
+        }
+
+        fetch(`/getMessages?u_id=${u_id}&o_id=${o_id}`)
+            .then(response => response.json())
+            .then(data => {
+                const chatBox = document.getElementById('chatBox');
+                chatBox.innerHTML = ''; // Clear existing messages
+
+                if (Array.isArray(data) && data.length > 0) {
+                    data.forEach(message => {
+                        const messageDiv = document.createElement('div');
+                        messageDiv.classList.add('message');
+                        if (message.writer == 'operator'){
+                            messageDiv.innerHTML = `<strong>From ${message.o_id} to ${message.u_id}:</strong> ${message.text}`;
+                        }
+                        else{
+                            messageDiv.innerHTML = `<strong>From ${message.u_id} to ${message.o_id}:</strong> ${message.text}`;
+                        }
+                        chatBox.appendChild(messageDiv);
+                    });
+                } else {
+                    chatBox.innerHTML = '<p>No messages found.</p>';
+                }
+            })
+            .catch(error => {
+                errorDiv.textContent = "Error loading messages: " + error.message;
+            });
+    }
+
+    function addMessage() {
+        const u_id = document.getElementById('u_id').value;
+        const o_id = document.getElementById('o_id').value;
+        const text = document.getElementById('text').value;
+        const errorDiv = document.getElementById('error');
+
+        if (!u_id || !o_id || !text) {
+            errorDiv.textContent = "Please fill out all fields.";
+            return;
+        }
+
+        fetch('/sendMessage', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ u_id, o_id, text }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                getMessages(); // Reload messages after adding
+            })
+            .catch(error => {
+                errorDiv.textContent = "Error sending message: " + error.message;
+            });
+    }
+
+    function deleteMessages() {
+        const u_id = document.getElementById('u_id').value;
+        const o_id = document.getElementById('o_id').value;
+        const errorDiv = document.getElementById('error');
+
+        if (!u_id || !o_id) {
+            errorDiv.textContent = "Please enter both 'u_id' and 'o_id' to delete messages.";
+            return;
+        }
+
+        fetch(`/deleteMessages?u_id=${u_id}&o_id=${o_id}`, {
+            method: 'DELETE',
+        })
+            .then(response => response.json())
+            .then(data => {
+                getMessages(); // Reload messages after deletion
+            })
+            .catch(error => {
+                errorDiv.textContent = "Error deleting messages: " + error.message;
+            });
+    }
+</script>
+
+</body>
+</html>

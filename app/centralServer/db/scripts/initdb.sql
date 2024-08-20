@@ -106,6 +106,14 @@ CREATE TABLE alarm (
     OperatorEval evaluation
 );
 
+CREATE TABLE message (
+    u_id int references users(user_id),
+    o_id varchar(255) references operator(code),
+    c_date TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    writer varchar(10),
+    text varchar(2000)
+);
+
 INSERT INTO animal (a_name, details, regions, std_points) VALUES
     ('Wolf', 'The wolf is a carnivorous mammal that inhabits various regions across Italy.', 'Northern Italy, Central Italy, Southern Italy, Islands of Italy', 100),
     ('Sheep', 'The sheep is a domesticated ruminant mammal commonly found in agricultural regions of Northern Italy and Central Italy.', 'Northern Italy, Central Italy', 80),

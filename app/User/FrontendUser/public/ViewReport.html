@@ -53,22 +53,33 @@
         .ok-button:hover {
             background-color: #45a049;
         }
+        .response-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="message-title">Received Message</div>
         <div class="message-content" id="messageContent">Loading message...</div>
+        <textarea id="responseMessage" class="response-input" placeholder="Write your response here..."></textarea>
+        <input type="hidden" id="operatorId" value=""> <!-- Hidden field for the extracted ID -->
         <button class="ok-button" onclick="sendOk()">OK</button>
     </div>
 
     <script>
+        let currentDeliveryTag = null;
+
         // Function to load the message from the server
         function loadMessage() {
             fetch('http://localhost:3002/consume')
                 .then(response => response.json()) // Parse the response as JSON
                 .then(data => {
-                    // Parse the nested JSON message
+                    currentDeliveryTag = data.delivery_tag; // Store the delivery tag
                     let parsedMessage;
                     try {
                         parsedMessage = JSON.parse(data.message);
@@ -76,7 +87,6 @@
                         parsedMessage = { error: "Invalid message format" };
                     }
 
-                    // Display the message content dynamically
                     const messageContentDiv = document.getElementById('messageContent');
                     messageContentDiv.innerHTML = Object.entries(parsedMessage).map(([key, value]) => {
                         return `<p><strong>${key.replace('_', ' ')}:</strong> ${value}</p>`;
@@ -88,13 +98,61 @@
                 });
         }
 
+        // Function to extract the operator ID from the Referer URL
+        function extractOperatorId() {
+            const referer = document.referrer; // Get the referrer URL
+            const regex = /\/([a-f0-9\-]+)$/; // Regex to match the last part of the URL
+            const match = referer.match(regex);
+
+            if (match) {
+                return match[1]; // Return the captured group
+            } else {
+                console.error('Failed to extract operator ID from referer.');
+                return null;
+            }
+        }
+
         // Load the message when the page loads
-        window.onload = loadMessage;
+        window.onload = function() {
+            loadMessage();
+            const operatorId = extractOperatorId();
+            if (operatorId) {
+                document.getElementById('operatorId').value = operatorId; // Set the extracted ID in the hidden field
+            }
+        };
 
         // Function to handle OK button click
         function sendOk() {
-            alert('OK clicked!');
-            // You can add any action you want here, such as sending a request back to the server
+            const responseMessage = document.getElementById('responseMessage').value;
+            const operatorId = document.getElementById('operatorId').value;
+
+            if (!responseMessage) {
+                alert('Please enter a response message.');
+                return;
+            }
+
+            fetch('http://localhost:3002/acknowledge', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    delivery_tag: currentDeliveryTag,
+                    response_message: responseMessage,
+                    operator_id: operatorId // Include the operator ID in the POST request
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                // Optionally, clear the input and reload a new message
+                document.getElementById('responseMessage').value = '';
+                loadMessage(); // Load the next message
+            })
+            .catch(error => {
+                console.error('Error sending ACK:', error);
+                alert('Failed to send acknowledgment.');
+            });
         }
     </script>
 </body>

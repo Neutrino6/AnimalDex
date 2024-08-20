@@ -64,8 +64,11 @@ router.post('/', (req, res) => {
     comment: comment
   };
 
-  // Send the message to RabbitMQ queue
-  channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)));
+  // Send the message to RabbitMQ queue with persistence
+  channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)), {
+    persistent: true // Ensure the message is persistent
+  });
+
   res.render('index', { response: `Successfully sent message: ${JSON.stringify(message)}` });
 });
 

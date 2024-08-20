@@ -17,6 +17,7 @@ const pool = new Pool({
 */
 
 const app = express();
+app.use(express.json())
 app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, './public')));
@@ -314,6 +315,65 @@ function isValidAuthCookie(cookieValue, userId) {
   console.log(cookieValue === expectedOauthCookieValue);
   return cookieValue === expectedLoginCookieValue || cookieValue === expectedOauthCookieValue;
 }
+
+// Route per ottenere i messaggi
+app.get('/getMessages', async (req, res) => {
+  const { u_id, o_id } = req.query;
+
+  try {
+      const response = await axios.get('http://host.docker.internal:6039/getMessages', {
+          params: { u_id, o_id }
+      });
+      res.json(response.data);
+  } catch (error) {
+      console.error('Errore durante la richiesta al server esterno:', error.message);
+      res.status(500).json({ message: 'Errore durante la richiesta al server esterno' });
+  }
+});
+
+// Route per inviare un messaggio
+app.post('/sendMessage', async (req, res) => {
+  const { u_id, o_id, text } = req.body;
+  var writer;
+
+  if (req.cookies && req.cookies.authCookie) {
+    const authCookie = req.cookies.authCookie;
+    if (isValidAuthCookie(authCookie,u_id)) {
+      writer = 'user';
+    }
+    else{ 
+      writer = 'operator';
+    }
+  }
+  console.log(u_id,o_id,writer,text);
+  try {
+      const response = await axios.post('http://host.docker.internal:6039/sendMessage', {
+          u_id,
+          o_id,
+          writer,
+          text
+      });
+      res.json(response.data);
+  } catch (error) {
+      console.error('Errore durante l\'invio del messaggio:', error.message);
+      res.status(500).json({ message: 'Errore durante l\'invio del messaggio' });
+  }
+});
+
+// Route per eliminare i messaggi
+app.delete('/deleteMessages', async (req, res) => {
+  const { u_id, o_id } = req.query;
+
+  try {
+      const response = await axios.delete('http://host.docker.internal:6039/deleteMessages', {
+          params: { u_id, o_id }
+      });
+      res.json(response.data);
+  } catch (error) {
+      console.error('Errore durante l\'eliminazione dei messaggi:', error.message);
+      res.status(500).json({ message: 'Errore durante l\'eliminazione dei messaggi' });
+  }
+});
 
 /* ORIGINALE ALE
 app.use((req, res) => {
