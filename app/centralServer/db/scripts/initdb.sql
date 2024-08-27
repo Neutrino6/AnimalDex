@@ -114,6 +114,13 @@ CREATE TABLE message (
     text varchar(2000)
 );
 
+CREATE TABLE ranking(
+    u_id int references users(user_id),
+    o_id varchar(255) references operator(code),
+    eval int,
+    unique (u_id, o_id)
+);
+
 INSERT INTO animal (a_name, details, regions, std_points) VALUES
     ('Wolf', 'The wolf is a carnivorous mammal that inhabits various regions across Italy.', 'Northern Italy, Central Italy, Southern Italy, Islands of Italy', 100),
     ('Sheep', 'The sheep is a domesticated ruminant mammal commonly found in agricultural regions of Northern Italy and Central Italy.', 'Northern Italy, Central Italy', 80),

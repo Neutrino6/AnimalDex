@@ -61,6 +61,7 @@ public class MessageLogic {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error sending message: " + e.getMessage());
         }
     }
+
     
     @RequestMapping(value = "/getMessages", method = RequestMethod.GET)
     public ResponseEntity<?> getMessages(
@@ -115,4 +116,85 @@ public class MessageLogic {
         }
     }
 
+    @RequestMapping(value = "/saveRating", method = RequestMethod.POST)
+    public ResponseEntity<String> saveRating(@RequestBody String messageRequest) throws JsonProcessingException, IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode = mapper.readTree(messageRequest);
+        int u_id=0; 
+        int rating=0;
+        String o_id="";
+        if (jsonNode.has("user_id")) {
+            u_id = jsonNode.get("user_id").asInt();
+        }
+        if (jsonNode.has("operator_id")) {
+            o_id = jsonNode.get("operator_id").asText();
+        }
+        if (jsonNode.has("rating")) {
+            rating = jsonNode.get("rating").asInt();
+        }
+
+        String sql = "Select count(*) FROM ranking WHERE u_id = :u_id AND o_id = :o_id";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("u_id", u_id);
+        params.addValue("o_id", o_id);
+        try {
+            Integer count = jdbcTemplate.queryForObject(sql, params,Integer.class);
+            if (count == 0) {
+                String sql2 = "Insert into ranking (u_id, o_id, eval) values (:u_id, :o_id, :eval)";
+                MapSqlParameterSource params2 = new MapSqlParameterSource();
+                params2.addValue("u_id", u_id);
+                params2.addValue("o_id", o_id);
+                params2.addValue("eval", rating);
+                try {
+                    jdbcTemplate.update(sql2, params2);
+                    return ResponseEntity.ok("{\"message\":\"evaluation correctly inserted\"}");
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"message\":\"error inserting evaluation\"}");
+                }
+            } else {
+                String sql3 = "Update ranking set eval=:eval where u_id = :u_id and o_id = :o_id";
+                MapSqlParameterSource params3 = new MapSqlParameterSource();
+                params3.addValue("u_id", u_id);
+                params3.addValue("o_id", o_id);
+                params3.addValue("eval", rating);
+                try {
+                    jdbcTemplate.update(sql3, params3);
+                    return ResponseEntity.ok("{\"message\":\"evaluation correctly updated\"}");
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"message\":\"error inserting evaluation\"}");
+                }
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\\\"message\\\":\\\"Error while inserting message: \" + e.getMessage() + \"\\\"}");
+        }
+    }
+
+    @RequestMapping(value = "/getRating", method = RequestMethod.POST)
+    public ResponseEntity<?> getRating(@RequestBody String messageRequest) throws JsonProcessingException, IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode = mapper.readTree(messageRequest);
+        String o_id="";
+        if (jsonNode.has("id")) {
+            o_id = jsonNode.get("id").asText();
+        }
+        String sql = "Select eval FROM ranking WHERE o_id = :o_id";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("o_id", o_id);
+        try {
+            List<Integer> ratings = jdbcTemplate.queryForList(sql, params, Integer.class);
+            if (ratings.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No ratings found for the given ID");
+            }
+            double averageRating = ratings.stream()
+                                          .mapToInt(Integer::intValue)
+                                          .average()
+                                          .orElse(0.0);
+
+            // Restituisce la media in formato JSON
+            return ResponseEntity.ok(averageRating);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error to calculate the average: " + e.getMessage());
+        }
+    }
 }

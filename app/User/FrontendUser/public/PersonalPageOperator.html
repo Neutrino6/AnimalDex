@@ -15,6 +15,9 @@
 <!--  aggiungere modifica immagine e vedere come
 fare per modificare i vari campi -->
 
+    <script>
+
+    </script>
 
 </head>
 
@@ -157,8 +160,63 @@ fare per modificare i vari campi -->
     let operCodeInput = $("form #operCodeInput");
   
     $(operCodeInput).val(operCode);
+
+
   })
+  function updateStars(rating) {
+            const stars = document.querySelectorAll('#rating span');
+            stars.forEach((star, index) => {
+                if (index < Math.floor(rating)) {
+                    star.classList.add('selected');
+                } else {
+                    star.classList.remove('selected');
+                }
+            });
+
+            // Gestione dei mezzi
+            if (rating % 1 >= 0.5) {
+                stars[Math.floor(rating)].classList.add('selected');
+            }
+        }
+
+        // Funzione per ottenere il rating dal server
+        async function fetchRating() {
+          try {
+                const response = await fetch('/getRating', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: operCode }) // Usa l'ID appropriato
+                });
+
+                if (response.ok) {
+                    const averageRating = await response.json();
+                    console.log('Average Rating:', averageRating);
+
+                    // Aggiorna l'interfaccia utente con il rating
+                    updateStars(averageRating);
+                } else {
+                    console.error('Errore:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Errore nella fetch:', error);
+            }
+        }
+
+        // Fetch il rating quando la pagina viene caricata
+        window.onload = fetchRating;
   </script>
+<div id="container">
+  <h1 style="color:gold;">Operator rating</h1>
+  <div id="rating" class="rating">
+      <span>&#9733;</span>
+      <span>&#9733;</span>
+      <span>&#9733;</span>
+      <span>&#9733;</span>
+      <span>&#9733;</span>
+  </div>
+</div>
 
 <!-- delete account-->    
 <form action = "http://localhost:6039/deleteAccountOperator" class = "form-signin m-auto"

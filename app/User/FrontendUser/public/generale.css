@@ -47,6 +47,26 @@ body {
     
     /*fine caratteri*/
     
+    /* stelline */
+
+        #container{
+            text-align: center;
+        }
+
+        .rating {
+            justify-content: center;
+            display: flex;
+            font-size: 2rem;
+        }
+        .rating span {
+            color: gray;
+            cursor: pointer;
+        }
+        .rating span.selected {
+            color: gold;
+        }
+    
+    /* fine stelline*/
     
     /*menu*/
     
