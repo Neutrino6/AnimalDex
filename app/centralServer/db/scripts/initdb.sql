@@ -118,6 +118,7 @@ CREATE TABLE ranking(
     u_id int references users(user_id),
     o_id varchar(255) references operator(code),
     eval int,
+    eval_user int,
     unique (u_id, o_id)
 );
 

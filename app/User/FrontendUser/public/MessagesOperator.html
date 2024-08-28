@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .chat-box {
+            border: 1px solid #ccc;
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .message {
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 5px;
+            word-wrap: break-word;
+            cursor: pointer;
+        }
+
+        .message:last-child {
+            border-bottom: none;
+        }
+
+        .input-group {
+            margin-bottom: 10px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .input-group textarea {
+            resize: vertical;
+        }
+
+        .input-group button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .input-group button:hover {
+            background-color: #45a049;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: #2b7cff; /* Make highlighted text blue */
+        }
+        .rating span {
+            font-size: 2em;
+            cursor: pointer;
+            color: grey;
+        }
+
+        .rating span.selected {
+            color: gold;
+        }
+
+        .rating span:hover{
+            color: gold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="chat-box" id="chatBox">
+        <!-- Messages will be loaded here -->
+    </div>
+
+    <div class="input-group">
+        <label for="u_id">User ID (u_id):</label>
+        <input type="number" id="u_id" required>
+    </div>
+
+    <div class="input-group">
+        <label for="o_id">Operator ID (o_id):</label>
+        <input type="text" id="o_id" required>
+    </div>
+
+    <div class="input-group">
+        <label for="text">Message:</label>
+        <textarea id="text" rows="4"></textarea>
+    </div>
+
+    <div class="input-group">
+        <button onclick="addMessage()">Send Message</button>
+    </div>
+
+    <div class="input-group">
+        <button onclick="getMessages()">Load Messages</button>
+    </div>
+
+    <div class="input-group">
+        <button onclick="deleteMessages()">Delete Messages</button>
+    </div>
+
+    <div id="popup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background-color:white; padding:20px; border:1px solid black; z-index:1000;">
+    </div>
+
+    <div class="error" id="error"></div>
+</div>
+
+<script>
+    let selectedRating=0;
+    function getMessages() {
+        const u_id = document.getElementById('u_id').value;
+        const o_id = document.getElementById('o_id').value;
+        const errorDiv = document.getElementById('error');
+
+        if (!u_id && !o_id) {
+            errorDiv.textContent = "Please enter at least one of 'u_id' or 'o_id'.";
+            return;
+        }
+
+        fetch(`/getMessages?u_id=${u_id}&o_id=${o_id}`)
+            .then(response => response.json())
+            .then(data => {
+                const chatBox = document.getElementById('chatBox');
+                chatBox.innerHTML = ''; // Clear existing messages
+
+                if (Array.isArray(data) && data.length > 0) {
+                    data.forEach(message => {
+                        const messageDiv = document.createElement('div');
+                        messageDiv.classList.add('message');
+                        messageDiv.onclick = () => {
+                            document.getElementById('u_id').value = message.u_id;
+                            document.getElementById('o_id').value = message.o_id;
+                        };
+
+                        const senderId = `<span class="highlight">${message.writer === 'operator' ? message.o_id : message.u_id}</span>`;
+                        const receiverId = `<span class="highlight">${message.writer === 'operator' ? message.u_id : message.o_id}</span>`;
+                        
+                        messageDiv.innerHTML = `<strong>From ${senderId} to ${receiverId}:</strong> ${message.text}`;
+
+                        chatBox.appendChild(messageDiv);
+                    });
+                } else {
+                    chatBox.innerHTML = '<p>No messages found.</p>';
+                }
+            })
+            .catch(error => {
+                errorDiv.textContent = "Error loading messages: " + error.message;
+            });
+    }
+
+    function addMessage() {
+        const u_id = document.getElementById('u_id').value;
+        const o_id = document.getElementById('o_id').value;
+        const text = document.getElementById('text').value;
+        const errorDiv = document.getElementById('error');
+
+        if (!u_id || !o_id || !text) {
+            errorDiv.textContent = "Please fill out all fields.";
+            return;
+        }
+
+        fetch('/sendMessage', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ u_id, o_id, text }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                getMessages(); // Reload messages after adding
+            })
+            .catch(error => {
+                errorDiv.textContent = "Error sending message: " + error.message;
+            });
+    }
+
+    function deleteMessages() {
+        const u_id = document.getElementById('u_id').value;
+        const o_id = document.getElementById('o_id').value;
+        const errorDiv = document.getElementById('error');
+        const popupDiv = document.getElementById('popup');
+
+        if (!u_id || !o_id) {
+            errorDiv.textContent = "Please enter both 'u_id' and 'o_id' to delete messages.";
+            return;
+        }
+
+        fetch(`/deleteMessages?u_id=${u_id}&o_id=${o_id}`, {
+            method: 'DELETE',
+        })
+            .then(response => response.json())
+            .then(data => {
+                getMessages(); // Reload messages after deletion
+                popupDiv.innerHTML = `
+                <div class="popup-content">
+                    <h1>Messages Deleted Successfully</h1>
+                    <p>The messages for user ID ${u_id} and operator ID ${o_id} have been successfully deleted.</p>
+                        <p>Please rate your experience:</p>
+                        <div id="rating" class="rating">
+                            <span data-value="1">&#9733;</span>
+                            <span data-value="2">&#9733;</span>
+                            <span data-value="3">&#9733;</span>
+                            <span data-value="4">&#9733;</span>
+                            <span data-value="5">&#9733;</span>
+                        </div>
+                        <button onclick="submitRating()">Submit and Close</button>
+                </div>
+                <div id="error" style="color:red;"></div>
+                    <button onclick="closePopup()">Close</button>
+                </div>
+                `;
+                popupDiv.style.display = 'block';
+
+                addRatingListeners();
+            })
+            .catch(error => {
+                errorDiv.textContent = "Error deleting messages: " + error.message;
+            });
+    }
+
+    function addRatingListeners() {
+        selectedRating = 0;
+
+        document.querySelectorAll('#rating span').forEach(star => {
+            star.addEventListener('click', function() {
+                selectedRating = parseInt(this.getAttribute('data-value'));
+                highlightStars(selectedRating);
+            });
+        });
+
+        function highlightStars(rating) {
+            document.querySelectorAll('#rating span').forEach(star => {
+                star.classList.remove('selected');
+            });
+
+            document.querySelectorAll('#rating span').forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('selected');
+                }
+            });
+        }
+    }
+
+    function submitRating() {
+        const u_id = document.getElementById('u_id').value;
+        const o_id = document.getElementById('o_id').value;
+
+        if (!u_id || !o_id) {
+            alert("User ID and Operator ID are required.");
+            return;
+        }
+
+        if (selectedRating > 0) {
+            console.log("Rating submitted: " + selectedRating);
+
+            // Invia il rating al server
+            fetch('/saveRatingOperator', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    rating: selectedRating,
+                    user_id: u_id,
+                    operator_id: o_id
+                })
+            })
+            .then(response => {
+                // Controlla se la risposta è JSON
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.includes("application/json")) {
+                    return response.json();
+                } else {
+                    return response.text(); // Gestisci la risposta come testo se non è JSON
+                }
+            })
+            .then(data => {
+                if (typeof data === "string") {
+                    console.log("Response is not JSON:", data);
+                } else {
+                    console.log("Rating successfully submitted", data);
+                }
+                closePopup();
+            })
+            .catch(error => {
+                console.error('Error submitting rating:', error);
+                alert("There was an error submitting your rating. Please try again.");
+            });
+        } else {
+            alert("Please select a rating before submitting.");
+        }
+    }
+
+    function closePopup() {
+        document.getElementById('popup').style.display = 'none'; // Nascondi il pop-up
+    }
+</script>
+
+</body>
+</html>

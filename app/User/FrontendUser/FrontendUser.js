@@ -393,12 +393,46 @@ app.post('/saveRating', async (req, res) => {
   }
 });
 
+app.post('/saveRatingOperator', async (req, res) => {
+  const { user_id, operator_id, rating} = req.body;
+
+  console.log(user_id,operator_id,rating);
+  try {
+      const response = await axios.post('http://host.docker.internal:6039/saveRatingOperator', {
+          user_id,
+          operator_id,
+          rating
+      });
+      res.json(response.data);
+  } catch (error) {
+      console.error('Errore durante l\'invio del messaggio:', error.message);
+      console.error('Dettagli dell\'errore:', error.response ? error.response.data : error);
+      res.status(500).json({ message: 'Errore durante l\'invio del messaggio' });
+  }
+});
+
 app.post('/getRating', async (req, res) => {
   const {id} = req.body;
 
   console.log("Operator:"+id);
   try {
       const response = await axios.post('http://host.docker.internal:6039/getRating', {
+          id,
+      });
+      res.json(response.data);
+  } catch (error) {
+      console.error('Errore durante la richiesta del rating:', error.message);
+      console.error('Dettagli dell\'errore:', error.response ? error.response.data : error);
+      res.status(500).json({ message: 'Errore durante la richiesta del rating' });
+  }
+});
+
+app.post('/getRatingUser', async (req, res) => {
+  const {id} = req.body;
+
+  console.log("User:"+id);
+  try {
+      const response = await axios.post('http://host.docker.internal:6039/getRatingUser', {
           id,
       });
       res.json(response.data);

@@ -175,6 +175,17 @@
 
             <input type="hidden" name="user_id" id="userIdInput" value="">
     </form>
+
+    <div id="container">
+      <h1 style="color:gold;">User reporting's rating</h1>
+      <div id="rating" class="rating">
+          <span>&#9733;</span>
+          <span>&#9733;</span>
+          <span>&#9733;</span>
+          <span>&#9733;</span>
+          <span>&#9733;</span>
+      </div>
+    </div>
          
     <br><br><br>
     <!-- delete account-->    
@@ -452,6 +463,53 @@
           document.getElementById('adminform2').style.display = 'block';
         }
       });
+
+      // ranking stars management 
+
+      function updateStars(rating) {
+            const stars = document.querySelectorAll('#rating span');
+            stars.forEach((star, index) => {
+                if (index < Math.floor(rating)) {
+                    star.classList.add('selected');
+                } else {
+                    star.classList.remove('selected');
+                }
+            });
+
+            // Gestione dei mezzi
+            if (rating % 1 >= 0.5) {
+                stars[Math.floor(rating)].classList.add('selected');
+            }
+        }
+
+        // Funzione per ottenere il rating dal server
+        async function fetchRating() {
+          let userId=getUserIdFromUrl();
+          try {
+                const response = await fetch('/getRatingUser', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: userId}) // Usa l'ID appropriato
+                });
+
+                if (response.ok) {
+                    const averageRating = await response.json();
+                    console.log('Average Rating:', averageRating);
+
+                    // Aggiorna l'interfaccia utente con il rating
+                    updateStars(averageRating);
+                } else {
+                    console.error('Errore:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Errore nella fetch:', error);
+            }
+        }
+
+        // Fetch il rating quando la pagina viene caricata
+        window.onload = fetchRating;
     </script>
 
 
