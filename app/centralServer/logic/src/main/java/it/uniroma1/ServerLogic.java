@@ -22,6 +22,7 @@ import java.io.IOException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 //import javax.validation.constraints.Null;
+import javax.validation.constraints.Null;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -258,14 +259,34 @@ public class ServerLogic {
         System.out.println(strdob);
         Integer points = (Integer) userMap.get("points");
         Integer fav_animal = (Integer) userMap.get("fav_animal"); 
-        Boolean forum_not = (Boolean) userMap.get("forum_notify");
-        Boolean emergency_not = (Boolean) userMap.get("emergency_notify");
         Boolean admin = (Boolean) userMap.get("administrator");
         byte[] profileImage = (byte[]) userMap.get("profile_image");
         
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode responseJson = mapper.createObjectNode();
 
+        //Retrieve all animals and add them to the JSON response**
+        String animalQuery = "SELECT a.a_name FROM animal a ";
+        List<Map<String, Object>> animalList = jdbcTemplate.queryForList(animalQuery, source1);
+
+        // Iterating over the list of animals and adding each to the JSON response
+        for (int i = 0; i < animalList.size(); i++) {
+            String animalName = (String) animalList.get(i).get("a_name");
+            responseJson.put("animal" + (i+1), animalName);
+        }
+        String fav_animal_name;
+        if(fav_animal!=null) {
+            MapSqlParameterSource source2 = new MapSqlParameterSource().addValue("fav_animal", fav_animal);
+            String fav_animalQuery = "select a_name from animal where a_id = :fav_animal"; // Seleziona anche l'id dell'utente
+            // Recupera l'id e la password dell'utente dal database
+            Map<String, Object> fav_animalMap = jdbcTemplate.queryForMap(fav_animalQuery, source2);
+            fav_animal_name = (String) fav_animalMap.get("a_name");
+        }
+        else {
+            fav_animal_name = "No Favourite Animal Chosen";
+        }
+
+        responseJson.put("animalListSize", animalList.size());
         //responseJson.put("passw", passw);
         responseJson.put("username", username);
         responseJson.put("email", email);
@@ -274,10 +295,11 @@ public class ServerLogic {
         responseJson.put("points", points);
         responseJson.put("dob", strdob);
         responseJson.put("fav_animal", fav_animal);
-        responseJson.put("emergency_not", emergency_not);
-        responseJson.put("forum_not", forum_not);
+        responseJson.put("fav_animal_name", fav_animal_name);
         responseJson.put("profile_image", profileImage);
         responseJson.put("admin", admin);
+
+        
 
         String jsonResponse = mapper.writeValueAsString(responseJson);
         return ResponseEntity.ok(jsonResponse);
@@ -363,40 +385,44 @@ public class ServerLogic {
     @RequestParam(value = "username") String username, 
     @RequestParam(value = "name") String firstname, 
     @RequestParam(value = "surname") String surname, 
-    @RequestParam(value = "password") String password, 
     @RequestParam(value = "dateofbirth") String dob, 
-    @RequestParam(value = "animal") Integer animal, 
-    @RequestParam(value = "forum") Boolean forum, 
-    @RequestParam(value = "emergencies") Boolean emergencies) {
-        System.out.println(forum);
+    @RequestParam(value = "animal") Integer animal) {
         LocalDateTime dob2 = null;
         if(!dob.isEmpty()){
             dob+="T00:00:00";
             dob2 = LocalDateTime.parse(dob);
         }
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        password = encoder.encode(password);
         MapSqlParameterSource source = new MapSqlParameterSource()
         .addValue("user_id", userId)
         .addValue("email", email)
         .addValue("username", username)
         .addValue("firstname", firstname)
         .addValue("surname", surname)
-        .addValue("password", password)
         .addValue("dob", dob2)
-        .addValue("animal", animal)
-        .addValue("forum", forum)
-        .addValue("emergencies", emergencies);
+        .addValue("animal", animal);
         String updateQuery = "UPDATE users SET " +
                          "email = :email, " +
                          "username = :username, " +
                          "firstname = :firstname, " +
                          "surname = :surname, " +
-                         "passw = :password, " +
                          "birthday = :dob, " +
-                         "fav_animal = :animal, " +
-                         "forum_notify = :forum, " +
-                         "emergency_notify = :emergencies " +
+                         "fav_animal = :animal " +
+                         "WHERE user_id = :user_id";
+        jdbcTemplate.update(updateQuery, source);
+        return new ModelAndView("redirect:http://localhost:3000/Redirect/" + userId);
+    }
+
+    @RequestMapping(value = "/changePasswordUser", method = RequestMethod.POST)
+    public ModelAndView changeCredentialsUser(
+    @RequestParam(value = "user_id") Integer userId,
+    @RequestParam(value = "password") String password) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        password = encoder.encode(password);
+        MapSqlParameterSource source = new MapSqlParameterSource()
+        .addValue("user_id", userId)
+        .addValue("password", password);
+        String updateQuery = "UPDATE users SET " +
+                         "passw = :password " +
                          "WHERE user_id = :user_id";
         jdbcTemplate.update(updateQuery, source);
         return new ModelAndView("redirect:http://localhost:3000/Redirect/" + userId);

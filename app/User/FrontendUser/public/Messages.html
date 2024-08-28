@@ -106,6 +106,8 @@
             color: gold;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 <body>
 
@@ -116,7 +118,7 @@
 
     <div class="input-group">
         <label for="u_id">User ID (u_id):</label>
-        <input type="number" id="u_id" required>
+        <input type="text" id="u_id" required>
     </div>
 
     <div class="input-group">
@@ -147,8 +149,7 @@
     <div class="error" id="error"></div>
 </div>
 
-<script>
-    let selectedRating=0;
+<script type="text/javascript" language="javascript">
     function getMessages() {
         const u_id = document.getElementById('u_id').value;
         const o_id = document.getElementById('o_id').value;
@@ -337,6 +338,20 @@
     function closePopup() {
         document.getElementById('popup').style.display = 'none'; // Nascondi il pop-up
     }
+    function getUserIdFromUrl() {
+        const url = window.location.href;
+        const userIdIndex = url.lastIndexOf("/") + 1; // Trova l'indice dell'ultimo "/" nell'URL
+        const userId = url.substring(userIdIndex); // Estrai l'ID dell'utente dalla parte finale dell'URL
+        return userId;
+    }
+    $(document).ready(function() {
+        const userId = getUserIdFromUrl();
+        console.log("Valore user ID="+userId);
+        let userIdInput = $("#u_id");
+        $(userIdInput).val(userId);
+
+        let selectedRating = 0;
+    });
 </script>
 
 </body>

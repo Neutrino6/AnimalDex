@@ -7,10 +7,10 @@
     
     <link rel="stylesheet" href="../1 bootstrap/css/bootstrap.css" />
     <script src="../1 bootstrap/js/bootstrap.bundle.js"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link rel = "stylesheet" href = "../generale.css" />
 
-    <title> Personal Page </title>
+    <title> Operator Personal Page </title>
     
 <!--  aggiungere modifica immagine e vedere come
 fare per modificare i vari campi -->
@@ -37,24 +37,18 @@ fare per modificare i vari campi -->
           </button>
 
           <div class="collapse navbar-collapse" id="target">
+                
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <li class="nav-item">
-                <a class="nav-link" href="home.html">Home</a>
-              </li>
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button"
-                data-bs-toggle="dropdown" aria-expanded="false">
-                  Menù
-                </a>
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Menù</a>
                 <ul class="dropdown-menu text-center">
-                  <li><a class="dropdown-item" href="chisiamo.html">Chi siamo</a></li>
-                  <li><a class="dropdown-item" href="dovesiamo.html">Dove siamo</a></li>
-                  <li><a class="dropdown-item" href="corsi.html">Corsi</a></li>
-                  <li><a class="dropdown-item" href="http://localhost:3000/MessagesOperator.html">Messages</a></li>
-                  <li><a class="dropdown-item" href="http://localhost:3000/ViewReport.html">View reports</a></li>
-                  <li><a class="dropdown-item" href="contatti.html">Contatti</a></li>
+                  <li><a class="dropdown-item" id="changeAccount">Change Account</a> </li>
+                  <li><a class="dropdown-item" id="faq" href=""> FAQ </a></li>
+                  <li><a class="dropdown-item" id="messages" href=""> Messages </a></li>
+                  <li><a class="dropdown-item" id="reports" href=""> View reports </a></li>
                 </ul>
-            </li>
+              </li>
+            </ul>
         </ul>
         </div>
         </div>
@@ -64,12 +58,10 @@ fare per modificare i vari campi -->
 
 <br>
 <br>
-
-        <br>
+<br>
 
 <!-- form con tutti i dati-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script type="text/javascript" language="javascript">
+<script type="text/javascript" language="javascript">
       function getOperCodeFromUrl() {
         const url = window.location.href;
         const operCodeIndex = url.lastIndexOf("/") + 1; // Trova l'indice dell'ultimo "/" nell'URL
@@ -78,17 +70,21 @@ fare per modificare i vari campi -->
       }
 
       const operCode = getOperCodeFromUrl();
-      /*
-      const urlParams = new URLSearchParams(window.location.search);
-      // Recupera i valori dei parametri dall'URL
-      const email = urlParams.get('email');
-      //const opCode = urlParams.get('opCode');
-      const firstname = urlParams.get('firstname');
-      const surname = urlParams.get('surname');
-      const birthday = urlParams.get('dob');
-      */
       var operData = JSON.parse(`<<operData>>`);
       $(document).ready(function() {
+
+        var linkAccount= document.getElementById("changeAccount");
+        linkAccount.href="http://localhost:3000/ChangeAccount";
+
+        var linkMessages= document.getElementById("messages");
+        linkMessages.href="http://localhost:3000/MessagesOperator/"+operCode;
+
+        var linkFaq= document.getElementById("faq");
+        linkFaq.href="http://localhost:3000/FAQ/"+operCode;
+
+        var linkReports= document.getElementById("reports");
+        linkReports.href="http://localhost:3000/ReportsOperator/"+operCode;
+
         // Seleziona tutti gli input nella form
         let inputs = $("form :input");
 
@@ -99,18 +95,12 @@ fare per modificare i vari campi -->
         $(inputs[3]).val(operData.dob);
       });
       
-    </script>
-    <form action = "" class = "form-signin m-auto"
-        method = "POST" name = "iscrizione" onSubmit = "return validaIscrizione()">
+</script>
+    <form action = "" class = "form-signin m-auto" method = "POST" name = "iscrizione" onSubmit = "return validaIscrizione()">
 
-
-        
-            <input type="email" name="e-mail" 
-            placeholder = "E-mail"
-            class = "form-control">
-            
-            <a class="link" href="gallery.html">Change e-mail</a>
+            <input type="email" name="e-mail" placeholder = "E-mail" class = "form-control">
             <br><br>
+            <h2>Email</h2>
               
             <!--<input type="number" name="operatorcode"  
             placeholder = "Operator code"
@@ -119,38 +109,27 @@ fare per modificare i vari campi -->
             <br><br>-->
 
           
-            <input type="text" name="name" 
-                placeholder = "Name"
-                class = "form-control">
-                <a class="link" href="gallery.html">Change name</a>
+            <input type="text" name="name" placeholder = "Name" class = "form-control">
             <br><br>
+            <h2>Name</h2>
             
-            <input type="text" name="surname" 
-            placeholder = "Surname"
-            class = "form-control">
-            <a class="link" href="gallery.html">Change surname</a>
-        <br><br> 
+            <input type="text" name="surname" placeholder = "Surname" class = "form-control">
+            <br><br>
+            <h2>Surname</h2> 
 
         <!--<input type="password" name="password"
         placeholder = "Password" minlength="8" class = "form-control" required />
         <a class="link" href="gallery.html">Change password</a>
         <br><br>-->
 
-              <input type="date" name="dateofbirth"
-                class = "form-control">
-                <a class="link" href="gallery.html">Change date of birth</a>
-
-    <br><br>
+            <input type="date" name="dateofbirth" class = "form-control">
+            <br><br>
+            <h2>Date Of Birth</h2>
  
     </form>
 
-
-    <!-- pagina reports-->
-      
-    <h5 style="text-align: center;"><a class="link" href="Reports.html">View reports</a></h5>
-
 <br><br><br><br>
-<script>
+<script type="text/javascript" language="javascript">
   $(document).ready(function() {
     // Ottieni l'user_id dall'URL
     
@@ -206,7 +185,7 @@ fare per modificare i vari campi -->
 
         // Fetch il rating quando la pagina viene caricata
         window.onload = fetchRating;
-  </script>
+</script>
 <div id="container">
   <h1 style="color:gold;">Operator rating</h1>
   <div id="rating" class="rating">

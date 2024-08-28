@@ -68,19 +68,12 @@
               <li class="nav-item"><a class="nav-link" id="map_link" href="">Map</a></li>
               <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> Menù</a>
                 <ul class="dropdown-menu text-center">
-                  <li><a class="dropdown-item" href="">Login</a></li>
+                  <li><a class="dropdown-item" href="LoginUser.html">Change Account</a></li>
+                  <li><a class="dropdown-item" id="faq" href=""> FAQ </a></li>
                   <li><a class="dropdown-item" id="certificate_link" href="">Certificates</a></li>
                   <li><a class="dropdown-item" id="alarm_link" href="">Reports</a></li>
-                  <!--<li><a class="dropdown-item" href="http://localhost:3000/ViewReport.html">View Reports</a></li>-->
                   <li><a class="dropdown-item" id="forum">Forum</a></li>
-                  <li><a class="dropdown-item" href="http://localhost:3000/Messages.html">Messages</a></li>
-                    
-                    <!--<form action =  "http://localhost:6039/Forum" class = "dropdown-item" method = "POST" id="forumform"> 
-                    <input type="hidden" name="user_id" id="userIdInput" value="">
-                    <input type="hidden" name="admin" id="adminInput2" value="">
-                    <input type="hidden" name="sort" id="sort" value="newest">
-                    <button class = "transparent-button" name ="forum" type = "submit"> Forum </button>        
-                  </form>-->
+                  <li><a class="dropdown-item" id="messages" href="">Messages</a></li>
                 </ul>
               </li>
             </ul>
@@ -121,9 +114,9 @@
     </div>
 
     <form action = "http://localhost:6039/changeCredentialsUser" class = "form-signin m-auto" method = "POST" id = "PersPage" onSubmit = "return validaIscrizione()">
-            <input type="checkbox" id="CredentialModify" on>
-            <h5 style="color: aliceblue;"> Change my credentials</h5><br>
-            <button class = "custom-btn" name ="change" type = "submit"> Confirm credential changes </button>
+            <input type="checkbox" id="CredentialModify" on> Enable personal info edit 
+            <br>
+            <button class = "custom-btn" name ="change" type = "submit" id="infoChange" disabled> Confirm changes </button>
             <br><br>
 
             <input type="email" name="email"  id="email" placeholder = "Email" class = "form-control" readonly>
@@ -141,10 +134,6 @@
             <p>Surname</p>
             <br><br> 
 
-            <input type="password" name="password" id="password" placeholder = "Password" minlength="8" class = "form-control" readonly>
-            <p>Password</p>
-            <br><br>
-
             <textarea type="text" name="points" id="points" placeholder = "points" class = "form-control" readonly></textarea>
             <p>Current points</p>
             <br><br>
@@ -152,28 +141,27 @@
             <input type="date" name="dateofbirth" id="dob" class = "form-control" readonly>
             <p>Date of birth</p>
             <br><br>
-            <h5 style="color: aliceblue;">Favourite animal:</h5>
+            <h5 style="color: aliceblue;">Favourite animal:</h5> 
+            <h4 id="fav_animal_name"></h4>
+            <br>
+            <h5 style="color: aliceblue;">Choose another:</h5> 
             <br>
             <select name="animal" id="animal" disabled>
               <option></option>
-              <option value="1">Cane</option>
-              <option value="2">Gatto</option>
-              <option value="3">Lontra</option>
             </select>
             <br><br><br>
             <br>
-            <h5 style="color: aliceblue;"> Allow forum notification</h5><br>
-            <select name="forum" id="forum" disabled>
-              <option value="0">No</option>
-              <option value="1">Yes</option>
-            </select>
-            <h5 style="color: aliceblue;" > Allow emergencies notification</h5><br>
-            <select name="emergencies" id="emergencies" disabled>
-              <option value="0">No</option>
-              <option value="1">Yes</option>
-            </select>
-
             <input type="hidden" name="user_id" id="userIdInput" value="">
+    </form>
+
+    <form action = "http://localhost:6039/changePasswordUser" class = "form-signin m-auto" method = "POST" id = "PersPagePass" onSubmit = "return validaIscrizione()">
+      <input type="checkbox" id="PasswordModify" on> Enable password edit 
+      <br>
+      <button class = "custom-btn" name ="change" type = "submit" id="passChange" disabled> Confirm password change </button>
+      <br><br>
+      <input type="password" name="password" id="password" placeholder = "Password" minlength="4" class = "form-control" readonly>
+      <br><br>
+      <input type="hidden" name="user_id" id="userIdInput" value="">
     </form>
 
     <div id="container">
@@ -369,6 +357,15 @@
 
       $(document).ready(function() {
 
+        $('#CredentialModify').change(function() {
+          $('#infoChange').prop('disabled', !this.checked);
+        });
+        $('#PasswordModify').change(function() {
+          $('#passChange').prop('disabled', !this.checked);
+        });
+        rendiInputModificabili('PersPage', 'CredentialModify');
+        rendiInputModificabili('PersPagePass', 'PasswordModify');
+
         var userData = JSON.parse(`<<userData>>`);
         var winner = JSON.parse('<<winner>>');
         
@@ -376,16 +373,25 @@
         if(winner){
           document.getElementById("winner").innerHTML="<img src='../cup.jpg' alt='Cup' class='cup'>";
         }
-
-        rendiInputModificabili('PersPage', 'CredentialModify');
+        
+        
         const userId = getUserIdFromUrl();
+
+        var linkFaq= document.getElementById("faq");
+        linkFaq.href="http://localhost:3000/FAQ/"+userId;
 
         var certificatelink = document.getElementById("certificate_link");
         certificatelink.href="http://localhost:7777/"+userId+"/certificates";
+
         var alarmlink = document.getElementById("alarm_link");
         alarmlink.href="http://localhost:3000/"+userId+"/sendAlarm";
+
         var linkMap = document.getElementById("map_link");
         linkMap.href="http://localhost:3000/PersonalPageMap/"+userId;
+
+        var linkMessages= document.getElementById("messages");
+        linkMessages.href="http://localhost:3000/Messages/"+userId;
+
         var linkForum = document.getElementById("forum");
         linkForum.href="http://localhost:3000/Forum/"+userId+"/"+userData.admin+"/newest";
         // Ottieni l'user_id dall'URL
@@ -403,10 +409,12 @@
         let dob = $("form #dob");
         //let passw = $("form #passw");
         let animal = $("form #animal");
+        let fav_animal = $("form #fav_animal_name");
         let forum = $("form #forum");
         let emergency = $("form #emergencies");
         let admin = $("form #adminInput");
         let admin2 = $("form #adminInput2");
+        
 
         //let fileInput = $("form #profileImageDisplay")
 
@@ -419,9 +427,11 @@
         $(points).val(userData.points);
         $(dob).val(userData.dob);
         $(animal).val(userData.fav_animal);
+        $(fav_animal).text(userData.fav_animal_name);
         $(admin).val(userData.admin);
         $(admin2).val(userData.admin);
         //$(fileInput).val(userData.profileImage);
+
 
 
         // Imposta l'immagine di profilo
@@ -461,6 +471,14 @@
           document.getElementById('adminform').style.display = 'block';
           // Mostra la form
           document.getElementById('adminform2').style.display = 'block';
+        }
+
+        for(i=0; i<userData.animalListSize; i++) {        
+          const animalKey = `animal${i + 1}`;   
+          const $option = $('<option></option>')
+          $($option).val(i+1);
+          $($option).text(userData[animalKey]);
+          $(animal).append($option);
         }
       });
 

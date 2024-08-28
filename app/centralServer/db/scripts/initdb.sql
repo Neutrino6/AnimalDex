@@ -30,8 +30,6 @@ CREATE TABLE users (
     points int default 0,
     birthday date,
     fav_animal int references animal(a_id),
-    forum_notify boolean default false,
-    emergency_notify boolean default false,
     administrator boolean default false,
     profile_image bytea, -- Campo per memorizzare i dati binari dell'immagine del profilo
     unique(email)

@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="1 bootstrap/css/bootstrap.css" />
-    <script src="1 bootstrap/js/bootstrap.bundle.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <link rel = "stylesheet" href = "generale.css" />
     <title> FAQ </title>
     <style>
       .custom-btn {
@@ -30,54 +27,127 @@
       #adminform {
         display: none;    /* Nasconde la form di default */
       }
+      body {
+        background-color: #000000;
+        background-position: center;
+        background-size: cover;
+        background-attachment: fixed;
+        }
+    /* avatar e corona */
+        .avatar {
+          
+          display: block;
+          margin-left: auto;
+          margin-right: auto;
+          width: 200px;
+          height: 200px;
+          border-radius: 50%;
+        }
+        
+        img {
+          
+          width: 5%;
+        }
+    
+        /*caratteri*/
+        hr {
+            color:aliceblue;
+            border-top: 2px dotted;
+            width:50%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        div.descrizione {
+        
+            text-align: center;
+            color:aliceblue;
+        }
+        
+        
+        a {
+        
+            text-decoration: none;
+            font-size: 18px;
+            color:white;
+        }
+        
+        /*fine caratteri*/
+        
+        /* stelline */
+    
+            #container{
+                text-align: center;
+            }
+    
+            .rating {
+                justify-content: center;
+                display: flex;
+                font-size: 2rem;
+            }
+            .rating span {
+                color: gray;
+                cursor: pointer;
+            }
+            .rating span.selected {
+                color: gold;
+            }
+        
+        /* fine stelline*/
+        
+        /*menu*/
+        
+        .nav-item
+        {
+            text-decoration: none;
+            padding-left:60px;
+        }
+        
+        .dropdown
+        {
+            text-decoration: none;
+            padding-left:80px;
+        }
+        
+        .nav-link {
+            color:black;
+            font-size: 20px;
+            text-shadow: -1px 0 white,
+            0 1px white, 1px 0 white,
+            0 -1px white;
+            
+        }
+        
+        
+        /*fine menu*/
+        
+         
+        
+        /*da bootstrap */
+        
+        .form-signin {
+            max-width: 330px;
+            padding: 15px;
+          }
+          
+          
+          .form-signin .form-floating:focus-within {
+            z-index: 2;
+          } 
+          
+          .form-signin input[type="email"] {
+            margin-bottom: -1px;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 0;
+          }
+          
+          
+          /*fine bootstrap*/    
     </style>
 </head>
 
 <body>
 <!-- navbar in alto -->
-    <nav class="navbar navbar-expand-lg bg-light">
-        <div class="container-fluid">
-            <a id="logo" class="navbar-brand" href="#">
-                </a>
-
-            <div>
-          <button class="navbar-toggler" type="button"
-          data-bs-toggle="collapse" data-bs-target="#target"
-          aria-controls="target" aria-expanded="false"
-          aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-          </button>
-
-          <div class="collapse navbar-collapse" id="target">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <li class="nav-item">
-                <a class="nav-link" href="home.html">Home</a>
-              </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button"
-                data-bs-toggle="dropdown" aria-expanded="false">
-                  Menù
-                </a>
-                <ul class="dropdown-menu text-center">
-                  <li><a class="dropdown-item" href="chisiamo.html">Chi siamo</a></li>
-                  <li><a class="dropdown-item" href="dovesiamo.html">Dove siamo</a></li>
-                  <li><a class="dropdown-item" id="certificate_link" href="">Certificates</a></li>
-                  <li><a class="dropdown-item" href="Faq.html">FAQ</a></li>
-                  <li><a class="dropdown-item" href="eventi.html">Eventi</a></li>
-                  <li><a class="dropdown-item" href="contatti.html">Contatti</a></li>
-                </ul>
-            </li>
-        </ul>
-        </div>
-        </div>
-     </div>
-</nav>
-
-
-<br>
-<br>
-<br>
-
         
 <div class="container" style="color: aliceblue; text-align: center;">
     <h1> FAQ </h1>

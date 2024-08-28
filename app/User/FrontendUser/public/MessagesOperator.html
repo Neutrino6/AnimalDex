@@ -106,6 +106,8 @@
             color: gold;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 <body>
 
@@ -147,8 +149,13 @@
     <div class="error" id="error"></div>
 </div>
 
-<script>
-    let selectedRating=0;
+<script type="text/javascript" language="javascript">
+    function getOperCodeFromUrl() {
+        const url = window.location.href;
+        const operCodeIndex = url.lastIndexOf("/") + 1; // Trova l'indice dell'ultimo "/" nell'URL
+        const operCode= url.substring(operCodeIndex); // Estrai l'ID dell'utente dalla parte finale dell'URL
+        return operCode;
+      }
     function getMessages() {
         const u_id = document.getElementById('u_id').value;
         const o_id = document.getElementById('o_id').value;
@@ -333,10 +340,17 @@
             alert("Please select a rating before submitting.");
         }
     }
-
     function closePopup() {
         document.getElementById('popup').style.display = 'none'; // Nascondi il pop-up
     }
+    $(document).ready(function() {
+        const operCode = getOperCodeFromUrl();
+        console.log("Valore operCode="+operCode);
+        let operCodeInput = $("#o_id");
+        $(operCodeInput).val(operCode);
+
+        let selectedRating = 0;
+    });
 </script>
 
 </body>

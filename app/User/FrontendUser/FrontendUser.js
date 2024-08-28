@@ -283,6 +283,86 @@ app.get('/Forum/:userId/:admin/:sort', async (req, res) => {
   }
 });
 
+app.get('/Messages/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  console.log(userId);
+
+  if (req.cookies && req.cookies.authCookie) {
+    const authCookie = req.cookies.authCookie;
+    if (!authCookie || !isValidAuthCookie(authCookie,userId)) {
+      return res.redirect('http://localhost:3000/LoginUser.html');
+    }
+  }
+  else{
+    return res.redirect('http://localhost:3000/LoginUser.html');
+  }
+  try {
+    res.sendFile(path.join(__dirname, './public/Messages.html'));
+  } catch (error) {
+    // Gestione degli errori nel caso in cui la richiesta fallisca
+    console.error('Errore durante la richiesta al servizio:', error.message);
+    res.status(500).send('Errore durante la richiesta al servizio esterno');
+  }
+});
+
+app.get('/MessagesOperator/:operCode', async (req, res) => {
+  const operCode = req.params.operCode;
+  console.log(operCode);
+  try {
+    res.sendFile(path.join(__dirname, './public/MessagesOperator.html'));
+  } catch (error) {
+    // Gestione degli errori nel caso in cui la richiesta fallisca
+    console.error('Errore durante la richiesta al servizio:', error.message);
+    res.status(500).send('Errore durante la richiesta al servizio esterno');
+  }
+});
+
+app.get('/ReportsOperator/:operCode', async (req, res) => {
+  const operCode = req.params.operCode;
+  console.log(operCode);
+  try {
+    res.sendFile(path.join(__dirname, './public/ViewReport.html'));
+  } catch (error) {
+    // Gestione degli errori nel caso in cui la richiesta fallisca
+    console.error('Errore durante la richiesta al servizio:', error.message);
+    res.status(500).send('Errore durante la richiesta al servizio esterno');
+  }
+});
+
+app.get('/FAQ/:operCode', async (req, res) => {
+  const operCode = req.params.operCode;
+  console.log(operCode);
+  try {
+    res.sendFile(path.join(__dirname, './public/Faq.html'));
+  } catch (error) {
+    // Gestione degli errori nel caso in cui la richiesta fallisca
+    console.error('Errore durante la richiesta al servizio:', error.message);
+    res.status(500).send('Errore durante la richiesta al servizio esterno');
+  }
+});
+
+app.get('/FAQ/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  console.log(userId);
+  try {
+    res.sendFile(path.join(__dirname, './public/Faq.html'));
+  } catch (error) {
+    // Gestione degli errori nel caso in cui la richiesta fallisca
+    console.error('Errore durante la richiesta al servizio:', error.message);
+    res.status(500).send('Errore durante la richiesta al servizio esterno');
+  }
+});
+
+app.get('/ChangeAccount', async (req, res) => {
+  try {
+    res.sendFile(path.join(__dirname, './public/LoginOperator.html'));
+  } catch (error) {
+    // Gestione degli errori nel caso in cui la richiesta fallisca
+    console.error('Errore durante la richiesta al servizio:', error.message);
+    res.status(500).send('Errore durante la richiesta al servizio esterno');
+  }
+});
+
 
 
 
