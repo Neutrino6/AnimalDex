@@ -268,14 +268,19 @@ public class MessageLogic {
             if (ratings.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No ratings found for the given ID");
             }
-            double averageRating = ratings.stream()
+            else if(ratings == null){
+                double averageRating = 0;
+                return ResponseEntity.ok(averageRating);
+            }
+            else{
+                double averageRating = ratings.stream()
                                           .mapToInt(Integer::intValue)
                                           .average()
                                           .orElse(0.0);
 
-            // Restituisce la media in formato JSON
-            return ResponseEntity.ok(averageRating);
-
+                // Restituisce la media in formato JSON
+                return ResponseEntity.ok(averageRating);
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error to calculate the average: " + e.getMessage());
         }

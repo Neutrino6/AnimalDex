@@ -4,6 +4,93 @@
     <meta charset="UTF-8" />
     <title>Error</title>
 </head>
+<style>
+    /* body */
+    body{
+        background-color: #000000;
+        background-position: center;
+        background-size: cover;
+        background-attachment: fixed;
+    }
+
+    /* form */
+    form{
+        color:mediumslateblue;
+        text-align: center;
+        justify-content: center;
+        font-size: large;
+    }
+
+    /* back button */
+
+    .back-button {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .back-button:hover {
+        background-color: #0056b3;
+    }
+
+    /* bouns points */
+    .bonus-points {
+        color: green;
+    }
+
+    /*caratteri*/
+    hr {
+        color:aliceblue;
+        border-top: 2px dotted;
+        width:50%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    div.descrizione {
+    
+        text-align: center;
+        color:aliceblue;
+    }
+    
+    
+    a {
+        text-decoration: none;
+        font-size: 18px;
+        color:white;
+    }
+    
+    /*fine caratteri*/
+    
+    /* top */
+    #top {
+        top: 10;
+        text-align: center; 
+        background-color: #f8f8f8; 
+        width: 100%; 
+        padding: 10px 0; 
+        box-shadow: 0 2px 4px rgba(53, 54, 52, 0); 
+    }
+
+    #top a {
+        margin: 0 15px; 
+        text-decoration: none; 
+        color: #333; 
+        font-weight: bold; 
+    }
+
+    #top a:hover {
+        color: #007bff; 
+    }
+
+</style>
 <body>
     <p th:text="${error}"></p>
     <br>Please click <a th:href="${redirectUrl}">here</a> to be redirected.
