@@ -1,6 +1,6 @@
 # AnimalDex
   
-- Istruzioni per uso di docker (prova per visualizzare il database):
+- Istruzioni per uso di docker (visualizzare il database):
  1) Nella cartella di AnimalDex eseguire il comando "docker compose up --build";
  2) Una volta eseguito, le immagini di postgres e pgadmin4 saranno buildate e pronte all'uso;
  3) Andate nel browser e digitate nella barra delle url "localhost:5050";
