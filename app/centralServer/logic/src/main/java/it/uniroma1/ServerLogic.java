@@ -834,7 +834,150 @@ public class ServerLogic {
 
                 StringBuilder html = new StringBuilder();
                 html.append("<html>");
-                    html.append("<head><title>Animaldex Comment</title><style> .comment {background-color: green; color: white; } .reply {background-color: red; color: white; }</style></head>");
+                    html.append("<head><title>Animaldex Comment</title><style> .comment {background-color: green; color: white; } .reply {background-color: red; color: white; } body{\r\n" + //
+                                                    "    background-color: #000000;\r\n" + //
+                                                    "    background-position: center;\r\n" + //
+                                                    "    background-size: cover;\r\n" + //
+                                                    "    background-attachment: fixed;\r\n" + //
+                                                    "}\r\n" + //
+                                                    "\r\n" + //
+                                                    "/* form */\r\n" + //
+                                                    "form{\r\n" + //
+                                                    "    color:mediumslateblue;\r\n" + //
+                                                    "    text-align: center;\r\n" + //
+                                                    "    justify-content: center;\r\n" + //
+                                                    "    font-size: 30px;\r\n" + //
+                                                    "    font-weight: normal;\r\n" + //
+                                                    "    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;\r\n" + //
+                                                    "}\r\n" + //
+                                                    "\r\n" + //
+                                                    "/* back button */\r\n" + //
+                                                    "\r\n" + //
+                                                    ".back-button {\r\n" + //
+                                                    "    position: absolute;\r\n" + //
+                                                    "    top: 10px;\r\n" + //
+                                                    "    left: 10px;\r\n" + //
+                                                    "    background-color: #007bff;\r\n" + //
+                                                    "    color: white;\r\n" + //
+                                                    "    border: none;\r\n" + //
+                                                    "    border-radius: 5px;\r\n" + //
+                                                    "    padding: 10px 20px;\r\n" + //
+                                                    "    font-size: 16px;\r\n" + //
+                                                    "    cursor: pointer;\r\n" + //
+                                                    "    transition: background-color 0.3s;\r\n" + //
+                                                    "}\r\n" + //
+                                                    ".back-button:hover {\r\n" + //
+                                                    "    background-color: #0056b3;\r\n" + //
+                                                    "}\r\n" + //
+                                                    "\r\n" + //
+                                                    "/* bouns points */\r\n" + //
+                                                    ".bonus-points {\r\n" + //
+                                                    "    color: green;\r\n" + //
+                                                    "}\r\n" + //
+                                                    "\r\n" + //
+                                                    "/*caratteri*/\r\n" + //
+                                                    "hr {\r\n" + //
+                                                    "    color:aliceblue;\r\n" + //
+                                                    "    border-top: 2px dotted;\r\n" + //
+                                                    "    width:50%;\r\n" + //
+                                                    "    margin-left: auto;\r\n" + //
+                                                    "    margin-right: auto;\r\n" + //
+                                                    "}\r\n" + //
+                                                    "\r\n" + //
+                                                    "div.descrizione {\r\n" + //
+                                                    "\r\n" + //
+                                                    "    text-align: center;\r\n" + //
+                                                    "    color:aliceblue;\r\n" + //
+                                                    "}\r\n" + //
+                                                    "\r\n" + //
+                                                    "\r\n" + //
+                                                    "a {\r\n" + //
+                                                    "    text-decoration: none;\r\n" + //
+                                                    "    font-size: 18px;\r\n" + //
+                                                    "    color: skyblue;\r\n" + //
+                                                    "}\r\n" + //
+                                                    "\r\n" + //
+                                                    "h1{\r\n" + //
+                                                    "    color: white;\r\n" + //
+                                                    "    font-size: 30px;\r\n" + //
+                                                    "    font-weight: bold;\r\n" + //
+                                                    "    text-align: center;\r\n" + //
+                                                    "}\r\n" + //
+                                                    "/*fine caratteri*/\r\n" + //
+                                                    "\r\n" + //
+                                                    "/* top */\r\n" + //
+                                                    "#top {\r\n" + //
+                                                    "    top: 10;\r\n" + //
+                                                    "    text-align: center; \r\n" + //
+                                                    "    background-color: #f8f8f8; \r\n" + //
+                                                    "    width: 100%; \r\n" + //
+                                                    "    padding: 10px 0; \r\n" + //
+                                                    "    box-shadow: 0 2px 4px rgba(53, 54, 52, 0); \r\n" + //
+                                                    "}\r\n" + //
+                                                    "\r\n" + //
+                                                    "#top a {\r\n" + //
+                                                    "    margin: 0 15px; \r\n" + //
+                                                    "    text-decoration: none; \r\n" + //
+                                                    "    color: #333; \r\n" + //
+                                                    "    font-weight: bold; \r\n" + //
+                                                    "}\r\n" + //
+                                                    "\r\n" + //
+                                                    "#top a:hover {\r\n" + //
+                                                    "    color: #007bff; \r\n" + //
+                                                    "}\r\n" + //
+                                                    "\r\n" + //
+                                                    "/* table */\r\n" + //
+                                                    "\r\n" + //
+                                                    "table {\r\n" + //
+                                                    "    width: 100%;\r\n" + //
+                                                    "    border-collapse: collapse;\r\n" + //
+                                                    "    margin: 20px auto;\r\n" + //
+                                                    "    font-size: 16px;\r\n" + //
+                                                    "    font-family: 'Arial', sans-serif;\r\n" + //
+                                                    "    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);\r\n" + //
+                                                    "}\r\n" + //
+                                                    "\r\n" + //
+                                                    "table thead {\r\n" + //
+                                                    "    background-color: #007bff;\r\n" + //
+                                                    "    color: #ffffff;\r\n" + //
+                                                    "    text-align: left;\r\n" + //
+                                                    "}\r\n" + //
+                                                    "\r\n" + //
+                                                    "table thead th {\r\n" + //
+                                                    "    padding: 12px 15px;\r\n" + //
+                                                    "    text-transform: uppercase;\r\n" + //
+                                                    "}\r\n" + //
+                                                    "\r\n" + //
+                                                    "table tbody tr {\r\n" + //
+                                                    "    border-bottom: 1px solid #dddddd;\r\n" + //
+                                                    "}\r\n" + //
+                                                    "\r\n" + //
+                                                    "table tbody tr:nth-of-type(odd) {\r\n" + //
+                                                    "    background-color: #f3f3f3;\r\n" + //
+                                                    "}\r\n" + //
+                                                    "\r\n" + //
+                                                    "table tbody td {\r\n" + //
+                                                    "    padding: 12px 15px;\r\n" + //
+                                                    "    background-color: #e9ecef;\r\n" + //
+                                                    "}\r\n" + //
+                                                    "\r\n" + //
+                                                    "table tbody td a {\r\n" + //
+                                                    "    color: #007bff;\r\n" + //
+                                                    "    text-decoration: none;\r\n" + //
+                                                    "    font-weight: bold;\r\n" + //
+                                                    "}\r\n" + //
+                                                    "\r\n" + //
+                                                    "table tbody tr:hover {\r\n" + //
+                                                    "    background-color: #e9ecef;\r\n" + //
+                                                    "}\r\n" + //
+                                                    "\r\n" + //
+                                                    "table tbody td .empty{\r\n" + //
+                                                    "    background-color: #000000;\r\n" + //
+                                                    "}\r\n" + //
+                                                    "table tbody td a:hover {\r\n" + //
+                                                    "    text-decoration: underline;\r\n" + //
+                                                    "    color: #0056b3;\r\n" + //
+                                                    "}</style></head>");
                     html.append("<body>");
                     html.append("<h1>Welcome to the Animaldex forum!!</h1>");
                     html.append("<label for='sort'>Sort by:</label>")
@@ -916,7 +1059,7 @@ public class ServerLogic {
                             .append("</tr>");
                         for (Map<String, Object> reply : replies) {
                             if (reply.get("c_id_orig").equals(comment.get("c_id"))) {
-                                html.append("<td></td>") // Empty cell to indent the reply
+                                html//.append("<td class='empty'></td>") // Empty cell to indent the reply
                                     .append("<table border='1'>")
                                     .append("<tr>")
                                     .append("<th class='reply'>Reply</th>")
@@ -960,6 +1103,7 @@ public class ServerLogic {
                                     .append("</tr>");
                             }
                         }
+                        html.append("<br><br>");
                     }
 
                     html.append("</table>");

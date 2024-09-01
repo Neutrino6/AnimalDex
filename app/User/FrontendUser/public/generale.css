@@ -24,7 +24,7 @@ body {
 
     /*caratteri*/
     hr {
-        color:aliceblue;
+        color:white;
         border-top: 2px dotted;
         width:50%;
         margin-left: auto;
@@ -34,7 +34,7 @@ body {
     div.descrizione {
     
         text-align: center;
-        color:aliceblue;
+        color:white;
     }
     
     
