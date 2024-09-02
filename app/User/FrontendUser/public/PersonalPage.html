@@ -106,12 +106,34 @@
     <!-- Form per l'upload dell'immagine -->
      <div class="form-signin m-auto">
       <form action = "http://localhost:6039/changeProfileImage" method = "POST" id="profileImageForm" enctype="multipart/form-data">
-        <label for="profileImage">Select Profile Image (only png format, max 1MB):</label>
+        <label for="profileImage">Select Profile Image (max 1MB):</label>
         <input type="file" name="profile_image" id="profileImage" name="profileImage" accept="image/*">
         <input type="hidden" name="user_id" id="userIdInput" value="">
         <button type="submit" id="submitImage" value="Submit">Submit</button>
       </form>
     </div>
+
+    <!-- list of all users (only admin) -->
+    <form action =  "http://localhost:6039/UsersList" class = "form-signin m-auto" method = "POST" id="adminform"> 
+
+      <input type="hidden" name="user_id" id="userIdInput" value="">
+      <input type="hidden" name="admin" id="adminInput" value="">
+
+      <button class = "custom-btn-list" name ="list" type = "submit"> Show all subscribed users </button>    
+      <br>
+      <br>    
+    </form>
+    
+    <!-- list of all users (only admin) -->
+    <form action =  "http://localhost:6039/OpersList" class = "form-signin m-auto" method = "POST" id="adminform2"> 
+
+      <input type="hidden" name="user_id" id="userIdInput" value="">
+      <input type="hidden" name="admin" id="adminInput" value="">
+
+      <button class = "custom-btn-list" name ="list" type = "submit"> Show all subscribed opertators </button>    
+      <br>
+      <br>    
+    </form>
 
     <form action = "http://localhost:6039/changeCredentialsUser" class = "form-signin m-auto" method = "POST" id = "PersPage" onSubmit = "return validaIscrizione()">
             <input type="checkbox" id="CredentialModify" on> Enable personal info edit 
@@ -185,30 +207,6 @@
       <br>
       <br>    
     </form> 
-
-    <!-- list of all users (only admin) -->
-    <form action =  "http://localhost:6039/UsersList" class = "form-signin m-auto" method = "POST" id="adminform"> 
-
-      <input type="hidden" name="user_id" id="userIdInput" value="">
-      <input type="hidden" name="admin" id="adminInput" value="">
-
-      <button class = "custom-btn-list" name ="list" type = "submit"> Show all subscribed users </button>    
-      <br>
-      <br>    
-    </form>
-    
-    <!-- list of all users (only admin) -->
-    <form action =  "http://localhost:6039/OpersList" class = "form-signin m-auto" method = "POST" id="adminform2"> 
-
-      <input type="hidden" name="user_id" id="userIdInput" value="">
-      <input type="hidden" name="admin" id="adminInput" value="">
-
-      <button class = "custom-btn-list" name ="list" type = "submit"> Show all subscribed opertators </button>    
-      <br>
-      <br>    
-    </form>
-
-
 
 
 <!-- footer -->
