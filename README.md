@@ -15,6 +15,6 @@
  6) Una volta connessi, potrete trovare il database inizializzato con le tabelle specificate nel file init.sql.
 
 - Quando viene apportato un cambiamento in un file *.sql, se una volta eseguito il container nel servizio postgres si torva "Skipping initialization", allora bisogna assicurarsi di rimuovere manualmente i volumi che vengono utilizzati da quel container.
-  I voluni possono essere cancellati all'interno di Docker Desktop, ma può capitare che vi siano dei volumi ancora in uso che non sono possibili da eliminare. In tal caso esuguire "docker ps -a" e rimuovere i container che sono ancora in stato di running con    il comando "docker rm <nome-container/id-container>"; infine si possono quindi eliminare i volumi dall'interno dei Docker Desktop.
+  I volumi possono essere cancellati all'interno di Docker Desktop, ma può capitare che vi siano dei volumi ancora in uso che non sono possibili da eliminare. In tal caso esuguire "docker ps -a" e rimuovere i container che sono ancora in stato di running con    il comando "docker rm <nome-container/id-container>"; infine si possono quindi eliminare i volumi dall'interno dei Docker Desktop.
 - Se si vuole creare un admin, bisogna modificarlo direttamente nel database con la seguente query: "UPDATE users SET administrator = true WHERE user_id = {id_utente_scelto}".
 

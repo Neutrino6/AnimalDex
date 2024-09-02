@@ -481,7 +481,7 @@ public class ServerLogic {
             }
 
             // Recupera tutti gli utenti dal database, escludendo la password
-            String getUsersQuery = "SELECT user_id, email, username, firstname, surname, points, birthday, fav_animal, forum_notify, emergency_notify, administrator FROM users";
+            String getUsersQuery = "SELECT user_id, email, username, firstname, surname, points, birthday, fav_animal, administrator FROM users";
             List<Map<String, Object>> users = jdbcTemplate.queryForList(getUsersQuery, new MapSqlParameterSource());
 
             StringBuilder html = new StringBuilder();
@@ -499,8 +499,6 @@ public class ServerLogic {
                 .append("<th>Points</th>")
                 .append("<th>Birthday</th>")
                 .append("<th>Fav Animal</th>")
-                .append("<th>Forum Notify</th>")
-                .append("<th>Emergency Notify</th>")
                 .append("<th>Administrator</th>")
                 .append("</tr>");
 
@@ -514,8 +512,6 @@ public class ServerLogic {
                     .append("<td>").append(user.get("points")).append("</td>")
                     .append("<td>").append(user.get("birthday")).append("</td>")
                     .append("<td>").append(user.get("fav_animal")).append("</td>")
-                    .append("<td>").append(user.get("forum_notify")).append("</td>")
-                    .append("<td>").append(user.get("emergency_notify")).append("</td>")
                     .append("<td>").append(user.get("administrator")).append("</td>")
                     .append("<td>")
                     .append("<form action='/banUser' method='post'>")
@@ -903,6 +899,12 @@ public class ServerLogic {
                                                     "    font-weight: bold;\r\n" + //
                                                     "    text-align: center;\r\n" + //
                                                     "}\r\n" + //
+                                                    "h2{\r\n" + //
+                                                    "    color: white;\r\n" + //
+                                                    "    font-size: 30px;\r\n" + //
+                                                    "    font-weight: bold;\r\n" + //
+                                                    "    text-align: center;\r\n" + //
+                                                    "}\r\n" + //
                                                     "/*fine caratteri*/\r\n" + //
                                                     "\r\n" + //
                                                     "/* top */\r\n" + //
@@ -931,8 +933,8 @@ public class ServerLogic {
                                                     "table {\r\n" + //
                                                     "    width: 100%;\r\n" + //
                                                     "    border-collapse: collapse;\r\n" + //
-                                                    "    margin: 20px auto;\r\n" + //
-                                                    "    font-size: 16px;\r\n" + //
+                                                    "    margin: 18px auto;\r\n" + //
+                                                    "    font-size: 15px;\r\n" + //
                                                     "    font-family: 'Arial', sans-serif;\r\n" + //
                                                     "    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);\r\n" + //
                                                     "}\r\n" + //
@@ -944,20 +946,20 @@ public class ServerLogic {
                                                     "}\r\n" + //
                                                     "\r\n" + //
                                                     "table thead th {\r\n" + //
-                                                    "    padding: 12px 15px;\r\n" + //
+                                                    "    padding: 10px 12px;\r\n" + //
                                                     "    text-transform: uppercase;\r\n" + //
                                                     "}\r\n" + //
                                                     "\r\n" + //
                                                     "table tbody tr {\r\n" + //
                                                     "    border-bottom: 1px solid #dddddd;\r\n" + //
                                                     "}\r\n" + //
-                                                    "\r\n" + //
+                                                    "\r\n" + // 
                                                     "table tbody tr:nth-of-type(odd) {\r\n" + //
                                                     "    background-color: #f3f3f3;\r\n" + //
                                                     "}\r\n" + //
                                                     "\r\n" + //
                                                     "table tbody td {\r\n" + //
-                                                    "    padding: 12px 15px;\r\n" + //
+                                                    "    padding: 10px 12px;\r\n" + //
                                                     "    background-color: #e9ecef;\r\n" + //
                                                     "}\r\n" + //
                                                     "\r\n" + //
@@ -1002,13 +1004,10 @@ public class ServerLogic {
                     html.append("   updateSortLink();");  // Inizializza l'href del link
                     html.append("});");
                     html.append("</script>");
-                    html.append("<table border='1'>");
-
-
                 if(!admin) {
-                    
                     for (Map<String, Object> comment : comments) {
-                            html.append("<tr>")
+                            html.append("<table border='1'>")
+                            .append("<tr>")
                             .append("<th class='comment'>Comment</th>")
                             .append("<th class='comment'>Username</th>")
                             .append("<th class='comment'>Date</th>")
@@ -1060,7 +1059,7 @@ public class ServerLogic {
                         for (Map<String, Object> reply : replies) {
                             if (reply.get("c_id_orig").equals(comment.get("c_id"))) {
                                 html//.append("<td class='empty'></td>") // Empty cell to indent the reply
-                                    .append("<table border='1'>")
+                                    //.append("<table border='1'>")
                                     .append("<tr>")
                                     .append("<th class='reply'>Reply</th>")
                                     .append("<th class='reply'>Username</th>")
@@ -1103,15 +1102,14 @@ public class ServerLogic {
                                     .append("</tr>");
                             }
                         }
+                        html.append("</table>");
                         html.append("<br><br>");
                     }
-
-                    html.append("</table>");
                 }
                 else {
-
                     for (Map<String, Object> comment : comments) {
-                            html.append("<tr>")
+                            html.append("<table border='1'>")
+                            .append("<tr>")
                             .append("<th class='comment'>Comment</th>")
                             .append("<th class='comment'>Username</th>")
                             .append("<th class='comment'>Date</th>")
@@ -1166,8 +1164,7 @@ public class ServerLogic {
                             .append("</tr>");
                         for (Map<String, Object> reply : replies) {
                             if (reply.get("c_id_orig").equals(comment.get("c_id"))) {
-                                    html.append("<table border='1'>")
-                                    .append("<tr>")
+                                    html.append("<tr>")
                                     .append("<th class='reply'>Reply</th>")
                                     .append("<th class='reply'>Username</th>")
                                     .append("<th class='reply'>Date</th>")
@@ -1211,9 +1208,9 @@ public class ServerLogic {
                                     .append("</tr>");
                             }
                         }
+                        html.append("</table>");
+                        html.append("<br><br>");
                     }
-
-                    html.append("</table>");
                 }
                 // Aggiungi textarea e bottone per scrivere un commento e aggiungerlo al db
                 html.append("<h2>Add a new comment</h2>")
