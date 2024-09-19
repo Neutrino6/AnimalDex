@@ -219,9 +219,9 @@ public class CertificateLogic {
             String insertEvent = "INSERT INTO SpecialEvent (animal_id, StartDate, EndDate, BonusPoints) VALUES (:animal_id,:now,:end,:bonus);";
             jdbcTemplate.update(insertEvent,source3);
 
-            return new ModelAndView("redirect:http://localhost:7777/"+user_id+"/events?msg=OK");
+            return new ModelAndView("redirect:http://localhost:7777/"+user_id+"/newSpecialEvents?msg=OK");
         }
-        return new ModelAndView("redirect:http://localhost:7777/"+user_id+"/events?msg=KO");   
+        return new ModelAndView("redirect:http://localhost:7777/"+user_id+"/newSpecialEvents?msg=KO");   
     }
 
     @RequestMapping("getSpecialEvents")

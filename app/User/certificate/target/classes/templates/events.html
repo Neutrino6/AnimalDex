@@ -173,8 +173,8 @@
 </head>
 <body>
     <a th:href="${link1}"> Go back </a> <br>
-    <h3 th:text="${msg}"></h3>
-    <label>Insert a new event:</label><br>
+    <h3 th:text="${msg}" style="color: white;"></h3>
+    <label style="color: white;">Insert a new event:</label><br>
     <form action="http://localhost:6039/newSpecialEvent" method="post" enctype="multipart/form-data" onSubmit = "return check()">
         <input type="text" id="user_id" name="user_id" hidden required th:value="${userId}">
         <label for="end_date">Choose the end date:</label>
