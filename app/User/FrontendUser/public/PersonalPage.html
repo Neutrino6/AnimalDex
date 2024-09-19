@@ -136,7 +136,8 @@
     </form>
 
     <form action = "http://localhost:6039/changeCredentialsUser" class = "form-signin m-auto" method = "POST" id = "PersPage" onSubmit = "return validaIscrizione()">
-            <input type="checkbox" id="CredentialModify" on> Enable personal info edit 
+            <input type="checkbox"  id="CredentialModify" on> 
+            <label for="CredentialModify" style="color:white;">Enable personal info edit </label>
             <br>
             <button class = "custom-btn" name ="change" type = "submit" id="infoChange" disabled> Confirm changes </button>
             <br><br>
@@ -164,7 +165,7 @@
             <p>Date of birth</p>
             <br><br>
             <h5 style="color:white">Favourite animal:</h5> 
-            <h4 id="fav_animal_name"></h4>
+            <h4 id="fav_animal_name" style="color:white"></h4>
             <br>
             <h5 style="color:white">Choose another:</h5> 
             <br>
@@ -177,7 +178,8 @@
     </form>
 
     <form action = "http://localhost:6039/changePasswordUser" class = "form-signin m-auto" method = "POST" id = "PersPagePass" onSubmit = "return validaIscrizione()">
-      <input type="checkbox" id="PasswordModify" on> Enable password edit 
+      <input type="checkbox" style="color:white" id="PasswordModify" on> 
+      <label for="PasswordModify" style="color:white;">Enable password edit</label> 
       <br>
       <button class = "custom-btn" name ="change" type = "submit" id="passChange" disabled> Confirm password change </button>
       <br><br>

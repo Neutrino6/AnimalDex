@@ -16,6 +16,14 @@ body {
       height: 200px;
       border-radius: 50%;
     }
+
+    label {
+        color:white;
+    }
+
+    p{
+        color:white;
+    }
     
     img {
       
