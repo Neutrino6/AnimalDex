@@ -287,7 +287,7 @@ public class CertificatesController {
                 source3.addValue("cert_date", currentTime);
                 jdbcTemplate.update(updateCertificate, source3);
                 // Return HTML with image tag to display the uploaded image
-                return "<img src='data:image/jpeg;base64," + base64Image + "' alt='" + fileName + "'>" +
+                return "<img  style=\\\"width: 400px\\\" src='data:image/jpeg;base64," + base64Image + "' alt='" + fileName + "'>" +
                 "<p>File recognized as " + data + ". and has been updated at" + currentTime+ 
                 "<a href='http://localhost:7777/"+user_id+"/certificates'>Click here to insert a new certificate</a> <br></p>";
             }
@@ -302,7 +302,7 @@ public class CertificatesController {
                 jdbcTemplate.update(InsertCertificate, source2);
 
                 // Return HTML with image tag to display the uploaded image
-                return "<img src='data:image/jpeg;base64," + base64Image + "' alt='" + fileName + "'>" +
+                return "<img style=\"width: 400px\" src='data:image/jpeg;base64," + base64Image + "' alt='" + fileName + "'>" +
                 "<p>File recognized as " + data + ". <a href='http://localhost:7777/"+user_id+"/certificates'>Click here to insert a new certificate</a> <br></p>";
             }
         }
@@ -430,7 +430,7 @@ public class CertificatesController {
         byte[] imageBytes = jdbcTemplate.queryForObject(GetImage, source7, byte[].class);
         String base64Image = Base64.getEncoder().encodeToString(imageBytes);
 
-        return "<img src='data:image/jpeg;base64," + base64Image + "' alt='" + name + "'>"+
+        return "<img  style=\\\"width: 400px\\\" src='data:image/jpeg;base64," + base64Image + "' alt='" + name + "'>"+
         "<br> <a href='/"+user_id+"/certificates'> Go back to upload certificates </a> <br>"+
         "<a href='../certificates/list'> Go back to your certificates</a>";
     }
